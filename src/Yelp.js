@@ -4,6 +4,7 @@
 
 var config = require("./config");
 const https = require('https');
+const querystring = require('querystring');
 var categoryList = require('./categories');
 
 function SendYelpRequest(path, callback)
@@ -32,23 +33,24 @@ function SendYelpRequest(path, callback)
 
 function GetRestaurantList(location, latitude, longitude, categories, callback)
 {
-    var urlPath = "/v3/businesses/search?term=restaurants";
+    var urlPath = "/v3/businesses/search?term=restaurants&";
+    var params = {};
 
     // BUGBUG - Should we require location?
-    // Should we support latitude and longitude queries as well?
-    // UrlEncode this (querystring)
     if (location)
     {
-        urlPath += "&location=" + location;
+        params.location = location;
     }
     if (categories)
     {
-        urlPath += "&categories=" + categories;
+        params.categories = categories;
     }
     if (latitude && longitude)
     {
-        urlPath += "&latitude=" + latitude + "&longitude=" + longitude;
+        params.latitude = latitude;
+        params.longitude = longitude;
     }
+    urlPath += querystring.stringify(params)
 
     SendYelpRequest(urlPath, function(error, response) {
         if (error) {
