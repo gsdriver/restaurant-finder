@@ -1,7 +1,6 @@
 var config = {};
 
 // Local host settings
-config.appID = "Your YELP App ID";
-config.appSecret = "Your YELP App Secret";
+config.token = "Your Yelp token goes here";
 
 module.exports = config;
