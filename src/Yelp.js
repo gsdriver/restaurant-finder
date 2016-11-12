@@ -4,6 +4,7 @@
 
 var config = require("./config");
 const https = require('https');
+var categoryList = require('./categories');
 
 function SendYelpRequest(path, callback)
 {
@@ -29,7 +30,38 @@ function SendYelpRequest(path, callback)
     req.on('error', (e) => { callback(e, null); });
 }
 
-SendYelpRequest("/v3/autocomplete?text=del&latitude=37.786882&longitude=-122.399972", function(error, response) {
+function GetRestaurantList(location, latitude, longitude, categories, callback)
+{
+    var urlPath = "/v3/businesses/search?term=restaurants";
+
+    // BUGBUG - Should we require location?
+    // Should we support latitude and longitude queries as well?
+    // UrlEncode this (querystring)
+    if (location)
+    {
+        urlPath += "&location=" + location;
+    }
+    if (categories)
+    {
+        urlPath += "&categories=" + categories;
+    }
+    if (latitude && longitude)
+    {
+        urlPath += "&latitude=" + latitude + "&longitude=" + longitude;
+    }
+
+    SendYelpRequest(urlPath, function(error, response) {
+        if (error) {
+            callback(error, null);
+        }
+        else {
+            // Do some processing first
+            callback(error, response);
+        }
+    });
+}
+
+GetRestaurantList("Seattle", null, null, "afghani", function(error, response) {
     if (error) {
         console.log("Error " + error);
     } else {
