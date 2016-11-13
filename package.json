@@ -1,0 +1,30 @@
+{
+  "name": "restaurant-finder",
+  "version": "0.0.1",
+  "description": "Finds a restaurant based on customer input and Yelp reviews",
+  "main": "index.js",
+  "directories": {
+    "test": "test"
+  },
+  "dependencies": {
+    "aws-sdk": "^2.7.0"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "test\\app.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/gsdriver/restaurant-finder.git"
+  },
+  "keywords": [
+    "restaurant",
+    "Yelp"
+  ],
+  "author": "Garrett Vargas <gsdriver@live.com>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/gsdriver/restaurant-finder/issues"
+  },
+  "homepage": "https://github.com/gsdriver/restaurant-finder#readme"
+}

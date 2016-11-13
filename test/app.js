@@ -7,6 +7,7 @@ function BuildEvent(argv)
                     "SecondDescriptor": {"name": "SecondDescriptor", "value": ""},
                     "ThirdDescriptor": {"name": "ThirdDescriptor", "value": ""},
                     "Location": {"name": "Location", "value": ""}}};
+    var setLocation = {"name": "SetLocationIntent", "slots": {"Location": {"name": "Location", "value": ""}}};
 
     var lambda = {
        "session": {
@@ -61,7 +62,7 @@ function BuildEvent(argv)
     else if (argv[2] == "find")
     {
         lambda.request.intent = findRestaurant;
-        findRestaurant.slots.Location.value = (argv.length > 3) ? argv[3] : "Seattle";
+        //findRestaurant.slots.Location.value = (argv.length > 3) ? argv[3] : "Seattle";
         if (argv.length > 4)
         {
             findRestaurant.slots.FirstDescriptor.value = argv[4];
@@ -74,6 +75,11 @@ function BuildEvent(argv)
         {
             findRestaurant.slots.ThirdDescriptor.value = argv[6];
         }
+    }
+    else if (argv[2] == "location")
+    {
+        lambda.request.intent = setLocation;
+        setLocation.slots.Location.value = (argv.length > 3) ? argv[3] : "Seattle";
     }
     else
     {

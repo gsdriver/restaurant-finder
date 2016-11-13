@@ -1,0 +1,12 @@
+How the speech workflow works:
+
+- The user asks for restaurants fitting certain conditions
+   - We save the parameters of the request for future reference
+- If a location was not provided and one is not configured in the DB, we ask the user to do OOBE setup
+   - If the user agrees to setup, we store their location
+- A query is passed to Yelp which returns a list of restaurant results
+   - If the list is more than 5 results, we tell the user how many results and allow them to either provide an additional filter, or paginate the results 5 at a time
+   - If the user chooses to apply another filter, we append this to the previous filter and do another search
+   - If the user paginates results, we list the first five by name.  The user can either ask for more results, or can specify the number (1-5) of a restaurant to hear more details about
+   - If the user asks for more, we read more.  The user gets the same options (more or details)
+   - If the user asks for details on a restaurant, we provide the detailed information and the workflow finishes

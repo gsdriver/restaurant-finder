@@ -9,48 +9,46 @@ const querystring = require('querystring');
 module.exports = {
     ReadRestaurantResults : function(params, callback) {
         // First get the list of restaurants
-        GetRestaurantList(params, function(error, response) {
+        GetRestaurantList(params, function(error, restaurantList) {
             // OK, let them know how many results were found, and give them an option to filter
             if (error)
             {
-                callback(error, null, null, null);
+                callback(error, null, null, null, null);
             }
             else
             {
                 var speech, reprompt;
 
-console.log(JSON.stringify(response));
-
                 // If there are more than five results, prompt the user to filter further
-                if (response.total > 5)
+                if (restaurantList.total > 5)
                 {
-                    speech = "I found " + ((response.total > 100) ? "more than 100" : response.total) + " " + ParamsToText(params) + ". ";
+                    speech = "I found " + ((restaurantList.total > 100) ? "more than 100" : restaurantList.total) + " " + ParamsToText(params) + ". ";
                     reprompt = "Say an extra filter if you would like to narrow the list, or say Read List if you would like me to start reading the list.";
                     speech += reprompt;
-                    callback(null, null, speech, reprompt);
+                    callback(null, null, speech, reprompt, restaurantList);
                 }
-                else if (response.total > 0)
+                else if (restaurantList.total > 0)
                 {
                     // OK, read the names as allow them to ask for more detail on any choice
-                    speech = "I found " + response.total + " restaurants. ";
+                    speech = "I found " + restaurantList.total + " restaurants. ";
                     reprompt = "You can ask for more details on any of these restaurants by saying that restaurant number.";
 
                     speech += reprompt;
 
                     var i;
                     var ordinals = ["First", "Second", "Third", "Fourth", "Fifth"];
-                    for (i = 0; i < response.restaurants.length; i++)
+                    for (i = 0; i < restaurantList.restaurants.length; i++)
                     {
-                        speech += (" " + ordinals[i] + " result is " + response.restaurants[i].name + ".");
+                        speech += (" " + ordinals[i] + " result is " + restaurantList.restaurants[i].name + ".");
                     }
 
-                    callback(null, null, speech, reprompt);
+                    callback(null, null, speech, reprompt, restaurantList);
                 }
                 else
                 {
                     speech = "I'm sorry, I didn't find any " + ParamsToText(params);
 
-                    callback(null, speech, null, null);
+                    callback(null, speech, null, null, restaurantList);
                 }
             }
         });
@@ -96,15 +94,16 @@ function GetRestaurantList(params, callback)
 
     // BUGBUG - Should we do some validation on params?
     urlPath += querystring.stringify(params);
-    SendYelpRequest(urlPath, function(error, response) {
+    SendYelpRequest(urlPath, function(error, restaurantList) {
         if (error) {
             callback(error, null);
         }
         else {
-            // Do some processing first
-            var results = {total: response.total, restaurants: []};
+            // Save fields we care about from Yelp, also note the total number
+            // of restaurants and how many we've read to the user so far (0)
+            var results = {total: restaurantList.total, read: 0, restaurants: []};
 
-            response.businesses.forEach(restaurant => {
+            restaurantList.businesses.forEach(restaurant => {
                 let myResult = {};
 
                 myResult.name = restaurant.name;

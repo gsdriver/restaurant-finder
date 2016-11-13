@@ -27,6 +27,7 @@
 var AlexaSkill = require('./AlexaSkill');
 var yelp = require('./Yelp');
 var categoryList = require('./categories');
+var storage = require('./storage');
 
 var APP_ID = undefined; //"amzn1.ask.skill.8fb6e399-d431-4943-a797-7a6888e7c6ce";
 
@@ -54,13 +55,54 @@ RestaurantFinder.prototype.intentHandlers = {
         var params = BuildYelpParameters(intent);
         var error;
 
-        yelp.ReadRestaurantResults(params, function(speechError, speechResponse, speechQuestion, repromptQuestion) {
-            SendAlexaResponse(speechError, speechResponse, speechQuestion, repromptQuestion, response);
+        // First read in the last result in case we need to reference that instead
+        storage.loadUserData(session, function(userData) {
+            // If they didn't set a location in the request and we don't have one here, we
+            // will prompt the user for their current location
+            console.log("loaded " + JSON.stringify(userData));
+            if (!params.location && !userData.location)
+            {
+                var speech = "As a new user, please specify your location by saying Set Location.";
+
+                SendAlexaResponse(null, speech, null, null, response);
+                return;
+            }
+
+            // BUGBUG - we should check against the last query to see if this is a refinement
+
+            yelp.ReadRestaurantResults(params, function(speechError, speechResponse, speechQuestion, repromptQuestion, restaurantList) {
+                if (restaurantList)
+                {
+                    userData.lastRequestParams = params;
+                    userData.lastResponse = restaurantList;
+                    userData.save();
+                }
+
+                SendAlexaResponse(speechError, speechResponse, speechQuestion, repromptQuestion, response);
+            });
         });
     },
     // Location intent
     "SetLocationIntent" : function (intent, session, response) {
-        // To be filled in later
+        // If they have a location, we can use it
+        var locationSlot = intent.slots.Location;
+
+        if (!locationSlot || !locationSlot.value)
+        {
+            SendAlexaResponse("Please specify a location to set as your home location.", null, null, null, response);
+            return;
+        }
+
+        // They are specifying a location - we will set this in the DB - make sure to preserve
+        // any other entries associated with this user
+        storage.loadUserData(session, function(userData) {
+            userData.location = locationSlot.value;
+            userData.save((error) => {
+                var speech = "Home location set to " + locationSlot.value;
+
+                SendAlexaResponse(null, speech, null, null, response);
+            });
+        })
     },
     // Stop intent
     "AMAZON.StopIntent": function (intent, session, response) {
