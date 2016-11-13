@@ -108,6 +108,28 @@ RestaurantFinder.prototype.intentHandlers = {
             });
         })
     },
+    // Read list
+    "ReadListIntent" : function (intent, session, response) {
+        // We have to have a list to read
+        storage.loadUserData(session, function(userData) {
+            if (userData.lastResponse.read >= userData.lastResponse.restaurants.length) {
+                var speech = "You are at the end of the list. Please ask for a new set of restaurants.";
+
+                SendAlexaResponse(null, speech, null, null, response);
+            }
+            else
+            {
+                // OK, let's read
+                yelp.ReadRestaurantsFromList(userData.lastResponse, function(speech, reprompt) {
+                    // Awesome - now that we've read, we need to write this back out to the DB
+                    // in case there are more results to read
+                    userData.save((error) => {
+                        SendAlexaResponse(null, null, speech, reprompt, response);
+                    });
+                });
+            }
+        });
+    },
     // Stop intent
     "AMAZON.StopIntent": function (intent, session, response) {
         var speechOutput = "Goodbye";

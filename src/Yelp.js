@@ -29,20 +29,9 @@ module.exports = {
                 }
                 else if (restaurantList.total > 0)
                 {
-                    // OK, read the names as allow them to ask for more detail on any choice
-                    speech = "I found " + restaurantList.total + " restaurants. ";
-                    reprompt = "You can ask for more details on any of these restaurants by saying that restaurant number.";
-
-                    speech += reprompt;
-
-                    var i;
-                    var ordinals = ["First", "Second", "Third", "Fourth", "Fifth"];
-                    for (i = 0; i < restaurantList.restaurants.length; i++)
-                    {
-                        speech += (" " + ordinals[i] + " result is " + restaurantList.restaurants[i].name + ".");
-                    }
-
-                    callback(null, null, speech, reprompt, restaurantList);
+                    ReadRestaurantFromList(restaurantList, function(speech, reprompt) {
+                        callback(null, null, speech, reprompt, restaurantList);
+                    });
                 }
                 else
                 {
@@ -52,6 +41,27 @@ module.exports = {
                 }
             }
         });
+    },
+    ReadRestaurantsFromList : function(restaurantList, callback) {
+        var speech, reprompt;
+        var toRead = Math.min(restaurantList.restaurants.length - restaurantList.read, 5);
+
+        // OK, read the names as allow them to ask for more detail on any choice
+        speech = "Reading " + toRead + " restaurants. ";
+        reprompt = "You can ask for more details on any of these restaurants by saying that restaurant number";
+        reprompt += ((restaurantList.restaurants.length - restaurantList.read > 5) ? "or say More to hear more results. " : ". ");
+        speech += reprompt;
+
+        var i;
+        var ordinals = ["First", "Second", "Third", "Fourth", "Fifth"];
+        for (i = 0; i < toRead; i++)
+        {
+            speech += (" " + ordinals[i] + " result is " + restaurantList.restaurants[restaurantList.read + i].name + ".");
+        }
+        restaurantList.read += toRead;
+
+        // Return the speech and reprompt text
+        callback(speech, reprompt);
     }
 };
 

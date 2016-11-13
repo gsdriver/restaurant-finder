@@ -8,6 +8,7 @@ function BuildEvent(argv)
                     "ThirdDescriptor": {"name": "ThirdDescriptor", "value": ""},
                     "Location": {"name": "Location", "value": ""}}};
     var setLocation = {"name": "SetLocationIntent", "slots": {"Location": {"name": "Location", "value": ""}}};
+    var readList = {"name": "ReadListIntent", "slots": {}};
 
     var lambda = {
        "session": {
@@ -87,6 +88,10 @@ function BuildEvent(argv)
     {
         lambda.request.intent = setLocation;
         setLocation.slots.Location.value = (argv.length > 3) ? argv[3] : "Seattle";
+    }
+    else if (argv[2] == "readlist")
+    {
+        lambda.request.intent = readList;
     }
     else
     {
