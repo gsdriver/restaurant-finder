@@ -9,6 +9,7 @@ function BuildEvent(argv)
                     "Location": {"name": "Location", "value": ""}}};
     var setLocation = {"name": "SetLocationIntent", "slots": {"Location": {"name": "Location", "value": ""}}};
     var readList = {"name": "ReadListIntent", "slots": {}};
+    var restaurantDetails = {"name": "DetailsIntent", "slots": {"RestaurantID": {"name": "RestaurantID", "value": ""}}};
 
     var lambda = {
        "session": {
@@ -92,6 +93,11 @@ function BuildEvent(argv)
     else if (argv[2] == "readlist")
     {
         lambda.request.intent = readList;
+    }
+    else if (argv[2] == "details")
+    {
+        lambda.request.intent = restaurantDetails;
+        restaurantDetails.slots.RestaurantID.value = (argv.length > 4) ? argv[4] : 1;
     }
     else
     {

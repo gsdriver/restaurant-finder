@@ -130,6 +130,24 @@ RestaurantFinder.prototype.intentHandlers = {
             }
         });
     },
+    // Details on a specific restaurant
+    "DetailsIntent" : function (intent, session, response) {
+        var idSlot = intent.slots.RestaurantID;
+
+        if (!idSlot || !idSlot.value)
+        {
+            SendAlexaResponse("I'm sorry, I didn't hear a number of the restaurant you wanted details about.", null, null, null, response);
+            return;
+        }
+
+        // They need to have a list to read details from
+        storage.loadUserData(session, function(userData) {
+            // OK, let's get the details
+            yelp.ReadResturantDetails(userData.lastResponse, idSlot.value, function(error, speechResponse, speechReprompt, reprompt) {
+                SendAlexaResponse(error, speechResponse, speechReprompt, reprompt, response);
+            });
+        });
+    },
     // Stop intent
     "AMAZON.StopIntent": function (intent, session, response) {
         var speechOutput = "Goodbye";

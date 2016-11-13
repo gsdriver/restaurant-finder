@@ -62,6 +62,53 @@ module.exports = {
 
         // Return the speech and reprompt text
         callback(speech, reprompt);
+    },
+    ReadResturantDetails : function(restaurantList, indexToRead, callback) {
+        // I have to have read some results first
+        if (restaurantList.restaurants.length == 0)
+        {
+            callback(null, "Please ask for a set of restaurants before asking for details them.", null, null);
+        }
+        else if (restaurantList.read == 0)
+        {
+            callback(null, "Please ask to start reading the list before asking for details about restaurants on the list.", null, null);
+        }
+        else
+        {
+            // Let's figure out where exactly we should be reading - read is what we've read up thru
+            var toRead;
+
+            toRead = restaurantList.read - (5 * Math.floor(restaurantList.read / 5)) + indexToRead;
+
+            if (toRead >= restaurantList.restaurants.length)
+            {
+                var speechReprompt, reprompt;
+
+                speechReprompt = indexToRead + " is not a valid option to read.";
+                reprompt = "Please ask for a valid number or say repeat to repeat the list.";
+                speechReprompt += (" " + reprompt);
+                callback(null, null, speechReprompt, reprompt);
+            }
+            else
+            {
+                // OK, this should be good
+                var restaurant = restaurantList.restaurants[toRead];
+                var priceList = ["cheap", "moderate", "spendy", "splurge"];
+
+                // Read information about the restaurant
+                speech = restaurant.name + " is located at " + restaurant.location.address1 + " in " + restaurant.location.city;
+                speech += (". It has a Yelp rating of " + restaurant.rating + " based on " + restaurant.review_count + " reviews.");
+                if (restaurant.price)
+                {
+                    speech += (" It is a " + priceList[restaurant.price - 1] + " option.");
+                }
+                if (restaurant.phone)
+                {
+                    speech += (" The phone number is " + restaurant.phone);
+                }
+                callback(speech);
+            }
+        }
     }
 };
 
@@ -122,7 +169,7 @@ function GetRestaurantList(params, callback)
                 myResult.rating = restaurant.rating;
                 myResult.review_count = restaurant.review_count;
                 myResult.is_closed = restaurant.is_closed;
-                myResult.price = restaurant.price;
+                myResult.price = (restaurant.price) ? Math.max(restaurant.price.length, 4) : 0;
                 myResult.distance = restaurant.distance;
 
                 results.restaurants.push(myResult);
