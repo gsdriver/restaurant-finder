@@ -1,0 +1,55 @@
+{
+  "intents": [
+    {
+      "intent": "FindRestaurantIntent",
+      "slots": [
+      {
+        "name": "FirstDescriptor",
+        "type": "LIST_OF_DESCRIPTORS"
+      },
+      {
+        "name": "SecondDescriptor",
+        "type": "LIST_OF_DESCRIPTORS"
+      },
+      {
+        "name": "ThirdDescriptor",
+        "type": "LIST_OF_DESCRIPTORS"
+      },
+      {
+        "name": "Location",
+        "type": "AMAZON.US_CITY"
+      }
+     ]
+    },
+    {
+      "intent": "SetLocationIntent",
+      "slots": [
+        {
+          "name": "Location",
+          "type": "AMAZON.US_CITY"
+        }
+      ]
+    },
+    {
+      "intent": "ReadListIntent"
+    },
+    {
+      "intent": "DetailsIntent",
+      "slots": [
+        {
+          "name": "RestaurantID",
+          "type": "AMAZON.NUMBER"
+        }
+      ]
+    },
+    {
+      "intent": "AMAZON.HelpIntent"
+    },
+    {
+      "intent": "AMAZON.StopIntent"
+    },
+    {
+      "intent": "AMAZON.CancelIntent"
+    }
+  ]
+}

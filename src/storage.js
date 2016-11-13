@@ -3,10 +3,15 @@
  */
 
 var AWS = require("aws-sdk");
-AWS.config.update({
-  region: "us-west-2",
-  endpoint: "http://localhost:8000"
-});
+var config = require("./config");
+
+// Run locally if told to do so
+if (config.runDBLocal) {
+    AWS.config.update({
+      region: "us-west-2",
+      endpoint: "http://localhost:8000"
+    });
+}
 
 var storage = (function () {
     var dynamodb = new AWS.DynamoDB({apiVersion: '2012-08-10'});

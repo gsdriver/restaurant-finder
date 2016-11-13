@@ -1,0 +1,28 @@
+FindRestaurantIntent find a {FirstDescriptor} restaurant
+FindRestaurantIntent find an {FirstDescriptor} restaurant
+FindRestaurantIntent find a {FirstDescriptor} {SecondDescriptor} restaurant
+FindRestaurantIntent find an {FirstDescriptor} {SecondDescriptor} restaurant
+FindRestaurantIntent find a {FirstDescriptor} {SecondDescriptor} {ThirdDescriptor} restaurant
+FindRestaurantIntent find an {FirstDescriptor} {SecondDescriptor} {ThirdDescriptor} restaurant
+FindRestaurantIntent find a {FirstDescriptor} restaurant in {Location}
+FindRestaurantIntent find an {FirstDescriptor} restaurant in {Location}
+FindRestaurantIntent find a {FirstDescriptor} {SecondDescriptor} restaurant in {Location}
+FindRestaurantIntent find an {FirstDescriptor} {SecondDescriptor} restaurant in {Location}
+FindRestaurantIntent find a {FirstDescriptor} {SecondDescriptor} {ThirdDescriptor} restaurant in {Location}
+FindRestaurantIntent find an {FirstDescriptor} {SecondDescriptor} {ThirdDescriptor} restaurant in {Location}
+SetLocationIntent set my location to {Location}
+SetLocationIntent set my home to {Location}
+SetLocationIntent set my home location to {Location}
+SetLocationIntent set location to {Location}
+SetLocationIntent set home to {Location}
+SetLocationIntent set home location to {Location}
+ReadListIntent read the list
+ReadListIntent read list
+ReadListIntent read the list of restaurants
+ReadListIntent read list of restaurants
+ReadListIntent read the restaurants
+ReadListIntent read restaurants
+ReadListIntent more
+DetailsIntent details about {RestaurantID}
+DetailsIntent {RestaurantID} details
+DetailsIntent {RestaurantID}

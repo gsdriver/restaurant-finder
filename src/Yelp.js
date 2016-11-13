@@ -169,7 +169,7 @@ function GetRestaurantList(params, callback)
                 myResult.rating = restaurant.rating;
                 myResult.review_count = restaurant.review_count;
                 myResult.is_closed = restaurant.is_closed;
-                myResult.price = (restaurant.price) ? Math.max(restaurant.price.length, 4) : 0;
+                myResult.price = (restaurant.price) ? Math.min(restaurant.price.length, 4) : 0;
                 myResult.distance = restaurant.distance;
 
                 results.restaurants.push(myResult);
