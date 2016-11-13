@@ -15,7 +15,7 @@ function BuildEvent(argv)
        "session": {
          "sessionId": "SessionId.c88ec34d-28b0-46f6-a4c7-120d8fba8fa7",
          "application": {
-           "applicationId": "amzn1.ask.skill.8fb6e399-d431-4943-a797-7a6888e7c6ce"
+           "applicationId": "amzn1.ask.skill.4c848d38-347c-4e03-b908-42c6af6c207d"
          },
          "attributes": {},
          "user": {
@@ -37,7 +37,7 @@ function BuildEvent(argv)
        "session": {
          "sessionId": "SessionId.c88ec34d-28b0-46f6-a4c7-120d8fba8fa7",
          "application": {
-           "applicationId": "amzn1.ask.skill.8fb6e399-d431-4943-a797-7a6888e7c6ce"
+           "applicationId": "amzn1.ask.skill.4c848d38-347c-4e03-b908-42c6af6c207d"
          },
          "attributes": {},
          "user": {

@@ -29,7 +29,7 @@ var yelp = require('./Yelp');
 var categoryList = require('./categories');
 var storage = require('./storage');
 
-var APP_ID = undefined; //"amzn1.ask.skill.8fb6e399-d431-4943-a797-7a6888e7c6ce";
+var APP_ID = "amzn1.ask.skill.4c848d38-347c-4e03-b908-42c6af6c207d";
 
 var RestaurantFinder = function () {
     AlexaSkill.call(this, APP_ID);
