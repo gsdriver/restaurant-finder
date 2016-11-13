@@ -59,13 +59,17 @@ RestaurantFinder.prototype.intentHandlers = {
         storage.loadUserData(session, function(userData) {
             // If they didn't set a location in the request and we don't have one here, we
             // will prompt the user for their current location
-            console.log("loaded " + JSON.stringify(userData));
-            if (!params.location && !userData.location)
+            if (!params.location)
             {
-                var speech = "As a new user, please specify your location by saying Set Location.";
+                if (!userData.location)
+                {
+                    var speech = "As a new user, please specify your location by saying Set Location.";
 
-                SendAlexaResponse(null, speech, null, null, response);
-                return;
+                    SendAlexaResponse(null, speech, null, null, response);
+                    return;
+                }
+
+                params.location = userData.location;
             }
 
             // BUGBUG - we should check against the last query to see if this is a refinement

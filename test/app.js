@@ -62,7 +62,14 @@ function BuildEvent(argv)
     else if (argv[2] == "find")
     {
         lambda.request.intent = findRestaurant;
-        //findRestaurant.slots.Location.value = (argv.length > 3) ? argv[3] : "Seattle";
+        if (argv.length > 3)
+        {
+            // Special value of none means don't use a location at all
+            if (argv[3] != "none")
+            {
+                findRestaurant.slots.Location.value = argv[3];
+            }
+        }
         if (argv.length > 4)
         {
             findRestaurant.slots.FirstDescriptor.value = argv[4];

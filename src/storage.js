@@ -60,10 +60,10 @@ var storage = (function () {
             else
             {
                 dynamodb.getItem({TableName: 'RestaurantFinderUserData',
-                                  Key: { CustomerId: {S: session.user.userId}}}, function (error, data) {
+                                  Key: { UserID: {S: session.user.userId}}}, function (error, data) {
                     var userData;
 
-                    if (error || (userData.Item == undefined))
+                    if (error || (data.Item == undefined))
                     {
                         // No big deal, we'll just start over
                         userData = new UserData(session);
