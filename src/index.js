@@ -73,11 +73,9 @@ RestaurantFinder.prototype.intentHandlers = {
             }
 
             // BUGBUG - we should check against the last query to see if this is a refinement
-
             yelp.ReadRestaurantResults(params, function(speechError, speechResponse, speechQuestion, repromptQuestion, restaurantList) {
                 if (restaurantList)
                 {
-                    userData.lastRequestParams = params;
                     userData.lastResponse = restaurantList;
                     userData.save();
                 }

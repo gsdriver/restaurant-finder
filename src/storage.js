@@ -2,6 +2,8 @@
  * Handles DynamoDB storage
  */
 
+'use strict';
+
 var AWS = require("aws-sdk");
 var config = require("./config");
 
@@ -19,10 +21,9 @@ var storage = (function () {
     /*
      * The UserData class stores all game states for the user
      */
-    function UserData(session, location, lastRequestParams, lastResponse) {
+    function UserData(session, location, lastResponse) {
         // Save values or defaults
         this.location = (location) ? location : "";
-        this.lastRequestParams = (lastRequestParams) ? lastRequestParams : {};
         this.lastResponse = (lastResponse) ? lastResponse : {total: 0, read: 0, restaurants: []};
 
         // Save the session information
@@ -33,23 +34,33 @@ var storage = (function () {
         save: function (callback) {
             // Save state in the session object, so we can reference that instead of hitting the DB
             this._session.attributes.userData = this.data;
-            dynamodb.putItem({
-                TableName: 'RestaurantFinderUserData',
-                Item: { UserID: {S: this._session.user.userId },
-                        location: {S: this.location},
-                        lastRequestParams: {S: JSON.stringify(this.lastRequestParams)},
-                        lastResponse: {S: JSON.stringify(this.lastResponse)}}
-            }, function (err, data) {
-                // We only need to pass the error back - no other data to return
-                if (err)
-                {
-                    console.log(err, err.stack);
-                }
+            if (config.noDB)
+            {
+                // Don't save anything
                 if (callback)
                 {
-                    callback(err);
+                    callback(null);
                 }
-            });
+            }
+            else
+            {
+                dynamodb.putItem({
+                    TableName: 'RestaurantFinderUserData',
+                    Item: { UserID: {S: this._session.user.userId },
+                            location: {S: this.location},
+                            lastResponse: {S: JSON.stringify(this.lastResponse)}}
+                }, function (err, data) {
+                    // We only need to pass the error back - no other data to return
+                    if (err)
+                    {
+                        console.log(err, err.stack);
+                    }
+                    if (callback)
+                    {
+                        callback(err);
+                    }
+                });
+            }
         }
     };
 
@@ -59,8 +70,14 @@ var storage = (function () {
             {
                 // It was in the session so no need to hit the DB
                 callback(new UserData(session, session.attributes.userData.location,
-                                    session.attributes.userData.lastRequestParams,
                                     session.attributes.userData.lastResponse));
+            }
+            else if (config.noDB)
+            {
+                // We have no choice but to return an empty structure
+                var userData = new UserData(session);
+                session.attributes.userData = userData.data;
+                callback(userData);
             }
             else
             {
@@ -78,7 +95,6 @@ var storage = (function () {
                     else
                     {
                         userData = new UserData(session, data.Item.location.S,
-                                            JSON.parse(data.Item.lastRequestParams.S),
                                             JSON.parse(data.Item.lastResponse.S));
                         session.attributes.userData = userData.data;
                         callback(userData);

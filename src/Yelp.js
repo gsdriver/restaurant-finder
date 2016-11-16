@@ -2,6 +2,8 @@
  * Source file that connects to Yelp
  */
 
+'use strict';
+
 var config = require("./config");
 const https = require('https');
 const querystring = require('querystring');
@@ -23,7 +25,7 @@ module.exports = {
                 if (restaurantList.total > 5)
                 {
                     speech = "I found " + ((restaurantList.total > 100) ? "more than 100" : restaurantList.total) + " " + ParamsToText(params) + ". ";
-                    reprompt = "Say an extra filter if you would like to narrow the list, or say Read List if you would like me to start reading the list.";
+                    reprompt = "Repeat your request with additional conditions like good or cheap to narrow the list, or say Read List if you would like me to start reading the list.";
                     speech += reprompt;
                     callback(null, null, speech, reprompt, restaurantList);
                 }
@@ -78,7 +80,7 @@ module.exports = {
             // Let's figure out where exactly we should be reading - read is what we've read up thru
             var toRead;
 
-            toRead = restaurantList.read - (5 * Math.floor(restaurantList.read / 5)) + indexToRead;
+            toRead = (5 * Math.floor((restaurantList.read - 1) / 5)) + indexToRead - 1;
 
             if (toRead >= restaurantList.restaurants.length)
             {
@@ -114,6 +116,22 @@ module.exports = {
 
 function SendYelpRequest(path, callback)
 {
+    // Canned response if you want to bypass the Yelp call
+    if (config.noYelp)
+    {
+        var cannedResponse = {total: 6, businesses: [
+                        {name: "One Place", phone: "4255551212", location: {address1: "1 Main St", city: "Seattle" }, rating: "3", review_count: "12", is_closed: false, price: "$$", distance: 1000},
+                        {name: "Two Place", phone: "4255551212", location: {address1: "2 Main St", city: "Seattle" }, rating: "3.5", review_count: "12", is_closed: false, price: "$$", distance: 1000},
+                        {name: "Three Place", phone: "4255551212", location: {address1: "3 Main St", city: "Seattle" }, rating: "4", review_count: "12", is_closed: false, price: "$$", distance: 1000},
+                        {name: "Four Place", phone: "4255551212", location: {address1: "4 Main St", city: "Seattle" }, rating: "4.5", review_count: "12", is_closed: false, price: "$$", distance: 1000},
+                        {name: "Five Place", phone: "4255551212", location: {address1: "5 Main St", city: "Seattle" }, rating: "2.5", review_count: "12", is_closed: false, price: "$$", distance: 1000},
+                        {name: "Six Place", phone: "4255551212", location: {address1: "6 Main St", city: "Seattle" }, rating: "3", review_count: "12", is_closed: false, price: "$$", distance: 1000}
+                    ]};
+
+        callback(null, cannedResponse);
+        return;
+    }
+
     var headers = {"Authorization": "Bearer " + config.token};
     var options = { hostname: 'api.yelp.com', port: 443, path: path, method: "GET", headers: headers };
 

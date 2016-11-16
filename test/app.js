@@ -118,6 +118,10 @@ myResponse.succeed = function(result) {
     console.log("The session " + ((!result.response.shouldEndSession) ? "stays open." : "closes."));
 }
 
+myResponse.fail = function(e) {
+    console.log(e);
+}
+
 // Build the event object and call the app
 var event = BuildEvent(process.argv);
 if (event) {
