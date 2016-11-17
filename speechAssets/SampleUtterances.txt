@@ -1,21 +1,33 @@
 FindRestaurantIntent find a {FirstDescriptor} restaurant
 FindRestaurantIntent find an {FirstDescriptor} restaurant
+FindRestaurantIntent find {FirstDescriptor} restaurants
 FindRestaurantIntent find a {FirstDescriptor} {SecondDescriptor} restaurant
 FindRestaurantIntent find an {FirstDescriptor} {SecondDescriptor} restaurant
+FindRestaurantIntent find {FirstDescriptor} {SecondDescriptor} restaurants
 FindRestaurantIntent find a {FirstDescriptor} {SecondDescriptor} {ThirdDescriptor} restaurant
 FindRestaurantIntent find an {FirstDescriptor} {SecondDescriptor} {ThirdDescriptor} restaurant
+FindRestaurantIntent find {FirstDescriptor} {SecondDescriptor} {ThirdDescriptor} restaurants
 FindRestaurantIntent find a {FirstDescriptor} restaurant in {Location}
 FindRestaurantIntent find an {FirstDescriptor} restaurant in {Location}
+FindRestaurantIntent find {FirstDescriptor} restaurants in {Location}
 FindRestaurantIntent find a {FirstDescriptor} {SecondDescriptor} restaurant in {Location}
 FindRestaurantIntent find an {FirstDescriptor} {SecondDescriptor} restaurant in {Location}
+FindRestaurantIntent find {FirstDescriptor} {SecondDescriptor} restaurants in {Location}
 FindRestaurantIntent find a {FirstDescriptor} {SecondDescriptor} {ThirdDescriptor} restaurant in {Location}
 FindRestaurantIntent find an {FirstDescriptor} {SecondDescriptor} {ThirdDescriptor} restaurant in {Location}
+FindRestaurantIntent find {FirstDescriptor} {SecondDescriptor} {ThirdDescriptor} restaurants in {Location}
 SetLocationIntent set my location to {Location}
 SetLocationIntent set my home to {Location}
 SetLocationIntent set my home location to {Location}
 SetLocationIntent set location to {Location}
 SetLocationIntent set home to {Location}
 SetLocationIntent set home location to {Location}
+SetLocationIntent set my location to {LocationZIP}
+SetLocationIntent set my home to {LocationZIP}
+SetLocationIntent set my home location to {LocationZIP}
+SetLocationIntent set location to {LocationZIP}
+SetLocationIntent set home to {LocationZIP}
+SetLocationIntent set home location to {LocationZIP}
 ReadListIntent read the list
 ReadListIntent read list
 ReadListIntent read the list of restaurants

@@ -86,10 +86,26 @@ RestaurantFinder.prototype.intentHandlers = {
     },
     // Location intent
     "SetLocationIntent" : function (intent, session, response) {
-        // If they have a location, we can use it
+        // If they have a location, we can use it - it can either be a city or a 5-digit ZIP code
         var locationSlot = intent.slots.Location;
+        var locationZIPSlot = intent.slots.LocationZIP;
+        var location;
 
-        if (!locationSlot || !locationSlot.value)
+        if (locationSlot && locationSlot.value)
+        {
+            location = locationSlot.value;
+        }
+        else if (locationZIPSlot && locationZIPSlot.value)
+        {
+            // Has to be five digits
+            if (locationZIPSlot.value.length != 5)
+            {
+                SendAlexaResponse("Please specify a five-digit ZIP code as your home location", null, null, null, response);
+                return;
+            }
+            location = locationZIPSlot.value;
+        }
+        else
         {
             SendAlexaResponse("Please specify a location to set as your home location.", null, null, null, response);
             return;
@@ -98,9 +114,9 @@ RestaurantFinder.prototype.intentHandlers = {
         // They are specifying a location - we will set this in the DB - make sure to preserve
         // any other entries associated with this user
         storage.loadUserData(session, function(userData) {
-            userData.location = locationSlot.value;
+            userData.location = location;
             userData.save((error) => {
-                var speech = "Home location set to " + locationSlot.value;
+                var speech = "Home location set to " + location;
 
                 SendAlexaResponse(null, speech, null, null, response);
             });
@@ -252,6 +268,18 @@ function AddYelpParameter(params, value)
     var mapping = {
         "open": {field: "open_now", value: true},
         "open now": {field: "open_now", value: true},
+        "cheap": {field: "price", value: "1"},
+        "moderate": {field: "price", value: "2"},
+        "spendy": {field: "price", value: "3"},
+        "splurge": {field: "price", value: "4"},
+        "inexpensive": {field: "price", value: "1,2"},
+        "expensive": {field: "price", value: "3,4"},
+        "costly": {field: "price", value: "4"},
+        "pricey": {field: "price", value: "3,4"},
+        "good": {field: "rating", value: "3,5"},
+        "great": {field: "rating", value: "4,5"},
+        "bad": {field: "rating", value: "0,2.5"},
+        "terrible": {field: "rating", value: "0,2"}
     };
 
     if (category)
@@ -268,7 +296,7 @@ function AddYelpParameter(params, value)
     }
     else if (mapping[value])
     {
-        params[mapping[value].field] = params[mapping[value].value];
+        params[mapping[value].field] = mapping[value].value;
     }
 }
 

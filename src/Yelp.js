@@ -31,7 +31,7 @@ module.exports = {
                 }
                 else if (restaurantList.total > 0)
                 {
-                    ReadRestaurantFromList(restaurantList, function(speech, reprompt) {
+                    ReadList(restaurantList, function(speech, reprompt) {
                         callback(null, null, speech, reprompt, restaurantList);
                     });
                 }
@@ -45,25 +45,7 @@ module.exports = {
         });
     },
     ReadRestaurantsFromList : function(restaurantList, callback) {
-        var speech, reprompt;
-        var toRead = Math.min(restaurantList.restaurants.length - restaurantList.read, 5);
-
-        // OK, read the names as allow them to ask for more detail on any choice
-        speech = "Reading " + toRead + " restaurants. ";
-        reprompt = "You can ask for more details on any of these restaurants by saying that restaurant number";
-        reprompt += ((restaurantList.restaurants.length - restaurantList.read > 5) ? "or say More to hear more results. " : ". ");
-        speech += reprompt;
-
-        var i;
-        var ordinals = ["First", "Second", "Third", "Fourth", "Fifth"];
-        for (i = 0; i < toRead; i++)
-        {
-            speech += (" " + ordinals[i] + " result is " + restaurantList.restaurants[restaurantList.read + i].name + ".");
-        }
-        restaurantList.read += toRead;
-
-        // Return the speech and reprompt text
-        callback(speech, reprompt);
+        ReadList(restaurantList, callback);
     },
     ReadResturantDetails : function(restaurantList, indexToRead, callback) {
         // I have to have read some results first
@@ -80,8 +62,8 @@ module.exports = {
             // Let's figure out where exactly we should be reading - read is what we've read up thru
             var toRead;
 
-            toRead = (5 * Math.floor((restaurantList.read - 1) / 5)) + indexToRead - 1;
-
+            toRead = (5 * Math.floor((restaurantList.read - 1) / 5));
+            toRead += (indexToRead - 1);
             if (toRead >= restaurantList.restaurants.length)
             {
                 var speechReprompt, reprompt;
@@ -95,7 +77,8 @@ module.exports = {
             {
                 // OK, this should be good
                 var restaurant = restaurantList.restaurants[toRead];
-                var priceList = ["cheap", "moderate", "spendy", "splurge"];
+                var priceList = ["cheap", "moderately priced", "spendy", "splurge"];
+                var speech;
 
                 // Read information about the restaurant
                 speech = restaurant.name + " is located at " + restaurant.location.address1 + " in " + restaurant.location.city;
@@ -116,22 +99,6 @@ module.exports = {
 
 function SendYelpRequest(path, callback)
 {
-    // Canned response if you want to bypass the Yelp call
-    if (config.noYelp)
-    {
-        var cannedResponse = {total: 6, businesses: [
-                        {name: "One Place", phone: "4255551212", location: {address1: "1 Main St", city: "Seattle" }, rating: "3", review_count: "12", is_closed: false, price: "$$", distance: 1000},
-                        {name: "Two Place", phone: "4255551212", location: {address1: "2 Main St", city: "Seattle" }, rating: "3.5", review_count: "12", is_closed: false, price: "$$", distance: 1000},
-                        {name: "Three Place", phone: "4255551212", location: {address1: "3 Main St", city: "Seattle" }, rating: "4", review_count: "12", is_closed: false, price: "$$", distance: 1000},
-                        {name: "Four Place", phone: "4255551212", location: {address1: "4 Main St", city: "Seattle" }, rating: "4.5", review_count: "12", is_closed: false, price: "$$", distance: 1000},
-                        {name: "Five Place", phone: "4255551212", location: {address1: "5 Main St", city: "Seattle" }, rating: "2.5", review_count: "12", is_closed: false, price: "$$", distance: 1000},
-                        {name: "Six Place", phone: "4255551212", location: {address1: "6 Main St", city: "Seattle" }, rating: "3", review_count: "12", is_closed: false, price: "$$", distance: 1000}
-                    ]};
-
-        callback(null, cannedResponse);
-        return;
-    }
-
     var headers = {"Authorization": "Bearer " + config.token};
     var options = { hostname: 'api.yelp.com', port: 443, path: path, method: "GET", headers: headers };
 
@@ -165,10 +132,14 @@ function SendYelpRequest(path, callback)
  */
 function GetRestaurantList(params, callback)
 {
-    var urlPath = "/v3/businesses/search?term=restaurants&";
+    var urlPath = "/v3/businesses/search?term=restaurants&limit=50&";
+
+    // Actually rating is not a parameter, it's a filter - so strip that out of the URL query
+    var yelpParams = {};
+    for (var field in params) {if (field != "rating") {yelpParams[field] = params[field];}};
 
     // BUGBUG - Should we do some validation on params?
-    urlPath += querystring.stringify(params);
+    urlPath += querystring.stringify(yelpParams);
     SendYelpRequest(urlPath, function(error, restaurantList) {
         if (error) {
             callback(error, null);
@@ -177,6 +148,11 @@ function GetRestaurantList(params, callback)
             // Save fields we care about from Yelp, also note the total number
             // of restaurants and how many we've read to the user so far (0)
             var results = {total: restaurantList.total, read: 0, restaurants: []};
+            var ratingFilter = [];
+            if (params.rating)
+            {
+                ratingFilter = params.rating.split(",");
+            }
 
             restaurantList.businesses.forEach(restaurant => {
                 let myResult = {};
@@ -190,12 +166,41 @@ function GetRestaurantList(params, callback)
                 myResult.price = (restaurant.price) ? Math.min(restaurant.price.length, 4) : 0;
                 myResult.distance = restaurant.distance;
 
-                results.restaurants.push(myResult);
+                // If there is a rating filter, honor it
+                if ((ratingFilter.length != 2) ||
+                        ((myResult.rating >= ratingFilter[0]) && (myResult.rating <= ratingFilter[1])))
+                {
+                    results.restaurants.push(myResult);
+                }
             });
 
+            results.total = results.restaurants.length;
             callback(error, results);
         }
     });
+}
+
+function ReadList(restaurantList, callback)
+{
+    var speech, reprompt;
+    var toRead = Math.min(restaurantList.restaurants.length - restaurantList.read, 5);
+
+    // OK, read the names as allow them to ask for more detail on any choice
+    speech = "Reading " + toRead + " restaurants. ";
+    reprompt = "You can ask for more details on any of these restaurants by saying that restaurant number";
+    reprompt += ((restaurantList.restaurants.length - restaurantList.read > 5) ? "or say More to hear more results. " : ". ");
+    speech += reprompt;
+
+    var i;
+    var ordinals = ["First", "Second", "Third", "Fourth", "Fifth"];
+    for (i = 0; i < toRead; i++)
+    {
+        speech += (" " + ordinals[i] + " result is " + restaurantList.restaurants[restaurantList.read + i].name + ".");
+    }
+    restaurantList.read += toRead;
+
+    // Return the speech and reprompt text
+    callback(speech, reprompt);
 }
 
 /*
@@ -208,6 +213,21 @@ function ParamsToText(params)
     if (params.open_now)
     {
         result += "open ";
+    }
+    if (params.rating)
+    {
+        var ratingMap = {"3,5": "good", "4,5": "great", "0,2.5": "bad", "0,2": "terrible"};
+
+        result += ratingMap[params.rating];
+        result += " ";
+    }
+    if (params.price)
+    {
+        var priceMap = {"1": "cheap", "2": "moderate", "3": "spendy", "4": "splurge",
+            "1,2": "inexpensive", "3,4": "expensive"};
+
+        result += priceMap[params.price];
+        result += " ";
     }
     if (params.categories)
     {

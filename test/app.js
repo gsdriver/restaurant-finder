@@ -8,6 +8,7 @@ function BuildEvent(argv)
                     "ThirdDescriptor": {"name": "ThirdDescriptor", "value": ""},
                     "Location": {"name": "Location", "value": ""}}};
     var setLocation = {"name": "SetLocationIntent", "slots": {"Location": {"name": "Location", "value": ""}}};
+    var setLocationZIP = {"name": "SetLocationIntent", "slots": {"LocationZIP": {"name": "LocationZIP", "value": ""}}};
     var readList = {"name": "ReadListIntent", "slots": {}};
     var restaurantDetails = {"name": "DetailsIntent", "slots": {"RestaurantID": {"name": "RestaurantID", "value": ""}}};
 
@@ -90,6 +91,11 @@ function BuildEvent(argv)
         lambda.request.intent = setLocation;
         setLocation.slots.Location.value = (argv.length > 3) ? argv[3] : "Seattle";
     }
+    else if (argv[2] == "locationZIP")
+    {
+        lambda.request.intent = setLocationZIP;
+        setLocationZIP.slots.LocationZIP.value = (argv.length > 3) ? argv[3] : "98112";
+    }
     else if (argv[2] == "readlist")
     {
         lambda.request.intent = readList;
@@ -97,7 +103,7 @@ function BuildEvent(argv)
     else if (argv[2] == "details")
     {
         lambda.request.intent = restaurantDetails;
-        restaurantDetails.slots.RestaurantID.value = (argv.length > 4) ? argv[4] : 1;
+        restaurantDetails.slots.RestaurantID.value = (argv.length > 3) ? argv[3] : 1;
     }
     else
     {

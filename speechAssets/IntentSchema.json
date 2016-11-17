@@ -27,6 +27,10 @@
         {
           "name": "Location",
           "type": "AMAZON.US_CITY"
+        },
+        {
+          "name": "LocationZIP",
+          "type": "AMAZON.NUMBER"
         }
       ]
     },
