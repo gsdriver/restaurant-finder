@@ -16,6 +16,15 @@ FindRestaurantIntent find {FirstDescriptor} {SecondDescriptor} restaurants in {L
 FindRestaurantIntent find a {FirstDescriptor} {SecondDescriptor} {ThirdDescriptor} restaurant in {Location}
 FindRestaurantIntent find an {FirstDescriptor} {SecondDescriptor} {ThirdDescriptor} restaurant in {Location}
 FindRestaurantIntent find {FirstDescriptor} {SecondDescriptor} {ThirdDescriptor} restaurants in {Location}
+FindRestaurantIntent find a {FirstDescriptor} restaurant in {LocationZIP}
+FindRestaurantIntent find an {FirstDescriptor} restaurant in {LocationZIP}
+FindRestaurantIntent find {FirstDescriptor} restaurants in {LocationZIP}
+FindRestaurantIntent find a {FirstDescriptor} {SecondDescriptor} restaurant in {LocationZIP}
+FindRestaurantIntent find an {FirstDescriptor} {SecondDescriptor} restaurant in {LocationZIP}
+FindRestaurantIntent find {FirstDescriptor} {SecondDescriptor} restaurants in {LocationZIP}
+FindRestaurantIntent find a {FirstDescriptor} {SecondDescriptor} {ThirdDescriptor} restaurant in {LocationZIP}
+FindRestaurantIntent find an {FirstDescriptor} {SecondDescriptor} {ThirdDescriptor} restaurant in {LocationZIP}
+FindRestaurantIntent find {FirstDescriptor} {SecondDescriptor} {ThirdDescriptor} restaurants in {LocationZIP}
 SetLocationIntent set my location to {Location}
 SetLocationIntent set my home to {Location}
 SetLocationIntent set my home location to {Location}

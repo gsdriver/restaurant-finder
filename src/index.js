@@ -325,6 +325,10 @@ function BuildYelpParameters(intent)
     {
         params.location = intent.slots.Location.value;
     }
+    else if (intent.slots.LocationZIP && intent.slots.LocationZIP.value && intent.slots.LocationZIP.value.length == 5)
+    {
+        params.location = intent.slots.LocationZIP.value;
+    }
 
     return params;
 }
