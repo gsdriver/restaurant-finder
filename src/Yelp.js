@@ -7,6 +7,7 @@
 var config = require("./config");
 const https = require('https');
 const querystring = require('querystring');
+var phone = require('node-phonenumber');
 
 module.exports = {
     ReadRestaurantResults : function(params, callback) {
@@ -147,6 +148,7 @@ function GetRestaurantList(params, callback)
         else {
             // Save fields we care about from Yelp, also note the total number
             // of restaurants and how many we've read to the user so far (0)
+            var phoneUtil = phone.PhoneNumberUtil.getInstance();
             var results = {total: restaurantList.total, read: 0, restaurants: []};
             var ratingFilter = [];
             if (params.rating)
@@ -157,8 +159,14 @@ function GetRestaurantList(params, callback)
             restaurantList.businesses.forEach(restaurant => {
                 let myResult = {};
 
+                // Convert the phone number to a US number
+                if (restaurant.phone)
+                {
+                    var phoneNumber = phoneUtil.parse(restaurant.phone,'US');
+                    myResult.phone = phoneUtil.format(phoneNumber, phone.PhoneNumberFormat.NATIONAL);
+                }
+
                 myResult.name = restaurant.name;
-                myResult.phone = restaurant.phone;
                 myResult.location = restaurant.location;
                 myResult.rating = restaurant.rating;
                 myResult.review_count = restaurant.review_count;
