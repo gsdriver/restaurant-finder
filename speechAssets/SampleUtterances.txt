@@ -25,6 +25,24 @@ FindRestaurantIntent find {FirstDescriptor} {SecondDescriptor} restaurants in {L
 FindRestaurantIntent find a {FirstDescriptor} {SecondDescriptor} {ThirdDescriptor} restaurant in {LocationZIP}
 FindRestaurantIntent find an {FirstDescriptor} {SecondDescriptor} {ThirdDescriptor} restaurant in {LocationZIP}
 FindRestaurantIntent find {FirstDescriptor} {SecondDescriptor} {ThirdDescriptor} restaurants in {LocationZIP}
+FindRestaurantIntent find a {FirstDescriptor} restaurant near {Location}
+FindRestaurantIntent find an {FirstDescriptor} restaurant near {Location}
+FindRestaurantIntent find {FirstDescriptor} restaurants near {Location}
+FindRestaurantIntent find a {FirstDescriptor} {SecondDescriptor} restaurant near {Location}
+FindRestaurantIntent find an {FirstDescriptor} {SecondDescriptor} restaurant near {Location}
+FindRestaurantIntent find {FirstDescriptor} {SecondDescriptor} restaurants near {Location}
+FindRestaurantIntent find a {FirstDescriptor} {SecondDescriptor} {ThirdDescriptor} restaurant near {Location}
+FindRestaurantIntent find an {FirstDescriptor} {SecondDescriptor} {ThirdDescriptor} restaurant near {Location}
+FindRestaurantIntent find {FirstDescriptor} {SecondDescriptor} {ThirdDescriptor} restaurants near {Location}
+FindRestaurantIntent find a {FirstDescriptor} restaurant near {LocationZIP}
+FindRestaurantIntent find an {FirstDescriptor} restaurant near {LocationZIP}
+FindRestaurantIntent find {FirstDescriptor} restaurants near {LocationZIP}
+FindRestaurantIntent find a {FirstDescriptor} {SecondDescriptor} restaurant near {LocationZIP}
+FindRestaurantIntent find an {FirstDescriptor} {SecondDescriptor} restaurant near {LocationZIP}
+FindRestaurantIntent find {FirstDescriptor} {SecondDescriptor} restaurants near {LocationZIP}
+FindRestaurantIntent find a {FirstDescriptor} {SecondDescriptor} {ThirdDescriptor} restaurant near {LocationZIP}
+FindRestaurantIntent find an {FirstDescriptor} {SecondDescriptor} {ThirdDescriptor} restaurant near {LocationZIP}
+FindRestaurantIntent find {FirstDescriptor} {SecondDescriptor} {ThirdDescriptor} restaurants near {LocationZIP}
 SetLocationIntent set my location to {Location}
 SetLocationIntent set my home to {Location}
 SetLocationIntent set my home location to {Location}
@@ -37,6 +55,14 @@ SetLocationIntent set my home location to {LocationZIP}
 SetLocationIntent set location to {LocationZIP}
 SetLocationIntent set home to {LocationZIP}
 SetLocationIntent set home location to {LocationZIP}
+SetLocationIntent set my preferred to {Location}
+SetLocationIntent set my preferred location to {Location}
+SetLocationIntent set preferred to {Location}
+SetLocationIntent set preferred location to {Location}
+SetLocationIntent set my preferred to {LocationZIP}
+SetLocationIntent set my preferred location to {LocationZIP}
+SetLocationIntent set preferred to {LocationZIP}
+SetLocationIntent set preferred location to {LocationZIP}
 ReadListIntent read the list
 ReadListIntent read list
 ReadListIntent read the list of restaurants
@@ -45,5 +71,10 @@ ReadListIntent read the restaurants
 ReadListIntent read restaurants
 ReadListIntent more
 DetailsIntent details about {RestaurantID}
+DetailsIntent tell me about {RestaurantID}
+DetailsIntent read about {RestaurantID}
+DetailsIntent read {RestaurantID}
+DetailsIntent hear about {RestaurantID}
+DetailsIntent hear {RestaurantID}
 DetailsIntent {RestaurantID} details
 DetailsIntent {RestaurantID}

@@ -66,7 +66,7 @@ RestaurantFinder.prototype.intentHandlers = {
                 {
                     var speech = "As a new user, please specify your location by saying Set Location.";
 
-                    SendAlexaResponse(null, speech, null, null, response);
+                    SendAlexaResponse(null, speech, null, null, response, null);
                     return;
                 }
 
@@ -81,7 +81,7 @@ RestaurantFinder.prototype.intentHandlers = {
                     userData.save();
                 }
 
-                SendAlexaResponse(speechError, speechResponse, speechQuestion, repromptQuestion, response);
+                SendAlexaResponse(speechError, speechResponse, speechQuestion, repromptQuestion, response, null);
             });
         });
     },
@@ -101,14 +101,14 @@ RestaurantFinder.prototype.intentHandlers = {
             // Has to be five digits
             if (locationZIPSlot.value.length != 5)
             {
-                SendAlexaResponse("Please specify a city name or five-digit ZIP code as your preferred location", null, null, null, response);
+                SendAlexaResponse("Please specify a city name or five-digit ZIP code as your preferred location", null, null, null, response, null);
                 return;
             }
             location = locationZIPSlot.value;
         }
         else
         {
-            SendAlexaResponse("Please specify a city name or five-digit ZIP code as your preferred location.", null, null, null, response);
+            SendAlexaResponse("Please specify a city name or five-digit ZIP code as your preferred location.", null, null, null, response, null);
             return;
         }
 
@@ -126,7 +126,7 @@ RestaurantFinder.prototype.intentHandlers = {
                     speech += " If this is incorrect, you can also specify a five-digit ZIP code.";
                 }
 
-                SendAlexaResponse(null, speech, null, null, response);
+                SendAlexaResponse(null, speech, null, null, response, null);
             });
         })
     },
@@ -137,7 +137,7 @@ RestaurantFinder.prototype.intentHandlers = {
             if (userData.lastResponse.read >= userData.lastResponse.restaurants.length) {
                 var speech = "You are at the end of the list. Please ask for a new set of restaurants.";
 
-                SendAlexaResponse(null, speech, null, null, response);
+                SendAlexaResponse(null, speech, null, null, response, null);
             }
             else
             {
@@ -147,7 +147,7 @@ RestaurantFinder.prototype.intentHandlers = {
                     // Awesome - now that we've read, we need to write this back out to the DB
                     // in case there are more results to read
                     userData.save((error) => {
-                        SendAlexaResponse(null, null, speech, reprompt, response);
+                        SendAlexaResponse(null, null, speech, reprompt, response, null);
                     });
                 });
             }
@@ -159,21 +159,21 @@ RestaurantFinder.prototype.intentHandlers = {
 
         if (!idSlot || !idSlot.value)
         {
-            SendAlexaResponse("I'm sorry, I didn't hear a number of the restaurant you wanted details about.", null, null, null, response);
+            SendAlexaResponse("I'm sorry, I didn't hear a number of the restaurant you wanted details about.", null, null, null, response, null);
             return;
         }
 
         // They need to have a list to read details from
         storage.loadUserData(session, function(userData) {
             // OK, let's get the details
-            yelp.ReadResturantDetails(userData.lastResponse, idSlot.value, function(error, speechResponse, speechReprompt, reprompt, saveState) {
+            yelp.ReadResturantDetails(userData.lastResponse, idSlot.value, function(error, speechResponse, speechReprompt, reprompt, cardInfo) {
                 // If the user successfully read the list, then the last action has changed, otherwise keep the last action as it was
-                if (saveState)
+                if (cardInfo)
                 {
                     userData.lastAction = "Details," + idSlot.value;
                     userData.save();
                 }
-                SendAlexaResponse(error, speechResponse, speechReprompt, reprompt, response);
+                SendAlexaResponse(error, speechResponse, speechReprompt, reprompt, response, cardInfo);
             });
         });
     },
@@ -189,18 +189,18 @@ RestaurantFinder.prototype.intentHandlers = {
                 // Reset read so we re-read the last response
                 userData.lastResponse.read = parseInt(lastAction[1]);
                 yelp.ReadRestaurantsFromList(userData.lastResponse, function(speech, reprompt) {
-                    SendAlexaResponse(null, null, speech, reprompt, response);
+                    SendAlexaResponse(null, null, speech, reprompt, response, null);
                 });
             }
             else if ((lastAction.length == 2) && (lastAction[0] == "Details"))
             {
                 yelp.ReadResturantDetails(userData.lastResponse, parseInt(lastAction[1]), function(error, speechResponse, speechReprompt, reprompt, saveState) {
-                    SendAlexaResponse(error, speechResponse, speechReprompt, reprompt, response);
+                    SendAlexaResponse(error, speechResponse, speechReprompt, reprompt, response, null);
                 });
             }
             else
             {
-                SendAlexaResponse(null, "You can say repeat after you've read a list of restaurants or details on a specific restaurant.", null, null, response);
+                SendAlexaResponse(null, "You can say repeat after you've read a list of restaurants or details on a specific restaurant.", null, null, response, null);
             }
         });
     },
@@ -237,7 +237,7 @@ RestaurantFinder.prototype.intentHandlers = {
  * of the speechQuestion (just asking what they want to do rather than
  * giving a full game status)
  */
-function SendAlexaResponse(speechError, speechResponse, speechQuestion, repromptQuestion, response)
+function SendAlexaResponse(speechError, speechResponse, speechQuestion, repromptQuestion, response, cardInfo)
 {
     var speechOutput;
     var repromptOutput;
@@ -260,7 +260,7 @@ function SendAlexaResponse(speechError, speechResponse, speechQuestion, reprompt
             speech: speechResponse,
             type: AlexaSkill.speechOutputType.PLAIN_TEXT
         };
-        response.tellWithCard(speechOutput, cardTitle, speechResponse);
+        response.tellWithCard(speechOutput, cardTitle, (cardInfo) ? cardInfo : speechResponse);
     }
     else {
         speechOutput = {
@@ -271,7 +271,7 @@ function SendAlexaResponse(speechError, speechResponse, speechQuestion, reprompt
             speech: repromptQuestion,
             type: AlexaSkill.speechOutputType.PLAIN_TEXT
         };
-        response.askWithCard(speechOutput, repromptOutput, cardTitle, speechQuestion);
+        response.askWithCard(speechOutput, repromptOutput, cardTitle, (cardInfo) ? cardInfo : speechQuestion);
     }
 }
 
