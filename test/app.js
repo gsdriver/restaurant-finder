@@ -11,6 +11,7 @@ function BuildEvent(argv)
     var setLocationZIP = {"name": "SetLocationIntent", "slots": {"LocationZIP": {"name": "LocationZIP", "value": ""}}};
     var readList = {"name": "ReadListIntent", "slots": {}};
     var restaurantDetails = {"name": "DetailsIntent", "slots": {"RestaurantID": {"name": "RestaurantID", "value": ""}}};
+    var repeatIntent = {"name": "AMAZON.RepeatIntent", "slots": {}};
 
     var lambda = {
        "session": {
@@ -104,6 +105,10 @@ function BuildEvent(argv)
     {
         lambda.request.intent = restaurantDetails;
         restaurantDetails.slots.RestaurantID.value = (argv.length > 3) ? argv[3] : 1;
+    }
+    else if (argv[2] == "repeat")
+    {
+        lambda.request.intent = repeatIntent;
     }
     else
     {

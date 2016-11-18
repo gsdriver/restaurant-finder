@@ -28,6 +28,7 @@ var AlexaSkill = require('./AlexaSkill');
 var yelp = require('./Yelp');
 var categoryList = require('./categories');
 var storage = require('./storage');
+var utils = require('./utils');
 
 var APP_ID = "amzn1.ask.skill.4c848d38-347c-4e03-b908-42c6af6c207d";
 
@@ -72,10 +73,10 @@ RestaurantFinder.prototype.intentHandlers = {
                 params.location = userData.location;
             }
 
-            // BUGBUG - we should check against the last query to see if this is a refinement
             yelp.ReadRestaurantResults(params, function(speechError, speechResponse, speechQuestion, repromptQuestion, restaurantList) {
                 if (restaurantList)
                 {
+                    userData.lastAction = ((restaurantList.total > 0) && (restaurantList.total <= 5)) ? "ReadList,0" : "FindRestaurant";
                     userData.lastResponse = restaurantList;
                     userData.save();
                 }
@@ -100,14 +101,14 @@ RestaurantFinder.prototype.intentHandlers = {
             // Has to be five digits
             if (locationZIPSlot.value.length != 5)
             {
-                SendAlexaResponse("Please specify a five-digit ZIP code as your home location", null, null, null, response);
+                SendAlexaResponse("Please specify a city name or five-digit ZIP code as your preferred location", null, null, null, response);
                 return;
             }
             location = locationZIPSlot.value;
         }
         else
         {
-            SendAlexaResponse("Please specify a location to set as your home location.", null, null, null, response);
+            SendAlexaResponse("Please specify a city name or five-digit ZIP code as your preferred location.", null, null, null, response);
             return;
         }
 
@@ -116,7 +117,7 @@ RestaurantFinder.prototype.intentHandlers = {
         storage.loadUserData(session, function(userData) {
             userData.location = location;
             userData.save((error) => {
-                var speech = "Home location set to " + location;
+                var speech = "Preferred location set to " + utils.ReadLocation(location);
 
                 SendAlexaResponse(null, speech, null, null, response);
             });
@@ -133,7 +134,8 @@ RestaurantFinder.prototype.intentHandlers = {
             }
             else
             {
-                // OK, let's read
+                // OK, let's read - store the starting location first since reading the list will change it
+                userData.lastAction = "ReadList," + userData.lastResponse.read;
                 yelp.ReadRestaurantsFromList(userData.lastResponse, function(speech, reprompt) {
                     // Awesome - now that we've read, we need to write this back out to the DB
                     // in case there are more results to read
@@ -157,9 +159,42 @@ RestaurantFinder.prototype.intentHandlers = {
         // They need to have a list to read details from
         storage.loadUserData(session, function(userData) {
             // OK, let's get the details
-            yelp.ReadResturantDetails(userData.lastResponse, idSlot.value, function(error, speechResponse, speechReprompt, reprompt) {
+            yelp.ReadResturantDetails(userData.lastResponse, idSlot.value, function(error, speechResponse, speechReprompt, reprompt, saveState) {
+                // If the user successfully read the list, then the last action has changed, otherwise keep the last action as it was
+                if (saveState)
+                {
+                    userData.lastAction = "Details," + idSlot.value;
+                    userData.save();
+                }
                 SendAlexaResponse(error, speechResponse, speechReprompt, reprompt, response);
             });
+        });
+    },
+    // Repeat intent - read the last thing we read
+    "AMAZON.RepeatIntent": function (intent, session, response) {
+        // Well, let's see what they did last so we can re-issue that command
+        storage.loadUserData(session, function(userData) {
+            // I can only repeat if they did a Details or a Read List
+            var lastAction = userData.lastAction.split(",");
+
+            if ((lastAction.length == 2) && (lastAction[0] == "ReadList"))
+            {
+                // Reset read so we re-read the last response
+                userData.lastResponse.read = parseInt(lastAction[1]);
+                yelp.ReadRestaurantsFromList(userData.lastResponse, function(speech, reprompt) {
+                    SendAlexaResponse(null, null, speech, reprompt, response);
+                });
+            }
+            else if ((lastAction.length == 2) && (lastAction[0] == "Details"))
+            {
+                yelp.ReadResturantDetails(userData.lastResponse, parseInt(lastAction[1]), function(error, speechResponse, speechReprompt, reprompt, saveState) {
+                    SendAlexaResponse(error, speechResponse, speechReprompt, reprompt, response);
+                });
+            }
+            else
+            {
+                SendAlexaResponse(null, "You can say repeat after you've read a list of restaurants or details on a specific restaurant.", null, null, response);
+            }
         });
     },
     // Stop intent

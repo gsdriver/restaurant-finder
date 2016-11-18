@@ -21,9 +21,10 @@ var storage = (function () {
     /*
      * The UserData class stores all game states for the user
      */
-    function UserData(session, location, lastResponse) {
+    function UserData(session, location, lastAction, lastResponse) {
         // Save values or defaults
         this.location = (location) ? location : "";
+        this.lastAction = (lastAction) ? lastAction : "";
         this.lastResponse = (lastResponse) ? lastResponse : {total: 0, read: 0, restaurants: []};
 
         // Save the session information
@@ -48,6 +49,7 @@ var storage = (function () {
                     TableName: 'RestaurantFinderUserData',
                     Item: { UserID: {S: this._session.user.userId },
                             location: {S: this.location},
+                            lastAction: {S: this.lastAction},
                             lastResponse: {S: JSON.stringify(this.lastResponse)}}
                 }, function (err, data) {
                     // We only need to pass the error back - no other data to return
@@ -70,6 +72,7 @@ var storage = (function () {
             {
                 // It was in the session so no need to hit the DB
                 callback(new UserData(session, session.attributes.userData.location,
+                                    session.attributes.userData.lastAction,
                                     session.attributes.userData.lastResponse));
             }
             else if (config.noDB)
@@ -94,7 +97,7 @@ var storage = (function () {
                     }
                     else
                     {
-                        userData = new UserData(session, data.Item.location.S,
+                        userData = new UserData(session, data.Item.location.S, data.Item.lastAction.S,
                                             JSON.parse(data.Item.lastResponse.S));
                         session.attributes.userData = userData.data;
                         callback(userData);

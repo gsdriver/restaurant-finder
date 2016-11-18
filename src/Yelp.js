@@ -7,6 +7,7 @@
 var config = require("./config");
 const https = require('https');
 const querystring = require('querystring');
+var utils = require("./utils");
 
 module.exports = {
     ReadRestaurantResults : function(params, callback) {
@@ -25,7 +26,7 @@ module.exports = {
                 if (restaurantList.total > 5)
                 {
                     speech = "I found " + ((restaurantList.total > 100) ? "more than 100" : restaurantList.total) + " " + ParamsToText(params) + ". ";
-                    reprompt = "Repeat your request with additional conditions like good or cheap to narrow the list, or say Read List if you would like me to start reading the list.";
+                    reprompt = "Repeat your request with additional conditions like good or cheap to narrow the list, or say Read List to start reading the list.";
                     speech += reprompt;
                     callback(null, null, speech, reprompt, restaurantList);
                 }
@@ -51,11 +52,11 @@ module.exports = {
         // I have to have read some results first
         if (restaurantList.restaurants.length == 0)
         {
-            callback(null, "Please ask for a set of restaurants before asking for details them.", null, null);
+            callback(null, "Please ask for a set of restaurants before asking for details.", null, null, false);
         }
         else if (restaurantList.read == 0)
         {
-            callback(null, "Please ask to start reading the list before asking for details about restaurants on the list.", null, null);
+            callback(null, "Please ask to start reading the list before asking for details.", null, null, false);
         }
         else
         {
@@ -71,7 +72,7 @@ module.exports = {
                 speechReprompt = indexToRead + " is not a valid option to read.";
                 reprompt = "Please ask for a valid number or say repeat to repeat the list.";
                 speechReprompt += (" " + reprompt);
-                callback(null, null, speechReprompt, reprompt);
+                callback(null, null, speechReprompt, reprompt, false);
             }
             else
             {
@@ -91,7 +92,7 @@ module.exports = {
                 {
                     speech += (" The phone number is " + restaurant.phone);
                 }
-                callback(speech);
+                callback(null, speech, null, null, true);
             }
         }
     }
@@ -201,15 +202,14 @@ function ReadList(restaurantList, callback)
 
     // OK, read the names as allow them to ask for more detail on any choice
     speech = "Reading " + toRead + " restaurants. ";
-    reprompt = "You can ask for more details on any of these restaurants by saying that restaurant number";
-    reprompt += ((restaurantList.restaurants.length - restaurantList.read > 5) ? "or say More to hear more results. " : ". ");
+    reprompt = "You can ask for more details by saying the corresponding restaurant number";
+    reprompt += ((restaurantList.restaurants.length - restaurantList.read > 5) ? " or say More to hear more results. " : ". ");
     speech += reprompt;
 
     var i;
-    var ordinals = ["First", "Second", "Third", "Fourth", "Fifth"];
     for (i = 0; i < toRead; i++)
     {
-        speech += (" " + ordinals[i] + " result is " + restaurantList.restaurants[restaurantList.read + i].name + ".");
+        speech += (" " + (i + 1) + " ... " + restaurantList.restaurants[restaurantList.read + i].name + ".");
     }
     restaurantList.read += toRead;
 
@@ -253,7 +253,7 @@ function ParamsToText(params)
 
     if (params.location)
     {
-        result += " in " + params.location;
+        result += " in " + utils.ReadLocation(params.location);
     }
 
     return result;
