@@ -116,8 +116,15 @@ RestaurantFinder.prototype.intentHandlers = {
         // any other entries associated with this user
         storage.loadUserData(session, function(userData) {
             userData.location = location;
+            userData.lastAction = "SetLocation";
             userData.save((error) => {
-                var speech = "Preferred location set to " + utils.ReadLocation(location);
+                var speech = "Preferred location set to " + utils.ReadLocation(location) + ".";
+
+                // If this isn't a ZIP code, suggest that they can set by ZIP code
+                if (location.length != 5 || isNaN(parseInt(location)))
+                {
+                    speech += " If this is incorrect, you can also specify a five-digit ZIP code.";
+                }
 
                 SendAlexaResponse(null, speech, null, null, response);
             });
