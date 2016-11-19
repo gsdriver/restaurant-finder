@@ -69,7 +69,14 @@ ReadListIntent read the list of restaurants
 ReadListIntent read list of restaurants
 ReadListIntent read the restaurants
 ReadListIntent read restaurants
+ReadListIntent next
+ReadListIntent next restaurants
 ReadListIntent more
+ReadListIntent more restaurants
+ReadListIntent read more
+ReadListIntent read more restaurants
+BackIntent go back
+BackIntent back
 DetailsIntent details about {RestaurantID}
 DetailsIntent tell me about {RestaurantID}
 DetailsIntent read about {RestaurantID}

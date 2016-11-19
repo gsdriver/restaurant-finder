@@ -52,11 +52,11 @@ module.exports = {
         // I have to have read some results first
         if (restaurantList.restaurants.length == 0)
         {
-            callback(null, "Please ask for a set of restaurants before asking for details.", null, null, null);
+            callback(null, "Please ask for a set of restaurants before asking for details.", null, null);
         }
         else if (restaurantList.read == 0)
         {
-            callback(null, "Please ask to start reading the list before asking for details.", null, null, null);
+            callback(null, "Please ask to start reading the list before asking for details.", null, null);
         }
         else
         {
@@ -72,7 +72,7 @@ module.exports = {
                 speechReprompt = indexToRead + " is not a valid option to read.";
                 reprompt = "Please ask for a valid number or say repeat to repeat the list.";
                 speechReprompt += (" " + reprompt);
-                callback(null, null, speechReprompt, reprompt, null);
+                callback(null, null, speechReprompt, reprompt);
             }
             else
             {
@@ -80,7 +80,6 @@ module.exports = {
                 var restaurant = restaurantList.restaurants[toRead];
                 var priceList = ["cheap", "moderately priced", "spendy", "splurge"];
                 var speech;
-                var cardInfo;
 
                 // Read information about the restaurant
                 speech = restaurant.name + " is located at " + restaurant.location.address1 + " in " + restaurant.location.city;
@@ -94,8 +93,7 @@ module.exports = {
                     speech += (" The phone number is " + restaurant.phone);
                 }
 
-                cardInfo = "See Yelp review at " + restaurant.url + ".\n" + speech;
-                callback(null, speech, null, null, cardInfo);
+                callback(null, speech, null, null, true);
             }
         }
     }

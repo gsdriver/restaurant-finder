@@ -42,6 +42,9 @@
       "intent": "ReadListIntent"
     },
     {
+      "intent": "BackIntent"
+    },
+    {
       "intent": "DetailsIntent",
       "slots": [
         {

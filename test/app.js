@@ -10,6 +10,7 @@ function BuildEvent(argv)
     var setLocation = {"name": "SetLocationIntent", "slots": {"Location": {"name": "Location", "value": ""}}};
     var setLocationZIP = {"name": "SetLocationIntent", "slots": {"LocationZIP": {"name": "LocationZIP", "value": ""}}};
     var readList = {"name": "ReadListIntent", "slots": {}};
+    var backIntent = {"name": "BackIntent", "slots": {}};
     var restaurantDetails = {"name": "DetailsIntent", "slots": {"RestaurantID": {"name": "RestaurantID", "value": ""}}};
     var repeatIntent = {"name": "AMAZON.RepeatIntent", "slots": {}};
 
@@ -100,6 +101,10 @@ function BuildEvent(argv)
     else if (argv[2] == "readlist")
     {
         lambda.request.intent = readList;
+    }
+    else if (argv[2] == "back")
+    {
+        lambda.request.intent = backIntent;
     }
     else if (argv[2] == "details")
     {
