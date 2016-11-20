@@ -42,11 +42,13 @@ RestaurantFinder.prototype.constructor = RestaurantFinder;
 
 RestaurantFinder.prototype.eventHandlers.onLaunch = function (launchRequest, session, response)
 {
-    var speechText = "Welcome to Restaurant Finder. You can find a restaurant by type of cuisine, price range, or with high Yelp reviews. How can I help you?";
+    var speechText = "Welcome to Restaurant Finder. You can find restaurants by type of cuisine, price range, or with high Yelp reviews. For example, you can say Find a cheap Chinese restaurant in Seattle. How can I help you?";
     
     // If the user either does not reply to the welcome message or says something that is not
     // understood, they will be prompted again with this text.
     var repromptText = "For instructions on what you can say, please say help me.";
+
+    response.ask(speechText, repromptText);
 };
 
 RestaurantFinder.prototype.intentHandlers = {
@@ -258,8 +260,8 @@ RestaurantFinder.prototype.intentHandlers = {
     },
     // Help intent - provide help
     "AMAZON.HelpIntent": function (intent, session, response) {
-        var speechText = "You can find a restaurant by type of cuisine, price range, or Yelp review. For example, you can say Find a cheap Chinese restaurant in Seattle ... Now, what can I help you with?";
-        var repromptText = "You can find a restaurant by type of cuisine, price range, or Yelp review, or you can say exit... Now, what can I help you with?";
+        var speechText = "You can find restaurants by type of cuisine, price range, or Yelp review. For example, you can say Find a cheap Chinese restaurant in Seattle ... Now, what can I help you with?";
+        var repromptText = "You can find restaurants by type of cuisine, price range, or Yelp review, or you can say exit... Now, what can I help you with?";
         var speechOutput = {
             speech: speechText,
             type: AlexaSkill.speechOutputType.PLAIN_TEXT

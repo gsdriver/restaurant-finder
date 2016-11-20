@@ -115,6 +115,11 @@ function BuildEvent(argv)
     {
         lambda.request.intent = repeatIntent;
     }
+    else if (argv[2] == "open")
+    {
+        // Return the launch request
+        return openEvent;
+    }
     else
     {
         console.log(argv[2] + " was not valid");

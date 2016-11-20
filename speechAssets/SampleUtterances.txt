@@ -43,6 +43,96 @@ FindRestaurantIntent find {FirstDescriptor} {SecondDescriptor} restaurants near 
 FindRestaurantIntent find a {FirstDescriptor} {SecondDescriptor} {ThirdDescriptor} restaurant near {LocationZIP}
 FindRestaurantIntent find an {FirstDescriptor} {SecondDescriptor} {ThirdDescriptor} restaurant near {LocationZIP}
 FindRestaurantIntent find {FirstDescriptor} {SecondDescriptor} {ThirdDescriptor} restaurants near {LocationZIP}
+FindRestaurantIntent find a {FirstDescriptor} place
+FindRestaurantIntent find an {FirstDescriptor} place
+FindRestaurantIntent find {FirstDescriptor} places
+FindRestaurantIntent find a {FirstDescriptor} {SecondDescriptor} place
+FindRestaurantIntent find an {FirstDescriptor} {SecondDescriptor} place
+FindRestaurantIntent find {FirstDescriptor} {SecondDescriptor} places
+FindRestaurantIntent find a {FirstDescriptor} {SecondDescriptor} {ThirdDescriptor} place
+FindRestaurantIntent find an {FirstDescriptor} {SecondDescriptor} {ThirdDescriptor} place
+FindRestaurantIntent find {FirstDescriptor} {SecondDescriptor} {ThirdDescriptor} places
+FindRestaurantIntent find a {FirstDescriptor} place in {Location}
+FindRestaurantIntent find an {FirstDescriptor} place in {Location}
+FindRestaurantIntent find {FirstDescriptor} places in {Location}
+FindRestaurantIntent find a {FirstDescriptor} {SecondDescriptor} place in {Location}
+FindRestaurantIntent find an {FirstDescriptor} {SecondDescriptor} place in {Location}
+FindRestaurantIntent find {FirstDescriptor} {SecondDescriptor} places in {Location}
+FindRestaurantIntent find a {FirstDescriptor} {SecondDescriptor} {ThirdDescriptor} place in {Location}
+FindRestaurantIntent find an {FirstDescriptor} {SecondDescriptor} {ThirdDescriptor} place in {Location}
+FindRestaurantIntent find {FirstDescriptor} {SecondDescriptor} {ThirdDescriptor} places in {Location}
+FindRestaurantIntent find a {FirstDescriptor} place in {LocationZIP}
+FindRestaurantIntent find an {FirstDescriptor} place in {LocationZIP}
+FindRestaurantIntent find {FirstDescriptor} places in {LocationZIP}
+FindRestaurantIntent find a {FirstDescriptor} {SecondDescriptor} place in {LocationZIP}
+FindRestaurantIntent find an {FirstDescriptor} {SecondDescriptor} place in {LocationZIP}
+FindRestaurantIntent find {FirstDescriptor} {SecondDescriptor} places in {LocationZIP}
+FindRestaurantIntent find a {FirstDescriptor} {SecondDescriptor} {ThirdDescriptor} place in {LocationZIP}
+FindRestaurantIntent find an {FirstDescriptor} {SecondDescriptor} {ThirdDescriptor} place in {LocationZIP}
+FindRestaurantIntent find {FirstDescriptor} {SecondDescriptor} {ThirdDescriptor} places in {LocationZIP}
+FindRestaurantIntent find a {FirstDescriptor} place near {Location}
+FindRestaurantIntent find an {FirstDescriptor} place near {Location}
+FindRestaurantIntent find {FirstDescriptor} places near {Location}
+FindRestaurantIntent find a {FirstDescriptor} {SecondDescriptor} place near {Location}
+FindRestaurantIntent find an {FirstDescriptor} {SecondDescriptor} place near {Location}
+FindRestaurantIntent find {FirstDescriptor} {SecondDescriptor} places near {Location}
+FindRestaurantIntent find a {FirstDescriptor} {SecondDescriptor} {ThirdDescriptor} place near {Location}
+FindRestaurantIntent find an {FirstDescriptor} {SecondDescriptor} {ThirdDescriptor} place near {Location}
+FindRestaurantIntent find {FirstDescriptor} {SecondDescriptor} {ThirdDescriptor} places near {Location}
+FindRestaurantIntent find a {FirstDescriptor} place near {LocationZIP}
+FindRestaurantIntent find an {FirstDescriptor} place near {LocationZIP}
+FindRestaurantIntent find {FirstDescriptor} places near {LocationZIP}
+FindRestaurantIntent find a {FirstDescriptor} {SecondDescriptor} place near {LocationZIP}
+FindRestaurantIntent find an {FirstDescriptor} {SecondDescriptor} place near {LocationZIP}
+FindRestaurantIntent find {FirstDescriptor} {SecondDescriptor} places near {LocationZIP}
+FindRestaurantIntent find a {FirstDescriptor} {SecondDescriptor} {ThirdDescriptor} place near {LocationZIP}
+FindRestaurantIntent find an {FirstDescriptor} {SecondDescriptor} {ThirdDescriptor} place near {LocationZIP}
+FindRestaurantIntent find {FirstDescriptor} {SecondDescriptor} {ThirdDescriptor} places near {LocationZIP}
+FindRestaurantIntent find a {FirstDescriptor}
+FindRestaurantIntent find an {FirstDescriptor}
+FindRestaurantIntent find {FirstDescriptor}
+FindRestaurantIntent find a {FirstDescriptor} {SecondDescriptor}
+FindRestaurantIntent find an {FirstDescriptor} {SecondDescriptor}
+FindRestaurantIntent find {FirstDescriptor} {SecondDescriptor}
+FindRestaurantIntent find a {FirstDescriptor} {SecondDescriptor} {ThirdDescriptor}
+FindRestaurantIntent find an {FirstDescriptor} {SecondDescriptor} {ThirdDescriptor}
+FindRestaurantIntent find {FirstDescriptor} {SecondDescriptor} {ThirdDescriptor}
+FindRestaurantIntent find a {FirstDescriptor} in {Location}
+FindRestaurantIntent find an {FirstDescriptor} in {Location}
+FindRestaurantIntent find {FirstDescriptor} in {Location}
+FindRestaurantIntent find a {FirstDescriptor} {SecondDescriptor} in {Location}
+FindRestaurantIntent find an {FirstDescriptor} {SecondDescriptor} in {Location}
+FindRestaurantIntent find {FirstDescriptor} {SecondDescriptor} in {Location}
+FindRestaurantIntent find a {FirstDescriptor} {SecondDescriptor} {ThirdDescriptor} in {Location}
+FindRestaurantIntent find an {FirstDescriptor} {SecondDescriptor} {ThirdDescriptor} in {Location}
+FindRestaurantIntent find {FirstDescriptor} {SecondDescriptor} {ThirdDescriptor} in {Location}
+FindRestaurantIntent find a {FirstDescriptor} in {LocationZIP}
+FindRestaurantIntent find an {FirstDescriptor} in {LocationZIP}
+FindRestaurantIntent find {FirstDescriptor} in {LocationZIP}
+FindRestaurantIntent find a {FirstDescriptor} {SecondDescriptor} in {LocationZIP}
+FindRestaurantIntent find an {FirstDescriptor} {SecondDescriptor} in {LocationZIP}
+FindRestaurantIntent find {FirstDescriptor} {SecondDescriptor} in {LocationZIP}
+FindRestaurantIntent find a {FirstDescriptor} {SecondDescriptor} {ThirdDescriptor} in {LocationZIP}
+FindRestaurantIntent find an {FirstDescriptor} {SecondDescriptor} {ThirdDescriptor} in {LocationZIP}
+FindRestaurantIntent find {FirstDescriptor} {SecondDescriptor} {ThirdDescriptor} in {LocationZIP}
+FindRestaurantIntent find a {FirstDescriptor} near {Location}
+FindRestaurantIntent find an {FirstDescriptor} near {Location}
+FindRestaurantIntent find {FirstDescriptor} near {Location}
+FindRestaurantIntent find a {FirstDescriptor} {SecondDescriptor} near {Location}
+FindRestaurantIntent find an {FirstDescriptor} {SecondDescriptor} near {Location}
+FindRestaurantIntent find {FirstDescriptor} {SecondDescriptor} near {Location}
+FindRestaurantIntent find a {FirstDescriptor} {SecondDescriptor} {ThirdDescriptor} near {Location}
+FindRestaurantIntent find an {FirstDescriptor} {SecondDescriptor} {ThirdDescriptor} near {Location}
+FindRestaurantIntent find {FirstDescriptor} {SecondDescriptor} {ThirdDescriptor} near {Location}
+FindRestaurantIntent find a {FirstDescriptor} near {LocationZIP}
+FindRestaurantIntent find an {FirstDescriptor} near {LocationZIP}
+FindRestaurantIntent find {FirstDescriptor} near {LocationZIP}
+FindRestaurantIntent find a {FirstDescriptor} {SecondDescriptor} near {LocationZIP}
+FindRestaurantIntent find an {FirstDescriptor} {SecondDescriptor} near {LocationZIP}
+FindRestaurantIntent find {FirstDescriptor} {SecondDescriptor} near {LocationZIP}
+FindRestaurantIntent find a {FirstDescriptor} {SecondDescriptor} {ThirdDescriptor} near {LocationZIP}
+FindRestaurantIntent find an {FirstDescriptor} {SecondDescriptor} {ThirdDescriptor} near {LocationZIP}
+FindRestaurantIntent find {FirstDescriptor} {SecondDescriptor} {ThirdDescriptor} near {LocationZIP}
 SetLocationIntent set my location to {Location}
 SetLocationIntent set my home to {Location}
 SetLocationIntent set my home location to {Location}
