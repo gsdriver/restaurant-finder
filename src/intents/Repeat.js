@@ -1,5 +1,5 @@
 //
-// Handles opening the skill
+// Repeats the last response
 //
 
 'use strict';
@@ -8,37 +8,23 @@ const utils = require('../utils');
 
 module.exports = {
   handleIntent: function() {
-    const speech = 'Welcome to Restaurant Finder. You can find restaurants by type of cuisine, price range, or with high Yelp reviews. For example, you can say Find a cheap Chinese restaurant in Seattle. How can I help you?';
-    const reprompt = 'For instructions on what you can say, please say help me.';
+    // I can only repeat if they did a Details or a Read List
+    const lastAction = this.attributes.lastAction.split(',');
 
-    utils.emitResponse(this, null, null, speech, reprompt);
+    if ((lastAction.length == 2) && (lastAction[0] == 'ReadList')) {
+      // Reset read so we re-read the last response
+      this.attributes.lastResponse.read = parseInt(lastAction[1]);
+      yelp.ReadRestaurantsFromList(this.attributes.lastResponse, (speech, reprompt) => {
+        utils.emitResponse(this, null, null, speech, reprompt);
+      });
+    } else if ((lastAction.length == 2) && (lastAction[0] == 'Details')) {
+      yelp.ReadResturantDetails(this.attributes.lastResponse, parseInt(lastAction[1]), (error, speechResponse, speechReprompt, reprompt, saveState) => {
+        utils.emitResponse(this, error, speechResponse, speechReprompt, reprompt);
+      });
+    }
+    else
+    {
+      utils.emitResponse(this, null, 'You can say repeat after you\'ve read a list of restaurants or details on a specific restaurant.');
+    }
   },
 };
-
-    // Repeat intent - read the last thing we read
-    "AMAZON.RepeatIntent": function (intent, session, response) {
-        // Well, let's see what they did last so we can re-issue that command
-        storage.loadUserData(session, function(userData) {
-            // I can only repeat if they did a Details or a Read List
-            var lastAction = userData.lastAction.split(",");
-
-            if ((lastAction.length == 2) && (lastAction[0] == "ReadList"))
-            {
-                // Reset read so we re-read the last response
-                userData.lastResponse.read = parseInt(lastAction[1]);
-                yelp.ReadRestaurantsFromList(userData.lastResponse, function(speech, reprompt) {
-                    SendAlexaResponse(null, null, speech, reprompt, response);
-                });
-            }
-            else if ((lastAction.length == 2) && (lastAction[0] == "Details"))
-            {
-                yelp.ReadResturantDetails(userData.lastResponse, parseInt(lastAction[1]), function(error, speechResponse, speechReprompt, reprompt, saveState) {
-                    SendAlexaResponse(error, speechResponse, speechReprompt, reprompt, response);
-                });
-            }
-            else
-            {
-                SendAlexaResponse(null, "You can say repeat after you've read a list of restaurants or details on a specific restaurant.", null, null, response);
-            }
-        });
-    },

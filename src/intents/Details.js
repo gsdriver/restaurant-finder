@@ -1,5 +1,5 @@
 //
-// Handles opening the skill
+// Provides details on a specific restaurant
 //
 
 'use strict';
@@ -8,34 +8,20 @@ const utils = require('../utils');
 
 module.exports = {
   handleIntent: function() {
-    const speech = 'Welcome to Restaurant Finder. You can find restaurants by type of cuisine, price range, or with high Yelp reviews. For example, you can say Find a cheap Chinese restaurant in Seattle. How can I help you?';
-    const reprompt = 'For instructions on what you can say, please say help me.';
+    const idSlot = this.event.request.intent.slots.RestaurantID;
 
-    utils.emitResponse(this, null, null, speech, reprompt);
+    if (!idSlot || !idSlot.value) {
+      utils.emitResponse(this, null, 'I\'m sorry, I didn\'t hear a number of the restaurant you wanted details about.');
+      return;
+    }
+
+    // OK, let's get the details
+    yelp.ReadResturantDetails(userData.lastResponse, idSlot.value, (error, speechResponse, speechReprompt, reprompt, readDetails) => {
+      // If the user successfully read the list, then the last action has changed, otherwise keep the last action as it was
+      if (readDetails) {
+        this.attributes.lastAction = 'Details,' + idSlot.value;
+      }
+      utils.emitResponse(this, error, speechResponse, speechReprompt, reprompt);
+    });
   },
 };
-
-    // Details on a specific restaurant
-    "DetailsIntent" : function (intent, session, response) {
-        var idSlot = intent.slots.RestaurantID;
-
-        if (!idSlot || !idSlot.value)
-        {
-            SendAlexaResponse("I'm sorry, I didn't hear a number of the restaurant you wanted details about.", null, null, null, response);
-            return;
-        }
-
-        // They need to have a list to read details from
-        storage.loadUserData(session, function(userData) {
-            // OK, let's get the details
-            yelp.ReadResturantDetails(userData.lastResponse, idSlot.value, function(error, speechResponse, speechReprompt, reprompt, readDetails) {
-                // If the user successfully read the list, then the last action has changed, otherwise keep the last action as it was
-                if (readDetails)
-                {
-                    userData.lastAction = "Details," + idSlot.value;
-                    userData.save();
-                }
-                SendAlexaResponse(error, speechResponse, speechReprompt, reprompt, response);
-            });
-        });
-    },

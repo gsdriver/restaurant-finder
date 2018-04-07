@@ -36,8 +36,8 @@ module.exports = {
 
     if ((location.length == 5) && !isNaN(parseInt(location))) {
       // This is a ZIP code
-      retval = location.substring(0,1) + " " + location.substring(1,2) + " " + location.substring(2,3) + " " +
-                  location.substring(3,4) + " " + location.substring(4,5);
+      retval = location.substring(0,1) + ' ' + location.substring(1,2) + ' ' + location.substring(2,3) + ' ' +
+                  location.substring(3,4) + ' ' + location.substring(4,5);
     }
 
     return retval;

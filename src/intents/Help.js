@@ -1,5 +1,5 @@
 //
-// Handles opening the skill
+// Gives help to the user
 //
 
 'use strict';
