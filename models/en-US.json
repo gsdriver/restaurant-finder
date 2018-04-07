@@ -1,0 +1,1493 @@
+{
+  "interactionModel": {
+    "languageModel": {
+      "invocationName": "restaurant finder",
+      "intents": [
+        {
+          "name": "FindRestaurantIntent",
+          "slots": [
+            {
+              "name": "FirstDescriptor",
+              "type": "LIST_OF_DESCRIPTORS"
+            },
+            {
+              "name": "SecondDescriptor",
+              "type": "LIST_OF_DESCRIPTORS"
+            },
+            {
+              "name": "ThirdDescriptor",
+              "type": "LIST_OF_DESCRIPTORS"
+            },
+            {
+              "name": "Location",
+              "type": "AMAZON.US_CITY"
+            },
+            {
+              "name": "LocationZIP",
+              "type": "AMAZON.NUMBER"
+            }
+          ],
+          "samples": [
+            "find a {FirstDescriptor} restaurant",
+            "find an {FirstDescriptor} restaurant",
+            "find {FirstDescriptor} restaurants",
+            "find a {FirstDescriptor} {SecondDescriptor} restaurant",
+            "find an {FirstDescriptor} {SecondDescriptor} restaurant",
+            "find {FirstDescriptor} {SecondDescriptor} restaurants",
+            "find a {FirstDescriptor} {SecondDescriptor} {ThirdDescriptor} restaurant",
+            "find an {FirstDescriptor} {SecondDescriptor} {ThirdDescriptor} restaurant",
+            "find {FirstDescriptor} {SecondDescriptor} {ThirdDescriptor} restaurants",
+            "find a {FirstDescriptor} restaurant in {Location}",
+            "find an {FirstDescriptor} restaurant in {Location}",
+            "find {FirstDescriptor} restaurants in {Location}",
+            "find a {FirstDescriptor} {SecondDescriptor} restaurant in {Location}",
+            "find an {FirstDescriptor} {SecondDescriptor} restaurant in {Location}",
+            "find {FirstDescriptor} {SecondDescriptor} restaurants in {Location}",
+            "find a {FirstDescriptor} {SecondDescriptor} {ThirdDescriptor} restaurant in {Location}",
+            "find an {FirstDescriptor} {SecondDescriptor} {ThirdDescriptor} restaurant in {Location}",
+            "find {FirstDescriptor} {SecondDescriptor} {ThirdDescriptor} restaurants in {Location}",
+            "find a {FirstDescriptor} restaurant in {LocationZIP}",
+            "find an {FirstDescriptor} restaurant in {LocationZIP}",
+            "find {FirstDescriptor} restaurants in {LocationZIP}",
+            "find a {FirstDescriptor} {SecondDescriptor} restaurant in {LocationZIP}",
+            "find an {FirstDescriptor} {SecondDescriptor} restaurant in {LocationZIP}",
+            "find {FirstDescriptor} {SecondDescriptor} restaurants in {LocationZIP}",
+            "find a {FirstDescriptor} {SecondDescriptor} {ThirdDescriptor} restaurant in {LocationZIP}",
+            "find an {FirstDescriptor} {SecondDescriptor} {ThirdDescriptor} restaurant in {LocationZIP}",
+            "find {FirstDescriptor} {SecondDescriptor} {ThirdDescriptor} restaurants in {LocationZIP}",
+            "find a {FirstDescriptor} restaurant near {Location}",
+            "find an {FirstDescriptor} restaurant near {Location}",
+            "find {FirstDescriptor} restaurants near {Location}",
+            "find a {FirstDescriptor} {SecondDescriptor} restaurant near {Location}",
+            "find an {FirstDescriptor} {SecondDescriptor} restaurant near {Location}",
+            "find {FirstDescriptor} {SecondDescriptor} restaurants near {Location}",
+            "find a {FirstDescriptor} {SecondDescriptor} {ThirdDescriptor} restaurant near {Location}",
+            "find an {FirstDescriptor} {SecondDescriptor} {ThirdDescriptor} restaurant near {Location}",
+            "find {FirstDescriptor} {SecondDescriptor} {ThirdDescriptor} restaurants near {Location}",
+            "find a {FirstDescriptor} restaurant near {LocationZIP}",
+            "find an {FirstDescriptor} restaurant near {LocationZIP}",
+            "find {FirstDescriptor} restaurants near {LocationZIP}",
+            "find a {FirstDescriptor} {SecondDescriptor} restaurant near {LocationZIP}",
+            "find an {FirstDescriptor} {SecondDescriptor} restaurant near {LocationZIP}",
+            "find {FirstDescriptor} {SecondDescriptor} restaurants near {LocationZIP}",
+            "find a {FirstDescriptor} {SecondDescriptor} {ThirdDescriptor} restaurant near {LocationZIP}",
+            "find an {FirstDescriptor} {SecondDescriptor} {ThirdDescriptor} restaurant near {LocationZIP}",
+            "find {FirstDescriptor} {SecondDescriptor} {ThirdDescriptor} restaurants near {LocationZIP}",
+            "find a {FirstDescriptor} place",
+            "find an {FirstDescriptor} place",
+            "find {FirstDescriptor} places",
+            "find a {FirstDescriptor} {SecondDescriptor} place",
+            "find an {FirstDescriptor} {SecondDescriptor} place",
+            "find {FirstDescriptor} {SecondDescriptor} places",
+            "find a {FirstDescriptor} {SecondDescriptor} {ThirdDescriptor} place",
+            "find an {FirstDescriptor} {SecondDescriptor} {ThirdDescriptor} place",
+            "find {FirstDescriptor} {SecondDescriptor} {ThirdDescriptor} places",
+            "find a {FirstDescriptor} place in {Location}",
+            "find an {FirstDescriptor} place in {Location}",
+            "find {FirstDescriptor} places in {Location}",
+            "find a {FirstDescriptor} {SecondDescriptor} place in {Location}",
+            "find an {FirstDescriptor} {SecondDescriptor} place in {Location}",
+            "find {FirstDescriptor} {SecondDescriptor} places in {Location}",
+            "find a {FirstDescriptor} {SecondDescriptor} {ThirdDescriptor} place in {Location}",
+            "find an {FirstDescriptor} {SecondDescriptor} {ThirdDescriptor} place in {Location}",
+            "find {FirstDescriptor} {SecondDescriptor} {ThirdDescriptor} places in {Location}",
+            "find a {FirstDescriptor} place in {LocationZIP}",
+            "find an {FirstDescriptor} place in {LocationZIP}",
+            "find {FirstDescriptor} places in {LocationZIP}",
+            "find a {FirstDescriptor} {SecondDescriptor} place in {LocationZIP}",
+            "find an {FirstDescriptor} {SecondDescriptor} place in {LocationZIP}",
+            "find {FirstDescriptor} {SecondDescriptor} places in {LocationZIP}",
+            "find a {FirstDescriptor} {SecondDescriptor} {ThirdDescriptor} place in {LocationZIP}",
+            "find an {FirstDescriptor} {SecondDescriptor} {ThirdDescriptor} place in {LocationZIP}",
+            "find {FirstDescriptor} {SecondDescriptor} {ThirdDescriptor} places in {LocationZIP}",
+            "find a {FirstDescriptor} place near {Location}",
+            "find an {FirstDescriptor} place near {Location}",
+            "find {FirstDescriptor} places near {Location}",
+            "find a {FirstDescriptor} {SecondDescriptor} place near {Location}",
+            "find an {FirstDescriptor} {SecondDescriptor} place near {Location}",
+            "find {FirstDescriptor} {SecondDescriptor} places near {Location}",
+            "find a {FirstDescriptor} {SecondDescriptor} {ThirdDescriptor} place near {Location}",
+            "find an {FirstDescriptor} {SecondDescriptor} {ThirdDescriptor} place near {Location}",
+            "find {FirstDescriptor} {SecondDescriptor} {ThirdDescriptor} places near {Location}",
+            "find a {FirstDescriptor} place near {LocationZIP}",
+            "find an {FirstDescriptor} place near {LocationZIP}",
+            "find {FirstDescriptor} places near {LocationZIP}",
+            "find a {FirstDescriptor} {SecondDescriptor} place near {LocationZIP}",
+            "find an {FirstDescriptor} {SecondDescriptor} place near {LocationZIP}",
+            "find {FirstDescriptor} {SecondDescriptor} places near {LocationZIP}",
+            "find a {FirstDescriptor} {SecondDescriptor} {ThirdDescriptor} place near {LocationZIP}",
+            "find an {FirstDescriptor} {SecondDescriptor} {ThirdDescriptor} place near {LocationZIP}",
+            "find {FirstDescriptor} {SecondDescriptor} {ThirdDescriptor} places near {LocationZIP}",
+            "find a {FirstDescriptor}",
+            "find an {FirstDescriptor}",
+            "find {FirstDescriptor}",
+            "find a {FirstDescriptor} {SecondDescriptor}",
+            "find an {FirstDescriptor} {SecondDescriptor}",
+            "find {FirstDescriptor} {SecondDescriptor}",
+            "find a {FirstDescriptor} {SecondDescriptor} {ThirdDescriptor}",
+            "find an {FirstDescriptor} {SecondDescriptor} {ThirdDescriptor}",
+            "find {FirstDescriptor} {SecondDescriptor} {ThirdDescriptor}",
+            "find a {FirstDescriptor} in {Location}",
+            "find an {FirstDescriptor} in {Location}",
+            "find {FirstDescriptor} in {Location}",
+            "find a {FirstDescriptor} {SecondDescriptor} in {Location}",
+            "find an {FirstDescriptor} {SecondDescriptor} in {Location}",
+            "find {FirstDescriptor} {SecondDescriptor} in {Location}",
+            "find a {FirstDescriptor} {SecondDescriptor} {ThirdDescriptor} in {Location}",
+            "find an {FirstDescriptor} {SecondDescriptor} {ThirdDescriptor} in {Location}",
+            "find {FirstDescriptor} {SecondDescriptor} {ThirdDescriptor} in {Location}",
+            "find a {FirstDescriptor} in {LocationZIP}",
+            "find an {FirstDescriptor} in {LocationZIP}",
+            "find {FirstDescriptor} in {LocationZIP}",
+            "find a {FirstDescriptor} {SecondDescriptor} in {LocationZIP}",
+            "find an {FirstDescriptor} {SecondDescriptor} in {LocationZIP}",
+            "find {FirstDescriptor} {SecondDescriptor} in {LocationZIP}",
+            "find a {FirstDescriptor} {SecondDescriptor} {ThirdDescriptor} in {LocationZIP}",
+            "find an {FirstDescriptor} {SecondDescriptor} {ThirdDescriptor} in {LocationZIP}",
+            "find {FirstDescriptor} {SecondDescriptor} {ThirdDescriptor} in {LocationZIP}",
+            "find a {FirstDescriptor} near {Location}",
+            "find an {FirstDescriptor} near {Location}",
+            "find {FirstDescriptor} near {Location}",
+            "find a {FirstDescriptor} {SecondDescriptor} near {Location}",
+            "find an {FirstDescriptor} {SecondDescriptor} near {Location}",
+            "find {FirstDescriptor} {SecondDescriptor} near {Location}",
+            "find a {FirstDescriptor} {SecondDescriptor} {ThirdDescriptor} near {Location}",
+            "find an {FirstDescriptor} {SecondDescriptor} {ThirdDescriptor} near {Location}",
+            "find {FirstDescriptor} {SecondDescriptor} {ThirdDescriptor} near {Location}",
+            "find a {FirstDescriptor} near {LocationZIP}",
+            "find an {FirstDescriptor} near {LocationZIP}",
+            "find {FirstDescriptor} near {LocationZIP}",
+            "find a {FirstDescriptor} {SecondDescriptor} near {LocationZIP}",
+            "find an {FirstDescriptor} {SecondDescriptor} near {LocationZIP}",
+            "find {FirstDescriptor} {SecondDescriptor} near {LocationZIP}",
+            "find a {FirstDescriptor} {SecondDescriptor} {ThirdDescriptor} near {LocationZIP}",
+            "find an {FirstDescriptor} {SecondDescriptor} {ThirdDescriptor} near {LocationZIP}",
+            "find {FirstDescriptor} {SecondDescriptor} {ThirdDescriptor} near {LocationZIP}"
+          ]
+        },
+        {
+          "name": "SetLocationIntent",
+          "slots": [
+            {
+              "name": "Location",
+              "type": "AMAZON.US_CITY"
+            },
+            {
+              "name": "LocationZIP",
+              "type": "AMAZON.NUMBER"
+            }
+          ],
+          "samples": [
+            "set my location to {Location}",
+            "set my home to {Location}",
+            "set my home location to {Location}",
+            "set location to {Location}",
+            "set home to {Location}",
+            "set home location to {Location}",
+            "set my location to {LocationZIP}",
+            "set my home to {LocationZIP}",
+            "set my home location to {LocationZIP}",
+            "set location to {LocationZIP}",
+            "set home to {LocationZIP}",
+            "set home location to {LocationZIP}",
+            "set my preferred to {Location}",
+            "set my preferred location to {Location}",
+            "set preferred to {Location}",
+            "set preferred location to {Location}",
+            "set my preferred to {LocationZIP}",
+            "set my preferred location to {LocationZIP}",
+            "set preferred to {LocationZIP}",
+            "set preferred location to {LocationZIP}"
+          ]
+        },
+        {
+          "name": "ReadListIntent",
+          "samples": [
+            "read the list",
+            "read list",
+            "read the list of restaurants",
+            "read list of restaurants",
+            "read the restaurants",
+            "read restaurants",
+            "next",
+            "next restaurants",
+            "more",
+            "more restaurants",
+            "read more",
+            "read more restaurants"
+          ]
+        },
+        {
+          "name": "BackIntent",
+          "samples": [
+            "go back",
+            "back"
+          ]
+        },
+        {
+          "name": "DetailsIntent",
+          "slots": [
+            {
+              "name": "RestaurantID",
+              "type": "AMAZON.NUMBER"
+            }
+          ],
+          "samples": [
+            "details about {RestaurantID}",
+            "tell me about {RestaurantID}",
+            "read about {RestaurantID}",
+            "read {RestaurantID}",
+            "hear about {RestaurantID}",
+            "hear {RestaurantID}",
+            "{RestaurantID} details",
+            "{RestaurantID}"
+          ]
+        },
+        {
+          "name": "AMAZON.RepeatIntent"
+        },
+        {
+          "name": "AMAZON.HelpIntent"
+        },
+        {
+          "name": "AMAZON.StopIntent"
+        },
+        {
+          "name": "AMAZON.CancelIntent"
+        }
+      ],
+      "types": [
+        {
+          "values": [
+            {
+              "name": {
+                "value": "open"
+              }
+            },
+            {
+              "name": {
+                "value": "open now"
+              }
+            },
+            {
+              "name": {
+                "value": "cheap"
+              }
+            },
+            {
+              "name": {
+                "value": "moderate"
+              }
+            },
+            {
+              "name": {
+                "value": "spendy"
+              }
+            },
+            {
+              "name": {
+                "value": "splurge"
+              }
+            },
+            {
+              "name": {
+                "value": "inexpensive"
+              }
+            },
+            {
+              "name": {
+                "value": "expensive"
+              }
+            },
+            {
+              "name": {
+                "value": "costly"
+              }
+            },
+            {
+              "name": {
+                "value": "pricey"
+              }
+            },
+            {
+              "name": {
+                "value": "good"
+              }
+            },
+            {
+              "name": {
+                "value": "great"
+              }
+            },
+            {
+              "name": {
+                "value": "bad"
+              }
+            },
+            {
+              "name": {
+                "value": "terrible"
+              }
+            },
+            {
+              "name": {
+                "value": "Afghan"
+              }
+            },
+            {
+              "name": {
+                "value": "African"
+              }
+            },
+            {
+              "name": {
+                "value": "Andalusian"
+              }
+            },
+            {
+              "name": {
+                "value": "Arabian"
+              }
+            },
+            {
+              "name": {
+                "value": "Argentine"
+              }
+            },
+            {
+              "name": {
+                "value": "Armenian"
+              }
+            },
+            {
+              "name": {
+                "value": "Asian Fusion"
+              }
+            },
+            {
+              "name": {
+                "value": "Asturian"
+              }
+            },
+            {
+              "name": {
+                "value": "Australian"
+              }
+            },
+            {
+              "name": {
+                "value": "Austrian"
+              }
+            },
+            {
+              "name": {
+                "value": "Baguettes"
+              }
+            },
+            {
+              "name": {
+                "value": "Bangladeshi"
+              }
+            },
+            {
+              "name": {
+                "value": "Bangladesh"
+              }
+            },
+            {
+              "name": {
+                "value": "Basque"
+              }
+            },
+            {
+              "name": {
+                "value": "Bavarian"
+              }
+            },
+            {
+              "name": {
+                "value": "Barbeque"
+              }
+            },
+            {
+              "name": {
+                "value": "BBQ"
+              }
+            },
+            {
+              "name": {
+                "value": "Beer Garden"
+              }
+            },
+            {
+              "name": {
+                "value": "Beer Hall"
+              }
+            },
+            {
+              "name": {
+                "value": "Beisl"
+              }
+            },
+            {
+              "name": {
+                "value": "Belgian"
+              }
+            },
+            {
+              "name": {
+                "value": "Bistros"
+              }
+            },
+            {
+              "name": {
+                "value": "Bistro"
+              }
+            },
+            {
+              "name": {
+                "value": "Black Sea"
+              }
+            },
+            {
+              "name": {
+                "value": "Brasseries"
+              }
+            },
+            {
+              "name": {
+                "value": "Brazilian"
+              }
+            },
+            {
+              "name": {
+                "value": "Breakfast & Brunch"
+              }
+            },
+            {
+              "name": {
+                "value": "Breakfast and Brunch"
+              }
+            },
+            {
+              "name": {
+                "value": "Brunch"
+              }
+            },
+            {
+              "name": {
+                "value": "British"
+              }
+            },
+            {
+              "name": {
+                "value": "Buffets"
+              }
+            },
+            {
+              "name": {
+                "value": "Buffet"
+              }
+            },
+            {
+              "name": {
+                "value": "Bulgarian"
+              }
+            },
+            {
+              "name": {
+                "value": "Burgers"
+              }
+            },
+            {
+              "name": {
+                "value": "Burger"
+              }
+            },
+            {
+              "name": {
+                "value": "Burmese"
+              }
+            },
+            {
+              "name": {
+                "value": "Cafes"
+              }
+            },
+            {
+              "name": {
+                "value": "Cafe"
+              }
+            },
+            {
+              "name": {
+                "value": "Cafeteria"
+              }
+            },
+            {
+              "name": {
+                "value": "Cajun"
+              }
+            },
+            {
+              "name": {
+                "value": "Creole"
+              }
+            },
+            {
+              "name": {
+                "value": "Cambodian"
+              }
+            },
+            {
+              "name": {
+                "value": "Canteen"
+              }
+            },
+            {
+              "name": {
+                "value": "Caribbean"
+              }
+            },
+            {
+              "name": {
+                "value": "Catalan"
+              }
+            },
+            {
+              "name": {
+                "value": "Cheesesteaks"
+              }
+            },
+            {
+              "name": {
+                "value": "Chicken Wings"
+              }
+            },
+            {
+              "name": {
+                "value": "Wings"
+              }
+            },
+            {
+              "name": {
+                "value": "Chicken Wing"
+              }
+            },
+            {
+              "name": {
+                "value": "Wing"
+              }
+            },
+            {
+              "name": {
+                "value": "Chicken Shop"
+              }
+            },
+            {
+              "name": {
+                "value": "Chilean"
+              }
+            },
+            {
+              "name": {
+                "value": "Chinese"
+              }
+            },
+            {
+              "name": {
+                "value": "Comfort Food"
+              }
+            },
+            {
+              "name": {
+                "value": "Comfort"
+              }
+            },
+            {
+              "name": {
+                "value": "Corsican"
+              }
+            },
+            {
+              "name": {
+                "value": "Creperies"
+              }
+            },
+            {
+              "name": {
+                "value": "Cuban"
+              }
+            },
+            {
+              "name": {
+                "value": "Curry Sausage"
+              }
+            },
+            {
+              "name": {
+                "value": "Cypriot"
+              }
+            },
+            {
+              "name": {
+                "value": "Czech"
+              }
+            },
+            {
+              "name": {
+                "value": "Czech Slovakian"
+              }
+            },
+            {
+              "name": {
+                "value": "Danish"
+              }
+            },
+            {
+              "name": {
+                "value": "Delis"
+              }
+            },
+            {
+              "name": {
+                "value": "Deli"
+              }
+            },
+            {
+              "name": {
+                "value": "Diners"
+              }
+            },
+            {
+              "name": {
+                "value": "Diner"
+              }
+            },
+            {
+              "name": {
+                "value": "Dinner Theater"
+              }
+            },
+            {
+              "name": {
+                "value": "Dumplings"
+              }
+            },
+            {
+              "name": {
+                "value": "Dumpling"
+              }
+            },
+            {
+              "name": {
+                "value": "Eastern European"
+              }
+            },
+            {
+              "name": {
+                "value": "Parent Cafes"
+              }
+            },
+            {
+              "name": {
+                "value": "Ethiopian"
+              }
+            },
+            {
+              "name": {
+                "value": "Filipino"
+              }
+            },
+            {
+              "name": {
+                "value": "Fischbroetchen"
+              }
+            },
+            {
+              "name": {
+                "value": "Fish & Chips"
+              }
+            },
+            {
+              "name": {
+                "value": "Fish and Chips"
+              }
+            },
+            {
+              "name": {
+                "value": "Flatbread"
+              }
+            },
+            {
+              "name": {
+                "value": "Fondue"
+              }
+            },
+            {
+              "name": {
+                "value": "Food Court"
+              }
+            },
+            {
+              "name": {
+                "value": "Food Stands"
+              }
+            },
+            {
+              "name": {
+                "value": "Food Stand"
+              }
+            },
+            {
+              "name": {
+                "value": "Freiduria"
+              }
+            },
+            {
+              "name": {
+                "value": "French"
+              }
+            },
+            {
+              "name": {
+                "value": "Galician"
+              }
+            },
+            {
+              "name": {
+                "value": "Gastropubs"
+              }
+            },
+            {
+              "name": {
+                "value": "Gastropub"
+              }
+            },
+            {
+              "name": {
+                "value": "Georgian"
+              }
+            },
+            {
+              "name": {
+                "value": "German"
+              }
+            },
+            {
+              "name": {
+                "value": "Giblets"
+              }
+            },
+            {
+              "name": {
+                "value": "Gluten-Free"
+              }
+            },
+            {
+              "name": {
+                "value": "Gluten Free"
+              }
+            },
+            {
+              "name": {
+                "value": "No Gluten"
+              }
+            },
+            {
+              "name": {
+                "value": "Greek"
+              }
+            },
+            {
+              "name": {
+                "value": "Halal"
+              }
+            },
+            {
+              "name": {
+                "value": "Hawaiian"
+              }
+            },
+            {
+              "name": {
+                "value": "Heuriger"
+              }
+            },
+            {
+              "name": {
+                "value": "Himalayan"
+              }
+            },
+            {
+              "name": {
+                "value": "Nepalese"
+              }
+            },
+            {
+              "name": {
+                "value": "Hong Kong Style Cafe"
+              }
+            },
+            {
+              "name": {
+                "value": "Hong Kong"
+              }
+            },
+            {
+              "name": {
+                "value": "Hot Dogs"
+              }
+            },
+            {
+              "name": {
+                "value": "Hot Dog"
+              }
+            },
+            {
+              "name": {
+                "value": "Fast Food"
+              }
+            },
+            {
+              "name": {
+                "value": "Hot Pot"
+              }
+            },
+            {
+              "name": {
+                "value": "Hungarian"
+              }
+            },
+            {
+              "name": {
+                "value": "Iberian"
+              }
+            },
+            {
+              "name": {
+                "value": "Indonesian"
+              }
+            },
+            {
+              "name": {
+                "value": "Indian"
+              }
+            },
+            {
+              "name": {
+                "value": "International"
+              }
+            },
+            {
+              "name": {
+                "value": "Irish"
+              }
+            },
+            {
+              "name": {
+                "value": "Island Pub"
+              }
+            },
+            {
+              "name": {
+                "value": "Israeli"
+              }
+            },
+            {
+              "name": {
+                "value": "Italian"
+              }
+            },
+            {
+              "name": {
+                "value": "Japanese"
+              }
+            },
+            {
+              "name": {
+                "value": "Jewish"
+              }
+            },
+            {
+              "name": {
+                "value": "Kebab"
+              }
+            },
+            {
+              "name": {
+                "value": "Kopitiam"
+              }
+            },
+            {
+              "name": {
+                "value": "Korean"
+              }
+            },
+            {
+              "name": {
+                "value": "Kosher"
+              }
+            },
+            {
+              "name": {
+                "value": "Kurdish"
+              }
+            },
+            {
+              "name": {
+                "value": "Laos"
+              }
+            },
+            {
+              "name": {
+                "value": "Laotian"
+              }
+            },
+            {
+              "name": {
+                "value": "Latin American"
+              }
+            },
+            {
+              "name": {
+                "value": "Lyonnais"
+              }
+            },
+            {
+              "name": {
+                "value": "Malaysian"
+              }
+            },
+            {
+              "name": {
+                "value": "Meatballs"
+              }
+            },
+            {
+              "name": {
+                "value": "Meatball"
+              }
+            },
+            {
+              "name": {
+                "value": "Mediterranean"
+              }
+            },
+            {
+              "name": {
+                "value": "Mexican"
+              }
+            },
+            {
+              "name": {
+                "value": "Middle Eastern"
+              }
+            },
+            {
+              "name": {
+                "value": "Milk Bars"
+              }
+            },
+            {
+              "name": {
+                "value": "Milk Bar"
+              }
+            },
+            {
+              "name": {
+                "value": "Modern Australian"
+              }
+            },
+            {
+              "name": {
+                "value": "Modern European"
+              }
+            },
+            {
+              "name": {
+                "value": "Mongolian"
+              }
+            },
+            {
+              "name": {
+                "value": "Moroccan"
+              }
+            },
+            {
+              "name": {
+                "value": "American"
+              }
+            },
+            {
+              "name": {
+                "value": "Canadian"
+              }
+            },
+            {
+              "name": {
+                "value": "New Mexican Cuisine"
+              }
+            },
+            {
+              "name": {
+                "value": "New Zealand"
+              }
+            },
+            {
+              "name": {
+                "value": "Nicaraguan"
+              }
+            },
+            {
+              "name": {
+                "value": "Night Food"
+              }
+            },
+            {
+              "name": {
+                "value": "Nikkei"
+              }
+            },
+            {
+              "name": {
+                "value": "Noodles"
+              }
+            },
+            {
+              "name": {
+                "value": "Noodle"
+              }
+            },
+            {
+              "name": {
+                "value": "Norcinerie"
+              }
+            },
+            {
+              "name": {
+                "value": "Traditional Norwegian"
+              }
+            },
+            {
+              "name": {
+                "value": "Norwegian"
+              }
+            },
+            {
+              "name": {
+                "value": "Open Sandwiches"
+              }
+            },
+            {
+              "name": {
+                "value": "Open Sandwich"
+              }
+            },
+            {
+              "name": {
+                "value": "Oriental"
+              }
+            },
+            {
+              "name": {
+                "value": "Pakistani"
+              }
+            },
+            {
+              "name": {
+                "value": "Pan Asian"
+              }
+            },
+            {
+              "name": {
+                "value": "Parma"
+              }
+            },
+            {
+              "name": {
+                "value": "Persian"
+              }
+            },
+            {
+              "name": {
+                "value": "Iranian"
+              }
+            },
+            {
+              "name": {
+                "value": "Peruvian"
+              }
+            },
+            {
+              "name": {
+                "value": "Comercial"
+              }
+            },
+            {
+              "name": {
+                "value": "Pho"
+              }
+            },
+            {
+              "name": {
+                "value": "Pita"
+              }
+            },
+            {
+              "name": {
+                "value": "Pizza"
+              }
+            },
+            {
+              "name": {
+                "value": "Polish"
+              }
+            },
+            {
+              "name": {
+                "value": "Pop-Up Restaurants"
+              }
+            },
+            {
+              "name": {
+                "value": "Portuguese"
+              }
+            },
+            {
+              "name": {
+                "value": "Potatoes"
+              }
+            },
+            {
+              "name": {
+                "value": "Poutineries"
+              }
+            },
+            {
+              "name": {
+                "value": "Poutine"
+              }
+            },
+            {
+              "name": {
+                "value": "Pub Food"
+              }
+            },
+            {
+              "name": {
+                "value": "Pub"
+              }
+            },
+            {
+              "name": {
+                "value": "Live Food"
+              }
+            },
+            {
+              "name": {
+                "value": "Raw Food"
+              }
+            },
+            {
+              "name": {
+                "value": "Rice"
+              }
+            },
+            {
+              "name": {
+                "value": "Romanian"
+              }
+            },
+            {
+              "name": {
+                "value": "Rotisserie Chicken"
+              }
+            },
+            {
+              "name": {
+                "value": "Rumanian"
+              }
+            },
+            {
+              "name": {
+                "value": "Russian"
+              }
+            },
+            {
+              "name": {
+                "value": "Salad"
+              }
+            },
+            {
+              "name": {
+                "value": "Sandwiches"
+              }
+            },
+            {
+              "name": {
+                "value": "Scandinavian"
+              }
+            },
+            {
+              "name": {
+                "value": "Schnitzel"
+              }
+            },
+            {
+              "name": {
+                "value": "Scottish"
+              }
+            },
+            {
+              "name": {
+                "value": "Seafood"
+              }
+            },
+            {
+              "name": {
+                "value": "Serbo Croatian"
+              }
+            },
+            {
+              "name": {
+                "value": "Signature Cuisine"
+              }
+            },
+            {
+              "name": {
+                "value": "Singaporean"
+              }
+            },
+            {
+              "name": {
+                "value": "Singapore"
+              }
+            },
+            {
+              "name": {
+                "value": "Slovakian"
+              }
+            },
+            {
+              "name": {
+                "value": "Soul Food"
+              }
+            },
+            {
+              "name": {
+                "value": "Soup"
+              }
+            },
+            {
+              "name": {
+                "value": "Southern"
+              }
+            },
+            {
+              "name": {
+                "value": "Spanish"
+              }
+            },
+            {
+              "name": {
+                "value": "Sri Lankan"
+              }
+            },
+            {
+              "name": {
+                "value": "Steakhouses"
+              }
+            },
+            {
+              "name": {
+                "value": "Steakhouse"
+              }
+            },
+            {
+              "name": {
+                "value": "Steak"
+              }
+            },
+            {
+              "name": {
+                "value": "French Southwest"
+              }
+            },
+            {
+              "name": {
+                "value": "Supper Clubs"
+              }
+            },
+            {
+              "name": {
+                "value": "Sushi Bars"
+              }
+            },
+            {
+              "name": {
+                "value": "Sushi Bar"
+              }
+            },
+            {
+              "name": {
+                "value": "Sushi"
+              }
+            },
+            {
+              "name": {
+                "value": "Swabian"
+              }
+            },
+            {
+              "name": {
+                "value": "Swedish"
+              }
+            },
+            {
+              "name": {
+                "value": "Swiss Food"
+              }
+            },
+            {
+              "name": {
+                "value": "Swiss"
+              }
+            },
+            {
+              "name": {
+                "value": "Syrian"
+              }
+            },
+            {
+              "name": {
+                "value": "Tabernas"
+              }
+            },
+            {
+              "name": {
+                "value": "Taiwanese"
+              }
+            },
+            {
+              "name": {
+                "value": "Tapas Bars"
+              }
+            },
+            {
+              "name": {
+                "value": "Tapas"
+              }
+            },
+            {
+              "name": {
+                "value": "Small Plates"
+              }
+            },
+            {
+              "name": {
+                "value": "Tavola Calda"
+              }
+            },
+            {
+              "name": {
+                "value": "Tex-Mex"
+              }
+            },
+            {
+              "name": {
+                "value": "Tex Mex"
+              }
+            },
+            {
+              "name": {
+                "value": "Thai"
+              }
+            },
+            {
+              "name": {
+                "value": "Traditional American"
+              }
+            },
+            {
+              "name": {
+                "value": "Traditional Swedish"
+              }
+            },
+            {
+              "name": {
+                "value": "Trattorie"
+              }
+            },
+            {
+              "name": {
+                "value": "Turkish"
+              }
+            },
+            {
+              "name": {
+                "value": "Ukrainian"
+              }
+            },
+            {
+              "name": {
+                "value": "Uzbek"
+              }
+            },
+            {
+              "name": {
+                "value": "Vegan"
+              }
+            },
+            {
+              "name": {
+                "value": "Vegetarian"
+              }
+            },
+            {
+              "name": {
+                "value": "Venison"
+              }
+            },
+            {
+              "name": {
+                "value": "Vietnamese"
+              }
+            },
+            {
+              "name": {
+                "value": "Waffles"
+              }
+            },
+            {
+              "name": {
+                "value": "Waffle"
+              }
+            },
+            {
+              "name": {
+                "value": "Wok"
+              }
+            },
+            {
+              "name": {
+                "value": "Wraps"
+              }
+            },
+            {
+              "name": {
+                "value": "Wrap"
+              }
+            },
+            {
+              "name": {
+                "value": "Yugoslav"
+              }
+            }
+          ],
+          "name": "LIST_OF_DESCRIPTORS"
+        }
+      ]
+    }
+  }
+}

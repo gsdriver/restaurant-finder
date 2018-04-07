@@ -4,7 +4,6 @@
 
 'use strict';
 
-var config = require("./config");
 const https = require('https');
 const querystring = require('querystring');
 var utils = require("./utils");
@@ -101,7 +100,7 @@ module.exports = {
 
 function SendYelpRequest(path, callback)
 {
-    var headers = {"Authorization": "Bearer " + config.token};
+    var headers = {"Authorization": "Bearer " + process.env.YELPTOKEN};
     var options = { hostname: 'api.yelp.com', port: 443, path: path, method: "GET", headers: headers };
 
     var req = https.request(options, (res) => {
