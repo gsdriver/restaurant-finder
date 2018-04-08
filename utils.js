@@ -8,15 +8,12 @@
 
 module.exports = {
   emitResponse: function(context, error, response, speech, reprompt, cardTitle, cardText) {
-    if (!process.env.NOLOG) {
-      console.log(JSON.stringify(context.event));
-    }
-
     if (error) {
       console.log('Speech error: ' + error);
       context.response.speak('Sorry, something went wrong')
         .listen('What can I help you with?');
     } else if (response) {
+      context.attributes.sessionCount = (context.attributes.sessionCount + 1) || 1;
       context.response.speak(response);
     } else if (cardTitle) {
       context.response.speak(speech)

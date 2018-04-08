@@ -47,11 +47,17 @@ const handlers = {
   'SetLocationIntent': SetLocation.handleIntent,
   'ReadListIntent': ReadList.handleIntent,
   'DetailsIntent': Details.handleIntent,
+  'BackIntent': Back.handleIntent,
   'AMAZON.PreviousIntent': Back.handleIntent,
   'AMAZON.RepeatIntent': Repeat.handleIntent,
   'AMAZON.HelpIntent': Help.handleIntent,
   'AMAZON.StopIntent': Exit.handleIntent,
   'AMAZON.CancelIntent': Exit.handleIntent,
+  'SessionEndedRequest': function() {
+    console.log('Session ended!');
+    this.attributes.sessionCount = (this.attributes.sessionCount + 1) || 1;
+    this.emit(':saveState', true);
+  },
   'Unhandled': function() {
     utils.emitResponse(this, null, null, 'Sorry, I didn\'t get that. Try saying help.', 'Try saying help.');
   },

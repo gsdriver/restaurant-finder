@@ -135,16 +135,16 @@ function getRestaurantList(params, callback) {
       // Save fields we care about from Yelp, also note the total number
       // of restaurants and how many we've read to the user so far (0)
       const results = {total: restaurantList.total, read: 0, restaurants: []};
-      const ratingFilter = [];
+      let ratingFilter = [];
       if (params.rating) {
-          ratingFilter = params.rating.split(',');
+        ratingFilter = params.rating.split(',');
       }
 
       restaurantList.businesses.forEach((restaurant) => {
         const myResult = {};
 
         // Convert the phone number to a US number
-        if (restaurant.phone) {
+        if (restaurant.phone && (restaurant.phone.length > 0)) {
           if ((restaurant.phone.length == 12 && (restaurant.phone.indexOf('+1') > -1))) {
             // OK, make it (xxx) xxx-xxxx
             myResult.phone = '(' +
@@ -157,8 +157,19 @@ function getRestaurantList(params, callback) {
           }
         }
 
+        // Set the location fields that we need
+        if (restaurant.location) {
+          myResult.location = {};
+          myResult.location.address1 =
+            (restaurant.location.address1 && restaurant.location.address1.length)
+            ? restaurant.location.address1 : undefined;
+          myResult.location.city =
+            (restaurant.location.city && restaurant.location.city.length)
+            ? restaurant.location.city : undefined;
+          myResult.location.display_address = restaurant.location.display_address;
+        }
+
         myResult.name = restaurant.name;
-        myResult.location = restaurant.location;
         myResult.rating = restaurant.rating;
         myResult.review_count = restaurant.review_count;
         myResult.is_closed = restaurant.is_closed;

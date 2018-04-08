@@ -218,7 +218,7 @@
           ]
         },
         {
-          "name": "AMAZON.PreviousIntent",
+          "name": "AMAZON.PreviousIntent"
         },
         {
           "name": "DetailsIntent",
