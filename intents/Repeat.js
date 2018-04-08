@@ -21,10 +21,11 @@ module.exports = {
         });
         break;
       case 'DETAILS':
-        let speech = utils.readRestaurantDetails(this.attributes.lastResponse);
-        const reprompt = 'What else can I help you with?';
-        speech += ' <break time=\"200ms\"/> ' + reprompt;
-        utils.emitResponse(this, null, null, speech, reprompt);
+        utils.readRestaurantDetails(this.attributes.lastResponse, (text) => {
+          const reprompt = 'What else can I help you with?';
+          const speech = text + ' <break time=\"200ms\"/> ' + reprompt;
+          utils.emitResponse(this, null, null, speech, reprompt);
+        });
         break;
       default:
         utils.emitResponse(this, null, null,

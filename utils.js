@@ -100,6 +100,7 @@ module.exports = {
     const restaurant = restaurantList.restaurants[restaurantList.details];
     const priceList = ['cheap', 'moderately priced', 'spendy', 'splurge'];
     let speech;
+    let cardText;
 
     // Read information about the restaurant
     speech = restaurant.name + ' is located at ' + restaurant.location.address1 + ' in ' + restaurant.location.city;
@@ -111,7 +112,25 @@ module.exports = {
       speech += (' The phone number is ' + restaurant.phone);
     }
 
-    return speech;
+    // And set up the card
+    cardText = restaurant.name + '\n';
+    if (restaurant.location.display_address) {
+      restaurant.location.display_address.forEach((address) => {
+        cardText += (address + '\n');
+      });
+    } else {
+      cardText += restaurant.location.address1 + '\n';
+      cardText += restaurant.location.city + '\n';
+    }
+    cardText += ('Yelp rating: ' + restaurant.rating + ' (' + restaurant.review_count + ' reviews)\n');
+    if (restaurant.price) {
+      cardText += ('Price: ' + priceList[restaurant.price - 1] + '\n');
+    }
+    if (restaurant.phone) {
+      cardText += ('Phone: ' + restaurant.phone + '\n');
+    }
+
+    callback(speech, cardText);
   },
 };
 

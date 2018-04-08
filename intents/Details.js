@@ -31,21 +31,7 @@ module.exports = {
           idSlot.value + ' is not a valid option to read. Please ask for a valid number or say repeat to repeat ths list.',
           'Please ask for a valid number of say repeat to repeat the list.');
       } else {
-        this.attributes.lastResponse.details = index;
-        let speech = utils.readRestaurantDetails(this.attributes.lastResponse);
-        const cardText = speech;
-        const reprompt = 'What else can I help you with?';
-        speech += ' <break time=\"200ms\"/> ' + reprompt;
-
-        this.handler.state = 'DETAILS';
-
-        // And get an image for the card
-        const restaurant = this.attributes.lastResponse.restaurants[index];
-        yelp.businessLookup(restaurant.id, (error, business) => {
-          const imageUrl = (business) ? business.image_url : undefined;
-          utils.emitResponse(this, null, null, speech, reprompt,
-            restaurant.name, cardText, imageUrl);
-        });
+        showDetails(this, index);
       }
     }
   },
@@ -57,12 +43,25 @@ module.exports = {
         'You are at the end of the list. Please do a new search or say back to go back to the list of results.',
         'Please search for another set of restaurants.');
     } else {
-      this.attributes.lastResponse.details = index;
-      let speech = utils.readRestaurantDetails(this.attributes.lastResponse);
-      const reprompt = 'What else can I help you with?';
-      speech += ' ' + reprompt;
-
-      utils.emitResponse(this, null, null, speech, reprompt);
+      showDetails(this, index);
     }
   },
 };
+
+function showDetails(context, index) {
+  context.attributes.lastResponse.details = index;
+  utils.readRestaurantDetails(context.attributes.lastResponse, (text, cardText) => {
+    const reprompt = 'What else can I help you with?';
+    const speech = text + ' <break time=\"200ms\"/> ' + reprompt;
+
+    context.handler.state = 'DETAILS';
+
+    // And get an image for the card
+    const restaurant = context.attributes.lastResponse.restaurants[index];
+    yelp.businessLookup(restaurant.id, (error, business) => {
+      const imageUrl = (business) ? business.image_url : undefined;
+      utils.emitResponse(context, null, null, speech, reprompt,
+        restaurant.name, cardText, imageUrl);
+    });
+  });
+}
