@@ -39,4 +39,7 @@ module.exports = {
 
     return retval;
   },
+  cleanString: function(str) {
+    return str.replace(/&/g, 'and');
+  },
 };

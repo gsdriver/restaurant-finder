@@ -162,14 +162,14 @@ function getRestaurantList(params, callback) {
           myResult.location = {};
           myResult.location.address1 =
             (restaurant.location.address1 && restaurant.location.address1.length)
-            ? restaurant.location.address1 : undefined;
+            ? utils.cleanString(restaurant.location.address1) : undefined;
           myResult.location.city =
             (restaurant.location.city && restaurant.location.city.length)
-            ? restaurant.location.city : undefined;
+            ? utils.cleanString(restaurant.location.city) : undefined;
           myResult.location.display_address = restaurant.location.display_address;
         }
 
-        myResult.name = restaurant.name;
+        myResult.name = utils.cleanString(restaurant.name);
         myResult.rating = restaurant.rating;
         myResult.review_count = restaurant.review_count;
         myResult.is_closed = restaurant.is_closed;
@@ -203,7 +203,7 @@ function readList(restaurantList, callback) {
 
   let i;
   for (i = 0; i < toRead; i++) {
-    speech += (' ' + (i + 1) + ' ... ' + restaurantList.restaurants[restaurantList.read + i].name + '.');
+    speech += (' ' + (i + 1) + ' <break time=\"200ms\"/> ' + restaurantList.restaurants[restaurantList.read + i].name + '.');
   }
   restaurantList.read += toRead;
 
