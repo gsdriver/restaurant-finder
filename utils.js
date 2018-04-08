@@ -113,7 +113,6 @@ module.exports = {
     }
 
     // And set up the card
-    cardText = restaurant.name + '\n';
     if (restaurant.location.display_address) {
       restaurant.location.display_address.forEach((address) => {
         cardText += (address + '\n');

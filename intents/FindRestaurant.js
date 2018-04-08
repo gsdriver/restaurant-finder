@@ -13,14 +13,19 @@ module.exports = {
     // Build up our parameter structure from the intent
     const params = buildYelpParameters(this.event.request.intent);
 
-    // If they didn't set a location in the request and we don't have one here, we
-    // will prompt the user for their current location
+    // Find a location in the following order:
+    // 1) They specified one in the request
+    // 2) They saved a location using set location
+    // 3) The location they used with the last search
     if (!params.location) {
-      if (!this.attributes.location) {
+      if (this.attributes.location) {
+        params.location = this.attributes.location;
+      } else if (this.attributes.lastSearch && this.attributes.lastSearch.location) {
+        params.location = this.attributes.lastSearch.location;
+      } else {
         utils.emitResponse(this, null, 'As a new user, please specify your location by saying Set Location.');
         return;
       }
-      params.location = this.attributes.location;
     }
 
     // OK, let's call Yelp API to get a list of restaurants
