@@ -38,8 +38,93 @@ const Exit = require('./intents/Exit');
 
 const APP_ID = 'amzn1.ask.skill.4c848d38-347c-4e03-b908-42c6af6c207d';
 
+const detailsHandlers = Alexa.CreateStateHandler('DETAILS', {
+  'NewSession': function() {
+    this.handler.state = '';
+    this.emitWithState('NewSession');
+  },
+  'LaunchRequest': Launch.handleIntent,
+  'FindRestaurantIntent': FindRestaurant.handleIntent,
+  'SetLocationIntent': SetLocation.handleIntent,
+  'ReadListIntent': ReadList.handleIntent,
+  'DetailsIntent': Details.handleIntent,
+  'BackIntent': Back.handleIntent,
+  'AMAZON.PreviousIntent': Back.handleIntent,
+  'AMAZON.MoreIntent': ReadList.handleIntent,
+  'AMAZON.NextIntent': ReadList.handleIntent,
+  'AMAZON.RepeatIntent': Repeat.handleIntent,
+  'AMAZON.HelpIntent': Help.handleIntent,
+  'AMAZON.StopIntent': Exit.handleIntent,
+  'AMAZON.CancelIntent': Exit.handleIntent,
+  'SessionEndedRequest': function() {
+    console.log('Session ended!');
+    this.attributes.sessionCount = (this.attributes.sessionCount + 1) || 1;
+    this.emit(':saveState', true);
+  },
+  'Unhandled': function() {
+    utils.emitResponse(this, null, null, 'Sorry, I didn\'t get that. Try saying help.', 'Try saying help.');
+  },
+});
+
+const listHandlers = Alexa.CreateStateHandler('LIST', {
+  'NewSession': function() {
+    this.handler.state = '';
+    this.emitWithState('NewSession');
+  },
+  'LaunchRequest': Launch.handleIntent,
+  'FindRestaurantIntent': FindRestaurant.handleIntent,
+  'SetLocationIntent': SetLocation.handleIntent,
+  'ReadListIntent': ReadList.handleIntent,
+  'DetailsIntent': Details.handleIntent,
+  'BackIntent': Back.handleIntent,
+  'AMAZON.PreviousIntent': Back.handleIntent,
+  'AMAZON.MoreIntent': ReadList.handleIntent,
+  'AMAZON.NextIntent': ReadList.handleIntent,
+  'AMAZON.RepeatIntent': Repeat.handleIntent,
+  'AMAZON.HelpIntent': Help.handleIntent,
+  'AMAZON.StopIntent': Exit.handleIntent,
+  'AMAZON.CancelIntent': Exit.handleIntent,
+  'SessionEndedRequest': function() {
+    console.log('Session ended!');
+    this.attributes.sessionCount = (this.attributes.sessionCount + 1) || 1;
+    this.emit(':saveState', true);
+  },
+  'Unhandled': function() {
+    utils.emitResponse(this, null, null, 'Sorry, I didn\'t get that. Try saying help.', 'Try saying help.');
+  },
+});
+
+const resultHandlers = Alexa.CreateStateHandler('RESULTS', {
+  'NewSession': function() {
+    this.handler.state = '';
+    this.emitWithState('NewSession');
+  },
+  'LaunchRequest': Launch.handleIntent,
+  'FindRestaurantIntent': FindRestaurant.handleIntent,
+  'SetLocationIntent': SetLocation.handleIntent,
+  'ReadListIntent': ReadList.handleIntent,
+  'DetailsIntent': Details.handleIntent,
+  'BackIntent': Back.handleIntent,
+  'AMAZON.PreviousIntent': Back.handleIntent,
+  'AMAZON.MoreIntent': ReadList.handleIntent,
+  'AMAZON.NextIntent': ReadList.handleIntent,
+  'AMAZON.RepeatIntent': Repeat.handleIntent,
+  'AMAZON.HelpIntent': Help.handleIntent,
+  'AMAZON.StopIntent': Exit.handleIntent,
+  'AMAZON.CancelIntent': Exit.handleIntent,
+  'SessionEndedRequest': function() {
+    console.log('Session ended!');
+    this.attributes.sessionCount = (this.attributes.sessionCount + 1) || 1;
+    this.emit(':saveState', true);
+  },
+  'Unhandled': function() {
+    utils.emitResponse(this, null, null, 'Sorry, I didn\'t get that. Try saying help.', 'Try saying help.');
+  },
+});
+
 const handlers = {
   'NewSession': function() {
+    this.attributes.lastRun = Date.now();
     this.emit('LaunchRequest');
   },
   'LaunchRequest': Launch.handleIntent,
@@ -49,6 +134,8 @@ const handlers = {
   'DetailsIntent': Details.handleIntent,
   'BackIntent': Back.handleIntent,
   'AMAZON.PreviousIntent': Back.handleIntent,
+  'AMAZON.MoreIntent': ReadList.handleIntent,
+  'AMAZON.NextIntent': ReadList.handleIntent,
   'AMAZON.RepeatIntent': Repeat.handleIntent,
   'AMAZON.HelpIntent': Help.handleIntent,
   'AMAZON.StopIntent': Exit.handleIntent,
@@ -80,7 +167,7 @@ function runSkill(event, context, callback) {
     console.log(JSON.stringify(event));
   }
   alexa.appId = APP_ID;
-  alexa.registerHandlers(handlers);
+  alexa.registerHandlers(resultHandlers, detailsHandlers, listHandlers, handlers);
   alexa.dynamoDBTableName = 'RestaurantFinder';
   alexa.execute();
 }

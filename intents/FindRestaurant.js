@@ -6,7 +6,7 @@
 
 const utils = require('../utils');
 const categoryList = require('../categories');
-const yelp = require('../Yelp');
+const yelp = require('../api/Yelp');
 
 module.exports = {
   handleIntent: function() {
@@ -23,14 +23,18 @@ module.exports = {
       params.location = this.attributes.location;
     }
 
-    yelp.readRestaurantResults(params,
-      (speechError, speechResponse, speechQuestion, repromptQuestion, restaurantList) => {
+    // OK, let's call Yelp API to get a list of restaurants
+    yelp.getRestaurantList(params, (error, restaurantList) => {
       if (restaurantList) {
-        this.attributes.lastAction = ((restaurantList.total > 0) && (restaurantList.total <= 5)) ? 'ReadList,0' : 'FindRestaurant';
+        this.attributes.lastSearch = params;
         this.attributes.lastResponse = restaurantList;
+        utils.readRestaurantResults(this.attributes, (speech, reprompt, state) => {
+          this.handler.state = state;
+          utils.emitResponse(this, null, null, speech, reprompt);
+        });
+      } else {
+        utils.emitResponse(this, error);
       }
-
-      utils.emitResponse(this, speechError, speechResponse, speechQuestion, repromptQuestion);
     });
   },
 };

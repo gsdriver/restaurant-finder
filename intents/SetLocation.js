@@ -30,7 +30,6 @@ module.exports = {
     // They are specifying a location - we will set this in the DB - make sure to preserve
     // any other entries associated with this user
     this.attributes.location = location;
-    this.attributes.lastAction = 'SetLocation';
     let speech = 'Preferred location set to ' + utils.readLocation(location) + '.';
 
     // If this isn't a ZIP code, suggest that they can set by ZIP code

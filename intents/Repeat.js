@@ -5,26 +5,32 @@
 'use strict';
 
 const utils = require('../utils');
-const yelp = require('../Yelp');
 
 module.exports = {
   handleIntent: function() {
-    // I can only repeat if they did a Details or a Read List
-    const lastAction = this.attributes.lastAction.split(',');
-
-    if ((lastAction.length == 2) && (lastAction[0] == 'ReadList')) {
-      // Reset read so we re-read the last response
-      this.attributes.lastResponse.read = parseInt(lastAction[1]);
-      yelp.readRestaurantsFromList(this.attributes.lastResponse, (speech, reprompt) => {
+    // Look at the state
+    switch (this.handler.state) {
+      case 'RESULTS':
+        utils.readRestaurantResults(this.attributes, (speech, reprompt) => {
+          utils.emitResponse(this, null, null, speech, reprompt);
+        });
+        break;
+      case 'LIST':
+        utils.readRestaurantsFromList(this.attributes.lastResponse, (speech, reprompt) => {
+          utils.emitResponse(this, null, null, speech, reprompt);
+        });
+        break;
+      case 'DETAILS':
+        let speech = yelp.readResturantDetails(this.attributes.lastResponse);
+        const reprompt = 'What else can I help you with?';
+        speech += ' ' + reprompt;
         utils.emitResponse(this, null, null, speech, reprompt);
-      });
-    } else if ((lastAction.length == 2) && (lastAction[0] == 'Details')) {
-      yelp.readResturantDetails(this.attributes.lastResponse, parseInt(lastAction[1]),
-        (error, speechResponse, speechReprompt, reprompt, saveState) => {
-        utils.emitResponse(this, error, speechResponse, speechReprompt, reprompt);
-      });
-    } else {
-      utils.emitResponse(this, null, 'You can say repeat after you\'ve read a list of restaurants or details on a specific restaurant.');
+        break;
+      default:
+        utils.emitResponse(this, null, null,
+            'I have nothing to repeat. What else can I help you with?',
+            'What else can I help you with?');
+        break;
     }
   },
 };
