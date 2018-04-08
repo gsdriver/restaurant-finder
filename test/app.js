@@ -21,6 +21,7 @@ function BuildEvent(argv)
     var backIntent = {"name": "AMAZON.PreviousIntent", "slots": {}};
     var restaurantDetails = {"name": "DetailsIntent", "slots": {"RestaurantID": {"name": "RestaurantID", "value": ""}}};
     var repeatIntent = {"name": "AMAZON.RepeatIntent", "slots": {}};
+    var help = {"name": "AMAZON.HelpIntent", "slots": {}};
 
     var lambda = {
       "session": {
@@ -122,6 +123,10 @@ function BuildEvent(argv)
     else if (argv[2] == "repeat")
     {
         lambda.request.intent = repeatIntent;
+    }
+    else if (argv[2] == "help")
+    {
+        lambda.request.intent = help;
     }
     else if (argv[2] == "open")
     {

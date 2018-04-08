@@ -6,7 +6,8 @@ const LIST_LENGTH = 5;
 
 module.exports = {
   PAGE_SIZE: LIST_LENGTH,
-  emitResponse: function(context, error, response, speech, reprompt, cardTitle, cardText) {
+  emitResponse: function(context, error, response, speech, reprompt,
+                        cardTitle, cardText, imageUrl) {
     if (error) {
       console.log('Speech error: ' + error);
       context.response.speak('Sorry, something went wrong')
@@ -16,8 +17,12 @@ module.exports = {
       context.response.speak(response);
     } else if (cardTitle) {
       context.response.speak(speech)
-        .listen(reprompt)
-        .cardRenderer(cardTitle, cardText);
+        .listen(reprompt);
+      if (imageUrl) {
+        context.response.cardRenderer(cardTitle, cardText, {smallImageUrl: imageUrl});
+      } else {
+        context.response.cardRenderer(cardTitle, cardText);
+      }
     } else {
       context.response.speak(speech)
         .listen(reprompt);
@@ -41,7 +46,6 @@ module.exports = {
   readRestaurantResults: function(attributes, callback) {
     let speech;
     let reprompt;
-    let state = 'RESULTS';
 
     // If there are more than five results, prompt the user to filter further
     if (!attributes.lastResponse || !attributes.lastResponse.restaurants
@@ -49,14 +53,15 @@ module.exports = {
       speech = 'I\'m sorry, I didn\'t find any ' + paramsToText(attributes.lastSearch) + '. ';
       reprompt = 'What else can I help you with?';
       speech += reprompt;
+      state = '';
     } else if (attributes.lastResponse.total > LIST_LENGTH) {
       speech = 'I found ' + ((attributes.lastResponse.total > 50)
         ? 'more than 50' : attributes.lastResponse.total);
       speech += ' ' + paramsToText(attributes.lastSearch) + '. ';
       reprompt = 'Repeat your request with additional conditions like good or cheap to narrow the list, or say Read List to start reading the list.';
       speech += reprompt;
+      state = 'RESULTS';
     } else {
-      state = 'LIST';
       attributes.lastResponse.read = 0;
       speech = 'I found ' + attributes.lastResponse.total + ' ' + paramsToText(attributes.lastSearch) + '. ';
 
@@ -67,6 +72,7 @@ module.exports = {
       }
       reprompt = 'You can ask for more details by saying the corresponding restaurant number';
       speech += ' ' + reprompt;
+      state = 'LIST';
     }
 
     callback(speech, reprompt, state);

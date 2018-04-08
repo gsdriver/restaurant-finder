@@ -21,9 +21,9 @@ module.exports = {
         });
         break;
       case 'DETAILS':
-        let speech = yelp.readResturantDetails(this.attributes.lastResponse);
+        let speech = utils.readRestaurantDetails(this.attributes.lastResponse);
         const reprompt = 'What else can I help you with?';
-        speech += ' ' + reprompt;
+        speech += ' <break time=\"200ms\"/> ' + reprompt;
         utils.emitResponse(this, null, null, speech, reprompt);
         break;
       default:

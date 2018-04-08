@@ -13,6 +13,7 @@ module.exports = {
 
     // Clear state
     this.handler.state = '';
+    delete this.attributes['STATE'];
     utils.emitResponse(this, null, null, speech, reprompt);
   },
 };

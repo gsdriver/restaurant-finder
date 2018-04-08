@@ -69,6 +69,7 @@ module.exports = {
           myResult.price = (restaurant.price) ? Math.min(restaurant.price.length, 4) : 0;
           myResult.distance = restaurant.distance;
           myResult.url = restaurant.url;
+          myResult.id = restaurant.id;
 
           // If there is a rating filter, honor it
           if ((ratingFilter.length != 2) ||
@@ -79,6 +80,18 @@ module.exports = {
 
         results.total = results.restaurants.length;
         callback(error, results);
+      }
+    });
+  },
+  businessLookup: function(id, callback) {
+    sendYelpRequest('/v3/businesses/' + id, (error, result) => {
+      if (error) {
+        callback(error, null);
+      } else {
+        const myResult = {};
+
+        myResult.image_url = result.image_url;
+        callback(error, myResult);
       }
     });
   },

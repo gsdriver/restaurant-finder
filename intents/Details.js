@@ -5,6 +5,7 @@
 'use strict';
 
 const utils = require('../utils');
+const yelp = require('../api/Yelp');
 
 module.exports = {
   handleIntent: function() {
@@ -32,12 +33,36 @@ module.exports = {
       } else {
         this.attributes.lastResponse.details = index;
         let speech = utils.readRestaurantDetails(this.attributes.lastResponse);
+        const cardText = speech;
         const reprompt = 'What else can I help you with?';
-        speech += ' ' + reprompt;
+        speech += ' <break time=\"200ms\"/> ' + reprompt;
 
         this.handler.state = 'DETAILS';
-        utils.emitResponse(this, null, null, speech, reprompt);
+
+        // And get an image for the card
+        const restaurant = this.attributes.lastResponse.restaurants[index];
+        yelp.businessLookup(restaurant.id, (error, business) => {
+          const imageUrl = (business) ? business.image_url : undefined;
+          utils.emitResponse(this, null, null, speech, reprompt,
+            restaurant.name, cardText, imageUrl);
+        });
       }
+    }
+  },
+  handleNextIntent: function() {
+    // Go to the next restaurant in the list
+    const index = this.attributes.lastResponse.details + 1;
+    if (index >= this.attributes.lastResponse.restaurants.length) {
+      utils.emitResponse(this, null, null,
+        'You are at the end of the list. Please do a new search or say back to go back to the list of results.',
+        'Please search for another set of restaurants.');
+    } else {
+      this.attributes.lastResponse.details = index;
+      let speech = utils.readRestaurantDetails(this.attributes.lastResponse);
+      const reprompt = 'What else can I help you with?';
+      speech += ' ' + reprompt;
+
+      utils.emitResponse(this, null, null, speech, reprompt);
     }
   },
 };
