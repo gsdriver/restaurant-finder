@@ -1,0 +1,1 @@
+aws lambda update-function-code --function-name RestaurantFinder_v2 --zip-file fileb://restaurant-finder.zip --region us-east-1

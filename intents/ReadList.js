@@ -5,7 +5,7 @@
 'use strict';
 
 const utils = require('../utils');
-const yelp = require('./Yelp');
+const yelp = require('../Yelp');
 
 module.exports = {
   handleIntent: function() {
@@ -24,9 +24,7 @@ module.exports = {
       yelp.readRestaurantsFromList(this.attributes.lastResponse, (speech, reprompt) => {
         // Awesome - now that we've read, we need to write this back out to the DB
         // in case there are more results to read
-        this.attributes.save((error) => {
-          utils.emitResponse(this, null, null, speech, reprompt);
-        });
+        utils.emitResponse(this, null, null, speech, reprompt);
       });
     }
   },

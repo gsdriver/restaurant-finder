@@ -5,7 +5,7 @@
 'use strict';
 
 const utils = require('../utils');
-const yelp = require('./Yelp');
+const yelp = require('../Yelp');
 
 module.exports = {
   handleIntent: function() {
@@ -17,13 +17,14 @@ module.exports = {
     }
 
     // OK, let's get the details
-    yelp.readResturantDetails(userData.lastResponse, idSlot.value,
+    yelp.readResturantDetails(this.attributes.lastResponse, idSlot.value,
       (error, speechResponse, speechReprompt, reprompt, readDetails) => {
       // If the user successfully read the list, then the last action has changed
       // otherwise keep the last action as it was
       if (readDetails) {
         this.attributes.lastAction = 'Details,' + idSlot.value;
       }
+
       utils.emitResponse(this, error, speechResponse, speechReprompt, reprompt);
     });
   },

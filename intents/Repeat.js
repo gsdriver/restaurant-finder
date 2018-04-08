@@ -5,7 +5,7 @@
 'use strict';
 
 const utils = require('../utils');
-const yelp = require('./Yelp');
+const yelp = require('../Yelp');
 
 module.exports = {
   handleIntent: function() {

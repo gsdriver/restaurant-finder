@@ -53,9 +53,7 @@ const handlers = {
   'AMAZON.StopIntent': Exit.handleIntent,
   'AMAZON.CancelIntent': Exit.handleIntent,
   'Unhandled': function() {
-    const res = require('./' + this.event.request.locale + '/resources');
-    utils.emitResponse(this, null, null,
-          res.strings.UNKNOWN_INTENT, res.strings.UNKNOWN_INTENT_REPROMPT);
+    utils.emitResponse(this, null, null, 'Sorry, I didn\'t get that. Try saying help.', 'Try saying help.');
   },
 };
 
@@ -67,10 +65,14 @@ if (process.env.DASHBOTKEY) {
 }
 
 function runSkill(event, context, callback) {
+  const AWS = require('aws-sdk');
   AWS.config.update({region: 'us-east-1'});
 
   const alexa = Alexa.handler(event, context);
 
+  if (!process.env.NOLOG) {
+    console.log(JSON.stringify(event));
+  }
   alexa.appId = APP_ID;
   alexa.registerHandlers(handlers);
   alexa.dynamoDBTableName = 'RestaurantFinder';

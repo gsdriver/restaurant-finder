@@ -6,13 +6,12 @@
 
 const utils = require('../utils');
 const categoryList = require('../categories');
-const yelp = require('./Yelp');
+const yelp = require('../Yelp');
 
 module.exports = {
   handleIntent: function() {
     // Build up our parameter structure from the intent
     const params = buildYelpParameters(this.event.request.intent);
-    let speech;
 
     // If they didn't set a location in the request and we don't have one here, we
     // will prompt the user for their current location
@@ -33,8 +32,6 @@ module.exports = {
 
       utils.emitResponse(this, speechError, speechResponse, speechQuestion, repromptQuestion);
     });
-
-    utils.emitResponse(this, null, null, speech, reprompt);
   },
 };
 

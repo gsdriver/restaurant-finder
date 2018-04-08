@@ -30,7 +30,7 @@ module.exports = {
     context.emit(':responseReady');
   },
   // Cache functions
-  ReadLocation: function(location) {
+  readLocation: function(location) {
     // If the location is a ZIP code, spell it out
     let retval = location;
 

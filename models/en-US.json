@@ -218,11 +218,7 @@
           ]
         },
         {
-          "name": "BackIntent",
-          "samples": [
-            "go back",
-            "back"
-          ]
+          "name": "AMAZON.PreviousIntent",
         },
         {
           "name": "DetailsIntent",
