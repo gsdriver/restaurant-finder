@@ -14,6 +14,31 @@ module.exports = {
     // Build up our parameter structure from the intent
     const params = buildYelpParameters(this.event.request.intent);
 
+    // If we are still in results mode, filter the current parameters
+    // if there is no overlap in fields (e.g. they are now saying cheap)
+    if ((this.handler.state == 'RESULTS') && this.attributes.lastSearch) {
+      let field;
+      let newSearch = false;
+
+      for (field in params) {
+        if (field) {
+          if (this.attributes.lastSearch[field]) {
+            // This field was mentioned last time, so it is a new search
+            newSearch = true;
+          }
+        }
+      }
+
+      // If it's not a new search, copy over the parameters from the last search
+      if (!newSearch) {
+        for (field in this.attributes.lastSearch) {
+          if (field) {
+            params[field] = this.attributes.lastSearch[field];
+          }
+        }
+      }
+    }
+
     // Find a location in the following order:
     // 1) They specified one in the request
     // 2) The location they used with the last search

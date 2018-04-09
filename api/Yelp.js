@@ -67,8 +67,6 @@ module.exports = {
           myResult.review_count = restaurant.review_count;
           myResult.is_closed = restaurant.is_closed;
           myResult.price = (restaurant.price) ? Math.min(restaurant.price.length, 4) : 0;
-          myResult.distance = restaurant.distance;
-          myResult.url = restaurant.url;
           myResult.id = restaurant.id;
 
           // If there is a rating filter, honor it
@@ -91,6 +89,10 @@ module.exports = {
         const myResult = {};
 
         myResult.image_url = result.image_url;
+        myResult.transactions = result.transactions;
+        if (result.hours && result.hours[0] && (result.hours[0].is_open_now !== undefined)) {
+          myResult.open = result.hours[0].is_open_now ? true : false;
+        }
         callback(error, myResult);
       }
     });

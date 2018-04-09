@@ -5,7 +5,6 @@
 'use strict';
 
 const utils = require('../utils');
-const yelp = require('../api/Yelp');
 
 module.exports = {
   handleIntent: function() {
@@ -50,18 +49,12 @@ module.exports = {
 
 function showDetails(context, index) {
   context.attributes.lastResponse.details = index;
-  utils.readRestaurantDetails(context.attributes.lastResponse, (text, cardText) => {
+  utils.readRestaurantDetails(context.attributes.lastResponse, (text, cardText, imageUrl) => {
     const reprompt = 'What else can I help you with?';
     const speech = text + ' <break time=\"200ms\"/> ' + reprompt;
 
     context.handler.state = 'DETAILS';
-
-    // And get an image for the card
-    const restaurant = context.attributes.lastResponse.restaurants[index];
-    yelp.businessLookup(restaurant.id, (error, business) => {
-      const imageUrl = (business) ? business.image_url : undefined;
-      utils.emitResponse(context, null, null, speech, reprompt,
-        restaurant.name, cardText, imageUrl);
-    });
+    utils.emitResponse(context, null, null, speech, reprompt,
+      context.attributes.lastResponse.restaurants[index].name, cardText, imageUrl);
   });
 }

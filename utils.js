@@ -2,6 +2,7 @@
 // Utility functionals
 //
 
+const yelp = require('./api/Yelp');
 const LIST_LENGTH = 5;
 
 module.exports = {
@@ -42,10 +43,28 @@ module.exports = {
       speech += reprompt;
       state = '';
     } else if (attributes.lastResponse.total > LIST_LENGTH) {
-      speech = 'I found ' + ((attributes.lastResponse.total > 50)
-        ? 'more than 50' : attributes.lastResponse.total);
-      speech += ' ' + paramsToText(attributes) + '. ';
-      reprompt = 'Repeat your request with additional conditions like good or cheap to narrow the list, or say Read List to start reading the list.';
+      speech = 'I found ' + attributes.lastResponse.total + ' ' + paramsToText(attributes) + '. ';
+
+      // More than two pages of results?  Suggest a filter
+      if (attributes.lastResponse.total > 2 * LIST_LENGTH) {
+        if (!attributes.lastSearch.price
+          || !attributes.lastSearch.categories
+          || !attributes.lastSearch.rating) {
+          reprompt = 'Repeat your request with additional conditions like ';
+          if (!attributes.lastSearch.categories) {
+            reprompt += pickRandomOption('chinese|british|italian|mexican|steakhouse|german');
+          } else if (!attributes.lastSearch.rating) {
+            reprompt += pickRandomOption('good|great');
+          } else if (!attributes.lastSearch.price) {
+            reprompt += pickRandomOption('cheap|moderate|expensive');
+          }
+
+          reprompt += ' <break time=\"200ms\"/> or say read list to start reading the list.';
+        } else {
+          reprompt = 'Say read list to start reading the list.';
+        }
+      }
+
       speech += reprompt;
       state = 'RESULTS';
     } else {
@@ -89,34 +108,70 @@ module.exports = {
     let speech;
     let cardText = '';
 
-    // Read information about the restaurant
-    speech = restaurant.name + ' is located at ' + restaurant.location.address1 + ' in ' + restaurant.location.city;
-    speech += ('. It has a Yelp rating of ' + restaurant.rating + ' based on ' + restaurant.review_count + ' reviews.');
-    if (restaurant.price) {
-      speech += (' It is a ' + priceList[restaurant.price - 1] + ' option.');
-    }
-    if (restaurant.phone) {
-      speech += (' The phone number is ' + restaurant.phone);
-    }
+    yelp.businessLookup(restaurant.id, (error, business) => {
+      const imageUrl = (business) ? business.image_url : undefined;
 
-    // And set up the card
-    if (restaurant.location.display_address) {
-      restaurant.location.display_address.forEach((address) => {
-        cardText += (address + '\n');
-      });
-    } else {
-      cardText += restaurant.location.address1 + '\n';
-      cardText += restaurant.location.city + '\n';
-    }
-    cardText += ('Yelp rating: ' + restaurant.rating + ' (' + restaurant.review_count + ' reviews)\n');
-    if (restaurant.price) {
-      cardText += ('Price: ' + priceList[restaurant.price - 1] + '\n');
-    }
-    if (restaurant.phone) {
-      cardText += ('Phone: ' + restaurant.phone + '\n');
-    }
+      // Read information about the restaurant
+      speech = restaurant.name + ' is located at ' + restaurant.location.address1 + ' in ' + restaurant.location.city;
+      speech += ('<break time=\"200ms\"/> It has a Yelp rating of ' + restaurant.rating + ' based on ' + restaurant.review_count + ' reviews');
+      if (restaurant.price) {
+        speech += ('<break time=\"200ms\"/> It is a ' + priceList[restaurant.price - 1] + ' option.');
+      }
+      if (restaurant.phone) {
+        speech += ('<break time=\"200ms\"/> The phone number is ' + restaurant.phone + '.');
+      }
+      if (business) {
+        if (business.open !== undefined) {
+          speech += ('<break time=\"200ms\"/> It is currently ' + (business.open ? 'open.' : 'closed.'));
+        }
+        if (business.transactions) {
+          if (business.transactions.indexOf('delivery') > -1) {
+            if (business.transactions.indexOf('restaurant_reservation') > -1) {
+              speech += '<break time=\"200ms\"/> They deliver and take reservations.';
+            } else {
+              speech += '<break time=\"200ms\"/> They deliver.';
+            }
+          } else if (business.transactions.indexOf('restaurant_reservation') > -1) {
+            speech += '<break time=\"200ms\"/> They take reservations.';
+          }
+        }
+      }
 
-    callback(speech, cardText);
+      // And set up the card
+      if (restaurant.location.display_address) {
+        restaurant.location.display_address.forEach((address) => {
+          cardText += (address + '\n');
+        });
+      } else {
+        cardText += restaurant.location.address1 + '\n';
+        cardText += restaurant.location.city + '\n';
+      }
+      cardText += ('Yelp rating: ' + restaurant.rating + ' (' + restaurant.review_count + ' reviews)\n');
+      if (restaurant.price) {
+        cardText += ('Price: ' + priceList[restaurant.price - 1] + '\n');
+      }
+      if (restaurant.phone) {
+        cardText += ('Phone: ' + restaurant.phone + '\n');
+      }
+      if (business) {
+        if (business.open !== undefined) {
+          cardText += ('Currently: ' + (business.open ? 'Open' : 'Closed') + '\n');
+        }
+        if (business.transactions) {
+          if (business.transactions.indexOf('delivery') > -1) {
+            if (business.transactions.indexOf('restaurant_reservation') > -1) {
+              cardText += 'Offers delivery and reservations\n';
+            } else {
+              cardText += 'Offers delivery\n';
+            }
+          } else if (business.transactions.indexOf('restaurant_reservation') > -1) {
+            cardText += 'Offers reservations\n';
+          }
+        }
+      }
+
+      callback(speech, cardText, imageUrl);
+    });
   },
 };
 
@@ -195,4 +250,9 @@ function readLocation(attributes) {
   }
 
   return retval;
+}
+
+function pickRandomOption(str) {
+  const options = str.split('|');
+  return options[Math.floor(Math.random() * options.length)];
 }
