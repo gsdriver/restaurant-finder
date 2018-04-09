@@ -71,6 +71,7 @@ const listHandlers = Alexa.CreateStateHandler('LIST', {
   'ReadListIntent': ReadList.handleIntent,
   'DetailsIntent': Details.handleIntent,
   'BackIntent': Back.handleIntent,
+  'ElementSelected': Details.handleIntent,
   'AMAZON.PreviousIntent': Back.handleIntent,
   'AMAZON.MoreIntent': ReadList.handleIntent,
   'AMAZON.NextIntent': ReadList.handleIntent,
@@ -120,10 +121,23 @@ const handlers = {
     } else {
       this.attributes.postalFormat = undefined;
     }
-    this.emit('LaunchRequest');
+
+    // Send on this request
+    if (this.event.request.type === 'IntentRequest') {
+      // Clear the last search if this is a FindRestaurantIntent
+      if (this.event.request.intent.name == 'FindRestaurantIntent') {
+        this.attributes.lastSearch = undefined;
+      }
+      this.emit(this.event.request.intent.name);
+    } else {
+      this.attributes.lastSearch = undefined;
+      this.emit('LaunchRequest');
+    }
   },
   'LaunchRequest': Launch.handleIntent,
   'FindRestaurantIntent': FindRestaurant.handleIntent,
+  'ReadListIntent': ReadList.handleIntent,
+  'DetailsIntent': Details.handleIntent,
   'AMAZON.HelpIntent': Help.handleIntent,
   'AMAZON.StopIntent': Exit.handleIntent,
   'AMAZON.CancelIntent': Exit.handleIntent,

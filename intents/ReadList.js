@@ -10,6 +10,16 @@ module.exports = {
   handleIntent: function() {
     let toRead;
 
+    // If I don't have a list, tell them to search first
+    if (!this.attributes.lastResponse
+      || !this.attributes.lastResponse.restaurants
+      || !this.attributes.lastResponse.restaurants.length) {
+      utils.emitResponse(this, null, null,
+        'You need to search for restaurants before reading a list. <break time=\"200ms\"/> Try saying find cheap chinese restaurants.',
+        'Try saying find cheap chinese restaurants.');
+      return;
+    }
+
     // If the last action was to read Details, then we should
     // re-read the list rather than going to the next chunk
     if (this.handler.state == 'DETAILS') {

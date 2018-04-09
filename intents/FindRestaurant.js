@@ -7,7 +7,7 @@
 const utils = require('../utils');
 const categoryList = require('../categories');
 const yelp = require('../api/Yelp');
-const Alexa = require('../api/Alexa');
+const location = require('../api/Location');
 
 module.exports = {
   handleIntent: function() {
@@ -47,7 +47,7 @@ module.exports = {
       if (this.attributes.lastSearch && this.attributes.lastSearch.location) {
         params.location = this.attributes.lastSearch.location;
       } else {
-        Alexa.getDeviceLocation(this, (err, address) => {
+        location.getDeviceLocation(this, (err, address) => {
           if (address && address.postalCode) {
             params.location = address.postalCode;
             complete(this);

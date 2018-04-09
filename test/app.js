@@ -15,13 +15,12 @@ function BuildEvent(argv)
                     "SecondDescriptor": {"name": "SecondDescriptor", "value": ""},
                     "ThirdDescriptor": {"name": "ThirdDescriptor", "value": ""},
                     "Location": {"name": "Location", "value": ""}}};
-    var setLocation = {"name": "SetLocationIntent", "slots": {"Location": {"name": "Location", "value": ""}}};
-    var setLocationZIP = {"name": "SetLocationIntent", "slots": {"LocationZIP": {"name": "LocationZIP", "value": ""}}};
     var readList = {"name": "ReadListIntent", "slots": {}};
     var backIntent = {"name": "AMAZON.PreviousIntent", "slots": {}};
     var restaurantDetails = {"name": "DetailsIntent", "slots": {"RestaurantID": {"name": "RestaurantID", "value": ""}}};
     var repeatIntent = {"name": "AMAZON.RepeatIntent", "slots": {}};
     var help = {"name": "AMAZON.HelpIntent", "slots": {}};
+    var stop = {"name": "AMAZON.StopIntent", "slots": {}};
 
     var lambda = {
       "session": {
@@ -123,16 +122,6 @@ function BuildEvent(argv)
             findRestaurant.slots.ThirdDescriptor.value = argv[6];
         }
     }
-    else if (argv[2] == "location")
-    {
-        lambda.request.intent = setLocation;
-        setLocation.slots.Location.value = (argv.length > 3) ? argv[3] : "Seattle";
-    }
-    else if (argv[2] == "locationZIP")
-    {
-        lambda.request.intent = setLocationZIP;
-        setLocationZIP.slots.LocationZIP.value = (argv.length > 3) ? argv[3] : "98112";
-    }
     else if (argv[2] == "readlist")
     {
         lambda.request.intent = readList;
@@ -153,6 +142,10 @@ function BuildEvent(argv)
     else if (argv[2] == "help")
     {
         lambda.request.intent = help;
+    }
+    else if (argv[2] == "stop")
+    {
+        lambda.request.intent = stop;
     }
     else if (argv[2] == "open")
     {

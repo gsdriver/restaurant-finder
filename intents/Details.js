@@ -8,9 +8,9 @@ const utils = require('../utils');
 
 module.exports = {
   handleIntent: function() {
-    const idSlot = this.event.request.intent.slots.RestaurantID;
+    const index = getSelectedIndex(this);
 
-    if (!idSlot || !idSlot.value || isNaN(idSlot.value)) {
+    if (index === undefined) {
       utils.emitResponse(this, null, null,
           'I\'m sorry, I didn\'t hear a number of the restaurant you wanted details about.',
           'What else can I help you with?');
@@ -23,11 +23,9 @@ module.exports = {
         'Please ask to start reading the list before asking for details.');
     } else {
       // OK, let's get the details
-      const index = this.attributes.lastResponse.read + parseInt(idSlot.value) - 1;
-
       if (index >= this.attributes.lastResponse.restaurants.length) {
         utils.emitResponse(this, null, null,
-          idSlot.value + ' is not a valid option to read. Please ask for a valid number or say repeat to repeat ths list.',
+          'That is not a valid option to read. Please ask for a valid number or say repeat to repeat ths list.',
           'Please ask for a valid number of say repeat to repeat the list.');
       } else {
         showDetails(this, index);
@@ -57,4 +55,30 @@ function showDetails(context, index) {
     utils.emitResponse(context, null, null, speech, reprompt,
       context.attributes.lastResponse.restaurants[index].name, cardText, imageUrl);
   });
+}
+
+function getSelectedIndex(context) {
+  let index;
+
+  if (context.event.request.token) {
+    const games = context.event.request.token.split('.');
+    if (games.length === 2) {
+      index = games[1];
+    }
+  } else {
+    // Look for an intent slot
+    if (context.event.request.intent.slots && context.event.request.intent.slots.RestaurantID
+      && context.event.request.intent.slots.RestaurantID.value) {
+      index = parseInt(context.event.request.intent.slots.RestaurantID.value);
+
+      if (isNaN(index)) {
+        index = undefined;
+      } else {
+        // Need to base this off last read
+        index = context.attributes.lastResponse.read + index - 1;
+      }
+    }
+  }
+
+  return index;
 }

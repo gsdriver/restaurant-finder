@@ -302,6 +302,7 @@
         },
         {
           "name": "ReadListIntent",
+          "slots": [],
           "samples": [
             "read the list",
             "read list",
@@ -309,12 +310,12 @@
             "read list of restaurants",
             "read the restaurants",
             "read restaurants",
-            "next",
             "next restaurants"
           ]
         },
         {
-          "name": "AMAZON.PreviousIntent"
+          "name": "AMAZON.PreviousIntent",
+          "samples": []
         },
         {
           "name": "DetailsIntent",
@@ -336,20 +337,65 @@
           ]
         },
         {
-          "name": "AMAZON.RepeatIntent"
+          "name": "AMAZON.RepeatIntent",
+          "samples": []
         },
         {
-          "name": "AMAZON.HelpIntent"
+          "name": "AMAZON.HelpIntent",
+          "samples": []
         },
         {
-          "name": "AMAZON.StopIntent"
+          "name": "AMAZON.StopIntent",
+          "samples": []
         },
         {
-          "name": "AMAZON.CancelIntent"
+          "name": "AMAZON.CancelIntent",
+          "samples": []
+        },
+        {
+          "name": "AMAZON.MoreIntent",
+          "samples": []
+        },
+        {
+          "name": "AMAZON.NavigateHomeIntent",
+          "samples": []
+        },
+        {
+          "name": "AMAZON.NavigateSettingsIntent",
+          "samples": []
+        },
+        {
+          "name": "AMAZON.NextIntent",
+          "samples": []
+        },
+        {
+          "name": "AMAZON.PageUpIntent",
+          "samples": []
+        },
+        {
+          "name": "AMAZON.PageDownIntent",
+          "samples": []
+        },
+        {
+          "name": "AMAZON.ScrollRightIntent",
+          "samples": []
+        },
+        {
+          "name": "AMAZON.ScrollDownIntent",
+          "samples": []
+        },
+        {
+          "name": "AMAZON.ScrollLeftIntent",
+          "samples": []
+        },
+        {
+          "name": "AMAZON.ScrollUpIntent",
+          "samples": []
         }
       ],
       "types": [
         {
+          "name": "LIST_OF_DESCRIPTORS",
           "values": [
             {
               "name": {
@@ -1576,8 +1622,7 @@
                 "value": "Yugoslav"
               }
             }
-          ],
-          "name": "LIST_OF_DESCRIPTORS"
+          ]
         }
       ]
     }

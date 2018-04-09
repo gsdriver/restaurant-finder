@@ -2,6 +2,9 @@
 // Utility functionals
 //
 
+const Alexa = require('alexa-sdk');
+// utility methods for creating Image and TextField objects
+const makeRichText = Alexa.utils.TextUtils.makeRichText;
 const yelp = require('./api/Yelp');
 const LIST_LENGTH = 5;
 
@@ -29,6 +32,11 @@ module.exports = {
         .listen(reprompt);
     }
 
+    // If the state is now list, we draw the template
+    if (context.handler.state == 'LIST') {
+      buildListTemplate(context);
+    }
+
     context.emit(':responseReady');
   },
   readRestaurantResults: function(attributes, callback) {
@@ -46,11 +54,12 @@ module.exports = {
       speech = 'I found ' + attributes.lastResponse.total + ' ' + paramsToText(attributes) + '. ';
 
       // More than two pages of results?  Suggest a filter
+      reprompt = 'Say read list to start reading the list';
       if (attributes.lastResponse.total > 2 * LIST_LENGTH) {
         if (!attributes.lastSearch.price
           || !attributes.lastSearch.categories
           || !attributes.lastSearch.rating) {
-          reprompt = 'Repeat your request with additional conditions like ';
+          reprompt += ' <break time=\"200ms\"/> or filter your search with additional conditions like ';
           if (!attributes.lastSearch.categories) {
             reprompt += pickRandomOption('chinese|british|italian|mexican|steakhouse|german');
           } else if (!attributes.lastSearch.rating) {
@@ -58,13 +67,10 @@ module.exports = {
           } else if (!attributes.lastSearch.price) {
             reprompt += pickRandomOption('cheap|moderate|expensive');
           }
-
-          reprompt += ' <break time=\"200ms\"/> or say read list to start reading the list.';
-        } else {
-          reprompt = 'Say read list to start reading the list.';
         }
       }
 
+      reprompt += '.';
       speech += reprompt;
       state = 'RESULTS';
     } else {
@@ -175,7 +181,6 @@ module.exports = {
   },
 };
 
-// Converts parameters to a string
 function paramsToText(attributes) {
   const params = attributes.lastSearch;
   let result = '';
@@ -250,6 +255,36 @@ function readLocation(attributes) {
   }
 
   return retval;
+}
+
+function buildListTemplate(context) {
+  let listTemplateBuilder;
+  let listItemBuilder;
+  let listTemplate;
+
+  if (context.event.context &&
+      context.event.context.System.device.supportedInterfaces.Display) {
+    context.attributes.display = true;
+
+    listItemBuilder = new Alexa.templateBuilders.ListItemBuilder();
+    listTemplateBuilder = new Alexa.templateBuilders.ListTemplate1Builder();
+    let i = 0;
+
+    context.attributes.lastResponse.restaurants.forEach((restaurant) => {
+      listItemBuilder.addItem(null, 'item.' + i++,
+        makeRichText('<font size="7">' + restaurant.name + '</font>'));
+    });
+
+    const listItems = listItemBuilder.build();
+    listTemplate = listTemplateBuilder
+      .setToken('listToken')
+      .setTitle(paramsToText(context.attributes))
+      .setListItems(listItems)
+      .setBackButtonBehavior('HIDDEN')
+      .build();
+
+    context.response.renderTemplate(listTemplate);
+  }
 }
 
 function pickRandomOption(str) {
