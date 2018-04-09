@@ -11,26 +11,24 @@ module.exports = {
     // Look at the state
     switch (this.handler.state) {
       case 'RESULTS':
-        utils.readRestaurantResults(this.attributes, (speech, reprompt) => {
+        utils.readRestaurantResults(this, (speech, reprompt) => {
           utils.emitResponse(this, null, null, speech, reprompt);
         });
         break;
       case 'LIST':
-        utils.readRestaurantsFromList(this.attributes.lastResponse, (speech, reprompt) => {
+        utils.readRestaurantsFromList(this, (speech, reprompt) => {
           utils.emitResponse(this, null, null, speech, reprompt);
         });
         break;
       case 'DETAILS':
-        utils.readRestaurantDetails(this.attributes.lastResponse, (text) => {
-          const reprompt = 'What else can I help you with?';
+        utils.readRestaurantDetails(this, (text) => {
+          const reprompt = this.t('GENERIC_REPROMPT');
           const speech = text + ' <break time=\"200ms\"/> ' + reprompt;
           utils.emitResponse(this, null, null, speech, reprompt);
         });
         break;
       default:
-        utils.emitResponse(this, null, null,
-            'I have nothing to repeat. What else can I help you with?',
-            'What else can I help you with?');
+        utils.emitResponse(this, null, null, this.t('REPEAT_NONE'), this.t('GENERIC_REPROMPT'));
         break;
     }
   },

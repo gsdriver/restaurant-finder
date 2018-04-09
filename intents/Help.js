@@ -9,27 +9,25 @@ const utils = require('../utils');
 module.exports = {
   handleIntent: function() {
     let speech;
-    const reprompt = 'What else can I help you with?';
+    const reprompt = this.t('GENERIC_REPROMPT');
 
     switch (this.handler.state) {
       case 'LIST':
         // Are there more restaurants?
-        speech = 'Say repeat to hear this list again or say the number of the restaurant that you want more details about';
+        speech = this.t('HELP_LIST');
         if ((this.attributes.lastResponse.read + utils.PAGE_SIZE) <
           this.attributes.lastResponse.restaurants.length) {
-          speech += ' or say more to hear more restaurants.';
+          speech += this.t('HELP_LIST_MORE');
         }
         break;
       case 'RESULTS':
-        speech = 'Say read list to hear the list of restaurants.';
+        speech = this.t('HELP_RESULTS');
         break;
       case 'DETAILS':
-        speech = 'You can say back to go back to the list of restaurants, or find restaurants to find more restaurants.';
+        speech = this.t('HELP_DETAILS');
         break;
       default:
-        const city = {'en-US': 'Seattle', 'en-CA': 'Toronto'};
-        speech = 'You can find restaurants by type of cuisine, price range, or Yelp review. For example, you can say Find a cheap Chinese restaurant in ';
-        speech += city[this.event.request.locale];
+        speech = this.t('HELP_DEFAULT');
         break;
     }
 

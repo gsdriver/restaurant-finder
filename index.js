@@ -25,7 +25,6 @@
 'use strict';
 
 const Alexa = require('alexa-sdk');
-const utils = require('./utils');
 const Launch = require('./intents/Launch');
 const FindRestaurant = require('./intents/FindRestaurant');
 const ReadList = require('./intents/ReadList');
@@ -34,6 +33,7 @@ const Back = require('./intents/Back');
 const Repeat = require('./intents/Repeat');
 const Help = require('./intents/Help');
 const Exit = require('./intents/Exit');
+const resources = require('./resources');
 
 const APP_ID = 'amzn1.ask.skill.4c848d38-347c-4e03-b908-42c6af6c207d';
 
@@ -58,7 +58,8 @@ const detailsHandlers = Alexa.CreateStateHandler('DETAILS', {
     this.emit(':saveState', true);
   },
   'Unhandled': function() {
-    utils.emitResponse(this, null, null, 'Sorry, I didn\'t get that. Try saying help.', 'Try saying help.');
+    this.response.speak(this.t('UNKNOWN_INTENT')).listen(this.t('UNKNOWN_INTENT_REPROMPT'));
+    this.emit(':responseReady');
   },
 });
 
@@ -85,7 +86,8 @@ const listHandlers = Alexa.CreateStateHandler('LIST', {
     this.emit(':saveState', true);
   },
   'Unhandled': function() {
-    utils.emitResponse(this, null, null, 'Sorry, I didn\'t get that. Try saying help.', 'Try saying help.');
+    this.response.speak(this.t('UNKNOWN_INTENT')).listen(this.t('UNKNOWN_INTENT_REPROMPT'));
+    this.emit(':responseReady');
   },
 });
 
@@ -106,7 +108,8 @@ const resultHandlers = Alexa.CreateStateHandler('RESULTS', {
     this.emit(':saveState', true);
   },
   'Unhandled': function() {
-    utils.emitResponse(this, null, null, 'Sorry, I didn\'t get that. Try saying help.', 'Try saying help.');
+    this.response.speak(this.t('UNKNOWN_INTENT')).listen(this.t('UNKNOWN_INTENT_REPROMPT'));
+    this.emit(':responseReady');
   },
 });
 
@@ -114,13 +117,6 @@ const handlers = {
   'NewSession': function() {
     this.attributes.lastRun = Date.now();
     this.attributes.userLocale = this.event.request.locale;
-    if (this.event.request.locale == 'en-US') {
-      this.attributes.postalFormat = 'NNNNN';
-    } else if (this.event.request.locale == 'en-CA') {
-      this.attributes.postalFormat = 'ANA NAN';
-    } else {
-      this.attributes.postalFormat = undefined;
-    }
 
     // Send on this request
     if (this.event.request.type === 'IntentRequest') {
@@ -147,7 +143,8 @@ const handlers = {
     this.emit(':saveState', true);
   },
   'Unhandled': function() {
-    utils.emitResponse(this, null, null, 'Sorry, I didn\'t get that. Try saying help.', 'Try saying help.');
+    this.response.speak(this.t('UNKNOWN_INTENT')).listen(this.t('UNKNOWN_INTENT_REPROMPT'));
+    this.emit(':responseReady');
   },
 };
 
@@ -168,6 +165,7 @@ function runSkill(event, context, callback) {
     console.log(JSON.stringify(event));
   }
   alexa.appId = APP_ID;
+  alexa.resources = resources.languageStrings;
   alexa.registerHandlers(resultHandlers, detailsHandlers, listHandlers, handlers);
   alexa.dynamoDBTableName = 'RestaurantFinder';
   alexa.execute();

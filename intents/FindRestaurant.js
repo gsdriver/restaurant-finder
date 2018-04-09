@@ -54,9 +54,7 @@ module.exports = {
           } else {
             console.log('Device Location: ' + JSON.stringify(address));
             this.response.askForPermissionsConsentCard(['read::alexa:device:all:address:country_and_postal_code']);
-            utils.emitResponse(this, null, null,
-                'Please provide a location, or grant this skill permission to use your Alexa device postal code.',
-                'What else can I help you with?');
+            utils.emitResponse(this, null, this.t('FIND_LOCATION'));
           }
         });
         return;
@@ -73,7 +71,7 @@ module.exports = {
         if (restaurantList) {
           context.attributes.lastSearch = params;
           context.attributes.lastResponse = restaurantList;
-          utils.readRestaurantResults(context.attributes, (speech, reprompt, state) => {
+          utils.readRestaurantResults(context, (speech, reprompt, state) => {
             context.handler.state = state;
             utils.emitResponse(context, null, null, speech, reprompt);
           });

@@ -21,13 +21,13 @@ module.exports = {
         // Just go back to the list state
         break;
       default:
-        utils.emitResponse(this, null, 'I can\'t go back from this point. Please ask for a new set of restaurants.');
+        utils.emitResponse(this, null, this.t('BACK_NOBACK'));
         return;
     }
 
     // OK, let's read - store the starting location first since reading the list will change it
     this.handler.state = 'LIST';
-    utils.readRestaurantsFromList(this.attributes.lastResponse, (speech, reprompt) => {
+    utils.readRestaurantsFromList(this, (speech, reprompt) => {
       utils.emitResponse(this, null, null, speech, reprompt);
     });
   },

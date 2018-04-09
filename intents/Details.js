@@ -11,22 +11,18 @@ module.exports = {
     const index = getSelectedIndex(this);
 
     if (index === undefined) {
-      utils.emitResponse(this, null, null,
-          'I\'m sorry, I didn\'t hear a number of the restaurant you wanted details about.',
-          'What else can I help you with?');
+      utils.emitResponse(this, null, null, this.t('DETAILS_NONUMBER'), this.t('GENERIC_REPROMPT'));
+      return;
     }
 
     // You have to be in list mode before you can ask for details
     if (this.handler.state != 'LIST') {
-      utils.emitResponse(this, null, null,
-        'Please ask to start reading the list before asking for details.',
-        'Please ask to start reading the list before asking for details.');
+      utils.emitResponse(this, null, null, this.t('DETAILS_READLIST'), this.t('DETAILS_READLIST'));
     } else {
       // OK, let's get the details
       if (index >= this.attributes.lastResponse.restaurants.length) {
         utils.emitResponse(this, null, null,
-          'That is not a valid option to read. Please ask for a valid number or say repeat to repeat ths list.',
-          'Please ask for a valid number of say repeat to repeat the list.');
+          this.t('DETAILS_INVALID_NUMBER'), this.t('DETAILS_INVALID_NUMBER_REPROMPT'));
       } else {
         showDetails(this, index);
       }
@@ -36,9 +32,7 @@ module.exports = {
     // Go to the next restaurant in the list
     const index = this.attributes.lastResponse.details + 1;
     if (index >= this.attributes.lastResponse.restaurants.length) {
-      utils.emitResponse(this, null, null,
-        'You are at the end of the list. Please do a new search or say back to go back to the list of results.',
-        'Please search for another set of restaurants.');
+      utils.emitResponse(this, null, null, this.t('DETAILS_LISTEND'), this.t('DETAILS_LISTEND_REPROMPT'));
     } else {
       showDetails(this, index);
     }
@@ -47,8 +41,8 @@ module.exports = {
 
 function showDetails(context, index) {
   context.attributes.lastResponse.details = index;
-  utils.readRestaurantDetails(context.attributes.lastResponse, (text, cardText, imageUrl) => {
-    const reprompt = 'What else can I help you with?';
+  utils.readRestaurantDetails(context, (text, cardText, imageUrl) => {
+    const reprompt = context.t('GENERIC_REPROMPT');
     const speech = text + ' <break time=\"200ms\"/> ' + reprompt;
 
     context.handler.state = 'DETAILS';
