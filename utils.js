@@ -30,19 +30,6 @@ module.exports = {
 
     context.emit(':responseReady');
   },
-  // Cache functions
-  readLocation: function(location) {
-    // If the location is a ZIP code, spell it out
-    let retval = location;
-
-    if ((location.length == 5) && !isNaN(parseInt(location))) {
-      // This is a ZIP code
-      retval = location.substring(0, 1) + ' ' + location.substring(1, 2) + ' ' + location.substring(2, 3) + ' ' +
-                  location.substring(3, 4) + ' ' + location.substring(4, 5);
-    }
-
-    return retval;
-  },
   readRestaurantResults: function(attributes, callback) {
     let speech;
     let reprompt;
@@ -50,20 +37,20 @@ module.exports = {
     // If there are more than five results, prompt the user to filter further
     if (!attributes.lastResponse || !attributes.lastResponse.restaurants
       || !attributes.lastResponse.restaurants.length) {
-      speech = 'I\'m sorry, I didn\'t find any ' + paramsToText(attributes.lastSearch) + '. ';
+      speech = 'I\'m sorry, I didn\'t find any ' + paramsToText(attributes) + '. ';
       reprompt = 'What else can I help you with?';
       speech += reprompt;
       state = '';
     } else if (attributes.lastResponse.total > LIST_LENGTH) {
       speech = 'I found ' + ((attributes.lastResponse.total > 50)
         ? 'more than 50' : attributes.lastResponse.total);
-      speech += ' ' + paramsToText(attributes.lastSearch) + '. ';
+      speech += ' ' + paramsToText(attributes) + '. ';
       reprompt = 'Repeat your request with additional conditions like good or cheap to narrow the list, or say Read List to start reading the list.';
       speech += reprompt;
       state = 'RESULTS';
     } else {
       attributes.lastResponse.read = 0;
-      speech = 'I found ' + attributes.lastResponse.total + ' ' + paramsToText(attributes.lastSearch) + '. ';
+      speech = 'I found ' + attributes.lastResponse.total + ' ' + paramsToText(attributes) + '. ';
 
       let i;
       for (i = 0; i < attributes.lastResponse.restaurants.length; i++) {
@@ -100,7 +87,7 @@ module.exports = {
     const restaurant = restaurantList.restaurants[restaurantList.details];
     const priceList = ['cheap', 'moderately priced', 'spendy', 'splurge'];
     let speech;
-    let cardText;
+    let cardText = '';
 
     // Read information about the restaurant
     speech = restaurant.name + ' is located at ' + restaurant.location.address1 + ' in ' + restaurant.location.city;
@@ -134,7 +121,8 @@ module.exports = {
 };
 
 // Converts parameters to a string
-function paramsToText(params) {
+function paramsToText(attributes) {
+  const params = attributes.lastSearch;
   let result = '';
 
   if (params.open_now) {
@@ -163,8 +151,48 @@ function paramsToText(params) {
   result += 'restaurants';
 
   if (params.location) {
-    result += ' in ' + module.exports.readLocation(params.location);
+    result += ' in ' + readLocation(attributes);
   }
 
   return result;
+}
+
+function readLocation(attributes) {
+  // If the location is a ZIP code, spell it out
+  let retval = attributes.lastSearch.location;
+  let isZIP = true;
+
+  if (attributes.postalFormat && (retval.length == attributes.postalFormat.length)) {
+    const zip = retval.toUpperCase(retval);
+    let i;
+    for (i = 0; i < attributes.postalFormat.length; i++) {
+      const postalChar = attributes.postalFormat.substring(i, i + 1);
+      const zipChar = zip.substring(i, i + 1);
+      if (postalChar == 'N') {
+        if (isNaN(parseInt(zipChar))) {
+          isZIP = false;
+        }
+      } else if (postalChar == 'A') {
+        if (!zipChar.match(/[a-z]/i)) {
+          isZIP = false;
+        }
+      } else if (postalChar != zipChar) {
+        isZIP = false;
+      }
+    }
+  } else {
+    isZIP = false;
+  }
+
+  if (isZIP) {
+    // This is a ZIP code - add a space between each character
+    let location = '';
+    let i;
+    for (i = 0; i < retval.length; i++) {
+      location += retval.substring(i, i + 1) + ' ';
+    }
+    retval = location;
+  }
+
+  return retval;
 }

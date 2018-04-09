@@ -27,7 +27,9 @@ module.exports = {
         speech = 'You can say back to go back to the list of restaurants, or find restaurants to find more restaurants.';
         break;
       default:
-        speech = 'You can find restaurants by type of cuisine, price range, or Yelp review. For example, you can say Find a cheap Chinese restaurant in Seattle';
+        const city = {'en-US': 'Seattle', 'en-CA': 'Toronto'};
+        speech = 'You can find restaurants by type of cuisine, price range, or Yelp review. For example, you can say Find a cheap Chinese restaurant in ';
+        speech += city[this.event.request.locale];
         break;
     }
 

@@ -28,7 +28,6 @@ const Alexa = require('alexa-sdk');
 const utils = require('./utils');
 const Launch = require('./intents/Launch');
 const FindRestaurant = require('./intents/FindRestaurant');
-const SetLocation = require('./intents/SetLocation');
 const ReadList = require('./intents/ReadList');
 const Details = require('./intents/Details');
 const Back = require('./intents/Back');
@@ -69,7 +68,6 @@ const listHandlers = Alexa.CreateStateHandler('LIST', {
     this.emitWithState('NewSession');
   },
   'FindRestaurantIntent': FindRestaurant.handleIntent,
-  'SetLocationIntent': SetLocation.handleIntent,
   'ReadListIntent': ReadList.handleIntent,
   'DetailsIntent': Details.handleIntent,
   'BackIntent': Back.handleIntent,
@@ -96,7 +94,6 @@ const resultHandlers = Alexa.CreateStateHandler('RESULTS', {
     this.emitWithState('NewSession');
   },
   'FindRestaurantIntent': FindRestaurant.handleIntent,
-  'SetLocationIntent': SetLocation.handleIntent,
   'ReadListIntent': ReadList.handleIntent,
   'AMAZON.RepeatIntent': Repeat.handleIntent,
   'AMAZON.HelpIntent': Help.handleIntent,
@@ -115,11 +112,18 @@ const resultHandlers = Alexa.CreateStateHandler('RESULTS', {
 const handlers = {
   'NewSession': function() {
     this.attributes.lastRun = Date.now();
+    this.attributes.userLocale = this.event.request.locale;
+    if (this.event.request.locale == 'en-US') {
+      this.attributes.postalFormat = 'NNNNN';
+    } else if (this.event.request.locale == 'en-CA') {
+      this.attributes.postalFormat = 'ANA NAN';
+    } else {
+      this.attributes.postalFormat = undefined;
+    }
     this.emit('LaunchRequest');
   },
   'LaunchRequest': Launch.handleIntent,
   'FindRestaurantIntent': FindRestaurant.handleIntent,
-  'SetLocationIntent': SetLocation.handleIntent,
   'AMAZON.HelpIntent': Help.handleIntent,
   'AMAZON.StopIntent': Exit.handleIntent,
   'AMAZON.CancelIntent': Exit.handleIntent,

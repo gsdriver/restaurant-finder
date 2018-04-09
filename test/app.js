@@ -35,6 +35,32 @@ function BuildEvent(argv)
         },
         "new": false
       },
+      "context": {
+        "AudioPlayer": {
+          "playerActivity": "IDLE"
+        },
+        "Display": {},
+        "System": {
+          "application": {
+            "applicationId": "amzn1.ask.skill.4c848d38-347c-4e03-b908-42c6af6c207d"
+          },
+          "user": {
+            "userId": "not-amazon"
+          },
+          "device": {
+            "deviceId": "amzn1.ask.device.AFD2MDKY4WIZW3HGZ277CUWUZEFNDPLO4JY3HDUCWFGN5CWX3LGTS5NANWJPJEKYVUMFU3IXR3LGTZQOU3GQMCSMRJTLEGKVKCAOZ5UPR7VRMI5BQ3HDELM5RA2EQA7IHDXG5SVUAT3FO3ASFNA7RX2NCC2Q",
+            "supportedInterfaces": {
+              "AudioPlayer": {},
+              "Display": {
+                "templateVersion": "1.0",
+                "markupVersion": "1.0"
+              }
+            }
+          },
+          "apiEndpoint": "https://api.amazonalexa.com",
+          "apiAccessToken": "eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiIsImtpZCI6IjEifQ.eyJhdWQiOiJodHRwczovL2FwaS5hbWF6b25hbGV4YS5jb20iLCJpc3MiOiJBbGV4YVNraWxsS2l0Iiwic3ViIjoiYW16bjEuYXNrLnNraWxsLjRjODQ4ZDM4LTM0N2MtNGUwMy1iOTA4LTQyYzZhZjZjMjA3ZCIsImV4cCI6MTUyMzIzNjExNCwiaWF0IjoxNTIzMjMyNTE0LCJuYmYiOjE1MjMyMzI1MTQsInByaXZhdGVDbGFpbXMiOnsiY29uc2VudFRva2VuIjpudWxsLCJkZXZpY2VJZCI6ImFtem4xLmFzay5kZXZpY2UuQUZEMk1ES1k0V0laVzNIR1oyNzdDVVdVWkVGTkRQTE80SlkzSERVQ1dGR041Q1dYM0xHVFM1TkFOV0pQSkVLWVZVTUZVM0lYUjNMR1RaUU9VM0dRTUNTTVJKVExFR0tWS0NBT1o1VVBSN1ZSTUk1QlEzSERFTE01UkEyRVFBN0lIRFhHNVNWVUFUM0ZPM0FTRk5BN1JYMk5DQzJRIiwidXNlcklkIjoiYW16bjEuYXNrLmFjY291bnQuQUZCQzRSVk8yT1NVNlpZRlpPRlNJT0lVSU1JRkczSkFKVFpPM01IM1YzTkJES1RXUTVaM0dYWkhQUEo1WEJRMkZDSUdSWTVKU081RU1XVk82QUlXMjdTT05NT0xGRExEWVNTWE43NVhPWURRQTU1WU1FM0FSTzJNUVRWR1FEQUdNUjZTVlNVTTZGSjVWR0JJVEFBUTROQ1M0TUFLWVdKSVFTV1NXVTRCSDVJM0JZSVZGTFJSMkpOUlVGWTVaQTRCNFU0VkJTSDdCN0tDQU1JIn19.T8olySoD7wEBc3zIU12wdcloMNniv8povyCTr_dIENqpyk8shf9dI2lj4KiahQ0gwL5R7TX6b2M2ufXnxytdgJauYU5jRtxQ7jw-TTSzlQVzQxWlqJ0It__6pYGnX86-y44781WAJJU8VYNBkSzY8qJbg1PMTaiyQ37QJGClEgWOccEqAOHcESvYwkQgBUkfLXRpGoxnm8D9JCORjrCPRtX6cT7eG0U88NULfp4QF4FkDG2hGn2TBFc0GRbmo7k8awddjRFDQjMmrOerrZ-A83OGYTQiOtW4Nla1xPrlioHWxH09ij2FZ6GZDVnFMfkeLIV1Suq5k_mJNbQI-aezHw"
+        }
+      },
       "request": {
         "type": "IntentRequest",
         "requestId": "EdwRequestId.26405959-e350-4dc0-8980-14cdc9a4e921",

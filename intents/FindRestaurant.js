@@ -7,6 +7,7 @@
 const utils = require('../utils');
 const categoryList = require('../categories');
 const yelp = require('../api/Yelp');
+const Alexa = require('../api/Alexa');
 
 module.exports = {
   handleIntent: function() {
@@ -15,32 +16,47 @@ module.exports = {
 
     // Find a location in the following order:
     // 1) They specified one in the request
-    // 2) They saved a location using set location
-    // 3) The location they used with the last search
+    // 2) The location they used with the last search
+    // 3) The device location (we'll need to ask permission in their app)
     if (!params.location) {
-      if (this.attributes.location) {
-        params.location = this.attributes.location;
-      } else if (this.attributes.lastSearch && this.attributes.lastSearch.location) {
+      if (this.attributes.lastSearch && this.attributes.lastSearch.location) {
         params.location = this.attributes.lastSearch.location;
       } else {
-        utils.emitResponse(this, null, 'As a new user, please specify your location by saying Set Location.');
+        Alexa.getDeviceLocation(this, (err, address) => {
+          if (address && address.postalCode) {
+            params.location = address.postalCode;
+            complete(this);
+          } else {
+            console.log('Device Location: ' + JSON.stringify(address));
+            this.response.askForPermissionsConsentCard(['read::alexa:device:all:address:country_and_postal_code']);
+            utils.emitResponse(this, null, null,
+                'Please provide a location, or grant this skill permission to use your Alexa device postal code.',
+                'What else can I help you with?');
+          }
+        });
         return;
       }
     }
 
-    // OK, let's call Yelp API to get a list of restaurants
-    yelp.getRestaurantList(params, (error, restaurantList) => {
-      if (restaurantList) {
-        this.attributes.lastSearch = params;
-        this.attributes.lastResponse = restaurantList;
-        utils.readRestaurantResults(this.attributes, (speech, reprompt, state) => {
-          this.handler.state = state;
-          utils.emitResponse(this, null, null, speech, reprompt);
-        });
-      } else {
-        utils.emitResponse(this, error);
-      }
-    });
+    if (params.location) {
+      complete(this);
+    }
+
+    function complete(context) {
+      // OK, let's call Yelp API to get a list of restaurants
+      yelp.getRestaurantList(params, (error, restaurantList) => {
+        if (restaurantList) {
+          context.attributes.lastSearch = params;
+          context.attributes.lastResponse = restaurantList;
+          utils.readRestaurantResults(context.attributes, (speech, reprompt, state) => {
+            context.handler.state = state;
+            utils.emitResponse(context, null, null, speech, reprompt);
+          });
+        } else {
+          utils.emitResponse(context, error);
+        }
+      });
+    }
   },
 };
 
