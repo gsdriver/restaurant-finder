@@ -248,13 +248,7 @@ function readLocation(context) {
   }
 
   if (isZIP) {
-    // This is a ZIP code - add a space between each character
-    let location = '';
-    let i;
-    for (i = 0; i < retval.length; i++) {
-      location += retval.substring(i, i + 1) + ' ';
-    }
-    retval = location;
+    retval = '<say-as interpret-as="digits">' + retval + '</say-as>';
   }
 
   return retval;
