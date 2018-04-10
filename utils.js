@@ -181,7 +181,7 @@ module.exports = {
   },
 };
 
-function paramsToText(context) {
+function paramsToText(context, noSSML) {
   const params = context.attributes.lastSearch;
   let result = '';
 
@@ -213,7 +213,8 @@ function paramsToText(context) {
   result += context.t('PARAMS_RESTAURANTS');
 
   if (params.location) {
-    result += context.t('PARAMS_IN').replace('{0}', readLocation(context));
+    const location = (noSSML) ? params.location : readLocation(context);
+    result += context.t('PARAMS_IN').replace('{0}', location);
   }
 
   return result;
@@ -275,7 +276,7 @@ function buildListTemplate(context) {
     const listItems = listItemBuilder.build();
     listTemplate = listTemplateBuilder
       .setToken('listToken')
-      .setTitle(paramsToText(context))
+      .setTitle(paramsToText(context, true))
       .setListItems(listItems)
       .setBackButtonBehavior('HIDDEN')
       .build();
