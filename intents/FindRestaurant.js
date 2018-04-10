@@ -88,6 +88,7 @@ module.exports = {
 function findCategoryInList(category) {
   let i;
   let alias;
+  let close;
 
   for (i = 0; i < categoryList.length; i++) {
     if (category == categoryList[i].alias.toLowerCase()
@@ -95,10 +96,17 @@ function findCategoryInList(category) {
       // This is it - use the alias
       alias = categoryList[i].alias;
       break;
+    } else {
+      // Let's see if it's close -- that is, the passed value
+      // contains the category alias or name
+      if ((category.indexOf(categoryList[i].alias.toLowerCase()) > -1)
+        || (category.indexOf(categoryList[i].title.toLowerCase()) > -1)) {
+        close = categoryList[i].alias;
+      }
     }
   }
 
-  return alias;
+  return alias ? alias : close;
 }
 
 // Takes a value and fits it into the appropriate Yelp parameter
