@@ -18,15 +18,15 @@ const resources = {
       // From Exit.js
       'EXIT_GOODBYE': 'Goodbye|Cheers|Thanks for using Restaurant Finder',
       // From FindRestaurant.js
-      'FIND_LOCATION': 'Please provide a location, or grant this skill permission to use your Alexa device postal code.',
+      'FIND_LOCATION': 'Please provide a location, or grant this skill permission in the Alexa app to use your current ZIP code.',
       // From Help.js
       'HELP_LIST': 'Say repeat to hear this list again or say the number of the restaurant that you want more details about',
       'HELP_LIST_MORE': ' or say more to hear more restaurants.',
       'HELP_RESULTS': 'Say read list to hear the list of restaurants.',
       'HELP_DETAILS': 'You can say back to go back to the list of restaurants, or find restaurants to find more restaurants.',
-      'HELP_DEFAULT': 'You can find restaurants by type of cuisine, price range, or Yelp review. For example, you can say Find a cheap Chinese restaurant in Seattle',
+      'HELP_DEFAULT': 'You can find restaurants by cuisine such as Chinese <break time=\"200ms\"/> price range such as cheap <break time=\"200ms\"/> Yelp view such as good <break time=\"200ms\"/> or open to find restaurants that are currently open. <break time=\"200ms\"/> For example, you can say Find a cheap Chinese restaurant in Seattle',
       // From Launch.js
-      'LAUNCH_WELCOME': 'Welcome to Restaurant Finder. You can find restaurants by type of cuisine or price range. For example, you can say Find a cheap Chinese restaurant in Seattle. How can I help you?',
+      'LAUNCH_WELCOME': 'Welcome to Restaurant Finder. You can say Find a cheap Chinese restaurant in Austin. How can I help you?',
       'LAUNCH_REPROMPT': 'For instructions on what you can say, please say help me.',
       // From ReadList.js
       'READLIST_SEARCH': 'You need to search for restaurants before reading a list. <break time=\"200ms\"/> Try saying find cheap chinese restaurants.',
@@ -52,15 +52,11 @@ const resources = {
       'DETAILS_PRICE_SPENDY': 'spendy',
       'DETAILS_PRICE_SPLURGE': 'splurge',
       'DETAILS_LOCATION': '{0} is located at {1} in {2}',
-      'DETAILS_YELP': '<break time=\"200ms\"/> It has a Yelp rating of {0} based on {1} reviews',
-      'DETAILS_PRICE': '<break time=\"200ms\"/> It is a {0} option.',
       'DETAILS_PHONE': '<break time=\"200ms\"/> The phone number is {0}.',
       'DETAILS_OPEN': 'open.',
       'DETAILS_CLOSED': 'closed.',
       'DETAILS_OPERATING': '<break time=\"200ms\"/> It is currently {0}',
-      'DETAILS_DELIVER_RESERVATION': '<break time=\"200ms\"/> They deliver and take reservations.',
-      'DETAILS_DELIVER': '<break time=\"200ms\"/> They deliver.',
-      'DETAILS_RESERVATION': '<break time=\"200ms\"/> They take reservations.',
+      'DETAILS_SEECARD': '<break time=\"200ms\"/> See the Alexa app for more details',
       'DETAILS_CARD_YELP': 'Yelp rating: {0} ({1} reviews)\n',
       'DETAILS_CARD_PRICE': 'Price: {0}\n',
       'DETAILS_CARD_PHONE': 'Phone: {0}\n',
@@ -103,15 +99,15 @@ const resources = {
       // From Exit.js
       'EXIT_GOODBYE': 'Goodbye|Cheers|Thanks for using Restaurant Finder',
       // From FindRestaurant.js
-      'FIND_LOCATION': 'Please provide a location, or grant this skill permission to use your Alexa device postal code.',
+      'FIND_LOCATION': 'Please provide a location, or grant this skill permission in the Alexa app to use your postal code.',
       // From Help.js
       'HELP_LIST': 'Say repeat to hear this list again or say the number of the restaurant that you want more details about',
       'HELP_LIST_MORE': ' or say more to hear more restaurants.',
       'HELP_RESULTS': 'Say read list to hear the list of restaurants.',
       'HELP_DETAILS': 'You can say back to go back to the list of restaurants, or find restaurants to find more restaurants.',
-      'HELP_DEFAULT': 'You can find restaurants by type of cuisine, price range, or Yelp review. For example, you can say Find a cheap Chinese restaurant in Toronto',
+      'HELP_DEFAULT': 'You can find restaurants by cuisine such as Chinese <break time=\"200ms\"/> price range such as cheap <break time=\"200ms\"/> Yelp view such as good <break time=\"200ms\"/> or open to find restaurants that are currently open. <break time=\"200ms\"/> For example, you can say Find a cheap Chinese restaurant in Toronto',
       // From Launch.js
-      'LAUNCH_WELCOME': 'Welcome to Restaurant Finder. You can find restaurants by type of cuisine or price range. For example, you can say Find a cheap Chinese restaurant in Toronto. How can I help you?',
+      'LAUNCH_WELCOME': 'Welcome to Restaurant Finder. You can say Find a cheap Chinese restaurant in Vancouver. How can I help you?',
       'LAUNCH_REPROMPT': 'For instructions on what you can say, please say help me.',
       // From ReadList.js
       'READLIST_SEARCH': 'You need to search for restaurants before reading a list. <break time=\"200ms\"/> Try saying find cheap chinese restaurants.',
@@ -137,15 +133,11 @@ const resources = {
       'DETAILS_PRICE_SPENDY': 'spendy',
       'DETAILS_PRICE_SPLURGE': 'splurge',
       'DETAILS_LOCATION': '{0} is located at {1} in {2}',
-      'DETAILS_YELP': '<break time=\"200ms\"/> It has a Yelp rating of {0} based on {1} reviews',
-      'DETAILS_PRICE': '<break time=\"200ms\"/> It is a {0} option.',
       'DETAILS_PHONE': '<break time=\"200ms\"/> The phone number is {0}.',
       'DETAILS_OPEN': 'open.',
       'DETAILS_CLOSED': 'closed.',
       'DETAILS_OPERATING': '<break time=\"200ms\"/> It is currently {0}',
-      'DETAILS_DELIVER_RESERVATION': '<break time=\"200ms\"/> They deliver and take reservations.',
-      'DETAILS_DELIVER': '<break time=\"200ms\"/> They deliver.',
-      'DETAILS_RESERVATION': '<break time=\"200ms\"/> They take reservations.',
+      'DETAILS_SEECARD': '<break time=\"200ms\"/> See the Alexa app for more details',
       'DETAILS_CARD_YELP': 'Yelp rating: {0} ({1} reviews)\n',
       'DETAILS_CARD_PRICE': 'Price: {0}\n',
       'DETAILS_CARD_PHONE': 'Phone: {0}\n',

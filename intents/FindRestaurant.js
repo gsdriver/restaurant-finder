@@ -54,7 +54,7 @@ module.exports = {
           } else {
             console.log('Device Location: ' + JSON.stringify(address));
             this.response.askForPermissionsConsentCard(['read::alexa:device:all:address:country_and_postal_code']);
-            utils.emitResponse(this, null, this.t('FIND_LOCATION'));
+            utils.emitResponse(this, null, null, this.t('FIND_LOCATION'), this.t('GENERIC_REPROMPT'));
           }
         });
         return;

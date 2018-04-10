@@ -134,9 +134,6 @@ module.exports = {
         .replace('{0}', restaurant.name)
         .replace('{1}', restaurant.location.address1)
         .replace('{2}', restaurant.location.city);
-      speech += context.t('DETAILS_YELP')
-        .replace('{0}', restaurant.rating)
-        .replace('{1}', restaurant.review_count);
 
       // And set up the card
       if (restaurant.location.display_address) {
@@ -152,7 +149,6 @@ module.exports = {
         .replace('{1}', restaurant.review_count);
 
       if (restaurant.price) {
-        speech += context.t('DETAILS_PRICE').replace('{0}', context.t(priceList[restaurant.price - 1]));
         cardText += context.t('DETAILS_CARD_PRICE').replace('{0}', context.t(priceList[restaurant.price - 1]));
       }
       if (restaurant.phone) {
@@ -169,19 +165,17 @@ module.exports = {
         if (business.transactions) {
           if (business.transactions.indexOf('delivery') > -1) {
             if (business.transactions.indexOf('restaurant_reservation') > -1) {
-              speech += context.t('DETAILS_DELIVER_RESERVATION');
               cardText += context.t('DETAILS_CARD_DELIVER_RESERVATION');
             } else {
-              speech += context.t('DETAILS_DELIVER');
               cardText += context.t('DETAILS_CARD_DELIVER');
             }
           } else if (business.transactions.indexOf('restaurant_reservation') > -1) {
-            speech += context.t('DETAILS_RESERVATION');
             cardText += context.t('DETAILS_CARD_RESERVATION');
           }
         }
       }
 
+      speech += context.t('DETAILS_SEECARD');
       callback(speech, cardText, imageUrl);
     });
   },
