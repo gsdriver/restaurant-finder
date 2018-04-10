@@ -13,6 +13,7 @@ module.exports = {
   handleIntent: function() {
     // Build up our parameter structure from the intent
     const params = buildYelpParameters(this.event.request.intent);
+    let useDeviceLocation;
 
     // If we are still in results mode, filter the current parameters
     // if there is no overlap in fields (e.g. they are now saying cheap)
@@ -40,25 +41,33 @@ module.exports = {
     }
 
     // Find a location in the following order:
-    // 1) They specified one in the request
-    // 2) The location they used with the last search
-    // 3) The device location (we'll need to ask permission in their app)
-    if (!params.location) {
+    //   1) They specified one in the request
+    //   2) The location they used with the last search
+    //   3) The device location (we'll need to ask permission in their app)
+    // If the location is me then we'll assume that they are looking near
+    // their location (not Maine), and will go directly to the device location
+    if (params.location && (params.location.toLowerCase() === 'me')) {
+      console.log('Location of me being converted to device location');
+      useDeviceLocation = true;
+    } else if (!params.location) {
       if (this.attributes.lastSearch && this.attributes.lastSearch.location) {
         params.location = this.attributes.lastSearch.location;
       } else {
-        location.getDeviceLocation(this, (err, address) => {
-          if (address && address.postalCode) {
-            params.location = address.postalCode;
-            complete(this);
-          } else {
-            console.log('Device Location: ' + JSON.stringify(address));
-            this.response.askForPermissionsConsentCard(['read::alexa:device:all:address:country_and_postal_code']);
-            utils.emitResponse(this, null, null, this.t('FIND_LOCATION'), this.t('GENERIC_REPROMPT'));
-          }
-        });
-        return;
+        useDeviceLocation = true;
       }
+    }
+    if (useDeviceLocation) {
+      location.getDeviceLocation(this, (err, address) => {
+        if (address && address.postalCode) {
+          params.location = address.postalCode;
+          complete(this);
+        } else {
+          console.log('Device Location: ' + JSON.stringify(address));
+          this.response.askForPermissionsConsentCard(['read::alexa:device:all:address:country_and_postal_code']);
+          utils.emitResponse(this, null, null, this.t('FIND_LOCATION'), this.t('GENERIC_REPROMPT'));
+        }
+      });
+      return;
     }
 
     if (params.location) {
