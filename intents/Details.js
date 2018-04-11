@@ -8,6 +8,11 @@ const utils = require('../utils');
 
 module.exports = {
   handleIntent: function() {
+    if (!this.attributes.lastResponse) {
+      utils.emitResponse(this, null, null, this.t('DETAILS_NOLIST'), this.t('GENERIC_REPROMPT'));
+      return;
+    }
+
     const index = getSelectedIndex(this);
 
     if (index === undefined) {
@@ -20,7 +25,8 @@ module.exports = {
       utils.emitResponse(this, null, null, this.t('DETAILS_READLIST'), this.t('DETAILS_READLIST'));
     } else {
       // OK, let's get the details
-      if (index >= this.attributes.lastResponse.restaurants.length) {
+      if (!this.attributes.lastResponse ||
+        (index >= this.attributes.lastResponse.restaurants.length)) {
         utils.emitResponse(this, null, null,
           this.t('DETAILS_INVALID_NUMBER'), this.t('DETAILS_INVALID_NUMBER_REPROMPT'));
       } else {
@@ -31,7 +37,8 @@ module.exports = {
   handleNextIntent: function() {
     // Go to the next restaurant in the list
     const index = this.attributes.lastResponse.details + 1;
-    if (index >= this.attributes.lastResponse.restaurants.length) {
+    if (!this.attributes.lastResponse ||
+      (index >= this.attributes.lastResponse.restaurants.length)) {
       utils.emitResponse(this, null, null, this.t('DETAILS_LISTEND'), this.t('DETAILS_LISTEND_REPROMPT'));
     } else {
       showDetails(this, index);

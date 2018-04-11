@@ -11,6 +11,7 @@ const resources = {
       // From Details.js
       'DETAILS_NONUMBER': 'I\'m sorry, I didn\'t hear a number of the restaurant you wanted details about.',
       'DETAILS_READLIST': 'Please ask to start reading the list before asking for details.',
+      'DETAILS_NOLIST': 'You need to search for restaurnts before reading details. Try saying fid cheap chinese restaurants.',
       'DETAILS_INVALID_NUMBER': 'That is not a valid option to read. Please ask for a valid number or say repeat to repeat ths list.',
       'DETAILS_INVALID_NUMBER_REPROMPT': 'Please ask for a valid number of say repeat to repeat the list.',
       'DETAILS_LISTEND': 'You are at the end of the list. Please do a new search or say back to go back to the list of results.',
@@ -92,6 +93,7 @@ const resources = {
       // From Details.js
       'DETAILS_NONUMBER': 'I\'m sorry, I didn\'t hear a number of the restaurant you wanted details about.',
       'DETAILS_READLIST': 'Please ask to start reading the list before asking for details.',
+      'DETAILS_NOLIST': 'You need to search for restaurnts before reading details. Try saying fid cheap chinese restaurants.',
       'DETAILS_INVALID_NUMBER': 'That is not a valid option to read. Please ask for a valid number or say repeat to repeat ths list.',
       'DETAILS_INVALID_NUMBER_REPROMPT': 'Please ask for a valid number of say repeat to repeat the list.',
       'DETAILS_LISTEND': 'You are at the end of the list. Please do a new search or say back to go back to the list of results.',

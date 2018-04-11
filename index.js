@@ -34,6 +34,7 @@ const Repeat = require('./intents/Repeat');
 const Help = require('./intents/Help');
 const Exit = require('./intents/Exit');
 const resources = require('./resources');
+const utils = require('./utils');
 
 const APP_ID = 'amzn1.ask.skill.4c848d38-347c-4e03-b908-42c6af6c207d';
 
@@ -122,11 +123,10 @@ const handlers = {
     if (this.event.request.type === 'IntentRequest') {
       // Clear the last search if this is a FindRestaurantIntent
       if (this.event.request.intent.name == 'FindRestaurantIntent') {
-        this.attributes.lastSearch = undefined;
+        utils.clearState(this);
       }
       this.emit(this.event.request.intent.name);
     } else {
-      this.attributes.lastSearch = undefined;
       this.emit('LaunchRequest');
     }
   },

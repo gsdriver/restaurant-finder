@@ -39,6 +39,12 @@ module.exports = {
 
     context.emit(':responseReady');
   },
+  clearState: function(context) {
+    context.handler.state = '';
+    delete context.attributes['STATE'];
+    context.attributes.lastSearch = undefined;
+    context.attributes.lastResponse = undefined;
+  },
   readRestaurantResults: function(context, callback) {
     const attributes = context.attributes;
     let speech;
