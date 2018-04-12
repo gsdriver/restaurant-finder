@@ -46,7 +46,7 @@ module.exports = {
     //   3) The device location (we'll need to ask permission in their app)
     // If the location is me then we'll assume that they are looking near
     // their location (not Maine), and will go directly to the device location
-    if (params.location && (params.location.toLowerCase() === 'me')) {
+    if (isMe(params.location)) {
       console.log('Location of me being converted to device location');
       useDeviceLocation = true;
     } else if (!params.location) {
@@ -172,4 +172,33 @@ function buildYelpParameters(intent) {
   }
 
   return params;
+}
+
+function isMe(location) {
+  if (!location) {
+    return false;
+  }
+
+  const loc = location.toLowerCase();
+
+  // Does it contain the word me?
+  if (loc === 'me') {
+    return true;
+  }
+  if (loc.indexOf(' me ') > -1) {
+    return true;
+  }
+  if (loc.indexOf(' me') == loc.length - 3) {
+    return true;
+  }
+
+  // What about my (not at the end of the string)?
+  if (loc.indexOf(' my ') > -1) {
+    return true;
+  }
+  if (loc.substring(0, 3) == 'my ') {
+    return true;
+  }
+
+  return false;
 }
