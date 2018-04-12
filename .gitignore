@@ -1,4 +1,8 @@
 credentials.txt
 .idea
 node_modules
-RestaurantFinder.zip
+*.zip
+contest
+build
+update.bat
+attributes.txt
