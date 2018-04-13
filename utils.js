@@ -78,11 +78,11 @@ module.exports = {
             || !attributes.lastSearch.rating) {
             let option;
             if (!attributes.lastSearch.categories) {
-              option = pickRandomOption(context.t('RESULTS_FILTER_CUISINE'));
+              option = module.exports.pickRandomOption(context.t('RESULTS_FILTER_CUISINE'));
             } else if (!attributes.lastSearch.rating) {
-              option = pickRandomOption(context.t('RESULTS_FILTER_RATING'));
+              option = module.exports.pickRandomOption(context.t('RESULTS_FILTER_RATING'));
             } else {
-              option = pickRandomOption(context.t('RESULTS_FILTER_PRICE'));
+              option = module.exports.pickRandomOption(context.t('RESULTS_FILTER_PRICE'));
             }
             reprompt += context.t('RESULTS_FILTER').replace('{0}', option);
           }
@@ -193,6 +193,17 @@ module.exports = {
       speech += context.t('DETAILS_SEECARD');
       callback(speech, cardText, imageUrl);
     });
+  },
+  pickRandomOption: function(str) {
+    const options = str.split('|');
+    const index = Math.floor(Math.random() * options.length);
+
+    // Just in case random returned 1.0
+    if (index == options.length) {
+      index--;
+    }
+
+    return options[index];
   },
 };
 
@@ -313,9 +324,4 @@ function buildListTemplate(context, callback) {
   } else {
     callback();
   }
-}
-
-function pickRandomOption(str) {
-  const options = str.split('|');
-  return options[Math.floor(Math.random() * options.length)];
 }

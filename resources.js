@@ -27,7 +27,10 @@ const resources = {
       'HELP_DETAILS': 'You can say back to go back to the list of restaurants, or find restaurants to find more restaurants.',
       'HELP_DEFAULT': 'You can find restaurants by cuisine such as Chinese <break time=\"200ms\"/> price range such as cheap <break time=\"200ms\"/> Yelp view such as good <break time=\"200ms\"/> or open to find restaurants that are currently open. <break time=\"200ms\"/> For example, you can say Find a cheap Chinese restaurant in Seattle',
       // From Launch.js
-      'LAUNCH_WELCOME': 'Welcome to Restaurant Finder. You can say Find a cheap Chinese restaurant in Austin. How can I help you?',
+      'LAUNCH_WELCOME': 'Welcome to Restaurant Finder. You can say Find {0} {1} restaurant {2}. How can I help you?',
+      'LAUNCH_CITIES': 'in Austin|in Seattle|in New York|in San Francisco|in Chicago|near me',
+      'LAUNCH_CUISINE': 'Chinese|Indian|Italian|burger|pizza',
+      'LAUNCH_QUALIFIER': 'a cheap|a great|a good|an open',
       'LAUNCH_REPROMPT': 'For instructions on what you can say, please say help me.',
       // From ReadList.js
       'READLIST_SEARCH': 'You need to search for restaurants before reading a list. <break time=\"200ms\"/> Try saying find cheap chinese restaurants.',
@@ -109,7 +112,10 @@ const resources = {
       'HELP_DETAILS': 'You can say back to go back to the list of restaurants, or find restaurants to find more restaurants.',
       'HELP_DEFAULT': 'You can find restaurants by cuisine such as Chinese <break time=\"200ms\"/> price range such as cheap <break time=\"200ms\"/> Yelp view such as good <break time=\"200ms\"/> or open to find restaurants that are currently open. <break time=\"200ms\"/> For example, you can say Find a cheap Chinese restaurant in Toronto',
       // From Launch.js
-      'LAUNCH_WELCOME': 'Welcome to Restaurant Finder. You can say Find a cheap Chinese restaurant in Vancouver. How can I help you?',
+      'LAUNCH_WELCOME': 'Welcome to Restaurant Finder. You can say Find {0} {1} restaurant {2}. How can I help you?',
+      'LAUNCH_CITIES': 'in Vancouver|in Toronto|in Montreal|in Victoria|near me',
+      'LAUNCH_CUISINE': 'Chinese|Indian|Italian|burger|pizza',
+      'LAUNCH_QUALIFIER': 'a cheap|a great|a good|an open',
       'LAUNCH_REPROMPT': 'For instructions on what you can say, please say help me.',
       // From ReadList.js
       'READLIST_SEARCH': 'You need to search for restaurants before reading a list. <break time=\"200ms\"/> Try saying find cheap chinese restaurants.',
