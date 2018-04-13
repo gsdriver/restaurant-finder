@@ -6,6 +6,7 @@ const Alexa = require('alexa-sdk');
 // utility methods for creating Image and TextField objects
 const makeRichText = Alexa.utils.TextUtils.makeRichText;
 const yelp = require('./api/Yelp');
+const geocahe = require('./api/Geocache');
 const LIST_LENGTH = 5;
 
 module.exports = {
@@ -34,10 +35,16 @@ module.exports = {
 
     // If the state is now list, we draw the template
     if (context.handler.state == 'LIST') {
-      buildListTemplate(context);
+      buildListTemplate(context, () => {
+        done();
+      });
+    } else {
+      done();
     }
 
-    context.emit(':responseReady');
+    function done() {
+      context.emit(':responseReady');
+    }
   },
   clearState: function(context) {
     context.handler.state = '';
@@ -50,56 +57,58 @@ module.exports = {
     let speech;
     let reprompt;
 
-    // If there are more than five results, prompt the user to filter further
-    if (!attributes.lastResponse || !attributes.lastResponse.restaurants
-      || !attributes.lastResponse.restaurants.length) {
-      speech = context.t('RESULTS_NORESULTS').replace('{0}', paramsToText(context));
-      reprompt = context.t('GENERIC_REPROMPT');
-      speech += reprompt;
-      state = '';
-    } else if (attributes.lastResponse.total > LIST_LENGTH) {
-      speech = context.t('RESULTS_RESULTS')
-        .replace('{0}', attributes.lastResponse.total)
-        .replace('{1}', paramsToText(context));
+    paramsToText(context, false, (text) => {
+      // If there are more than five results, prompt the user to filter further
+      if (!attributes.lastResponse || !attributes.lastResponse.restaurants
+        || !attributes.lastResponse.restaurants.length) {
+        speech = context.t('RESULTS_NORESULTS').replace('{0}', text);
+        reprompt = context.t('GENERIC_REPROMPT');
+        speech += reprompt;
+        state = '';
+      } else if (attributes.lastResponse.total > LIST_LENGTH) {
+        speech = context.t('RESULTS_RESULTS')
+          .replace('{0}', attributes.lastResponse.total)
+          .replace('{1}', text);
 
-      // More than two pages of results?  Suggest a filter
-      reprompt = context.t('RESULTS_REPROMPT');
-      if (attributes.lastResponse.total > 2 * LIST_LENGTH) {
-        if (!attributes.lastSearch.price
-          || !attributes.lastSearch.categories
-          || !attributes.lastSearch.rating) {
-          let option;
-          if (!attributes.lastSearch.categories) {
-            option = pickRandomOption(context.t('RESULTS_FILTER_CUISINE'));
-          } else if (!attributes.lastSearch.rating) {
-            option = pickRandomOption(context.t('RESULTS_FILTER_RATING'));
-          } else {
-            option = pickRandomOption(context.t('RESULTS_FILTER_PRICE'));
+        // More than two pages of results?  Suggest a filter
+        reprompt = context.t('RESULTS_REPROMPT');
+        if (attributes.lastResponse.total > 2 * LIST_LENGTH) {
+          if (!attributes.lastSearch.price
+            || !attributes.lastSearch.categories
+            || !attributes.lastSearch.rating) {
+            let option;
+            if (!attributes.lastSearch.categories) {
+              option = pickRandomOption(context.t('RESULTS_FILTER_CUISINE'));
+            } else if (!attributes.lastSearch.rating) {
+              option = pickRandomOption(context.t('RESULTS_FILTER_RATING'));
+            } else {
+              option = pickRandomOption(context.t('RESULTS_FILTER_PRICE'));
+            }
+            reprompt += context.t('RESULTS_FILTER').replace('{0}', option);
           }
-          reprompt += context.t('RESULTS_FILTER').replace('{0}', option);
         }
+
+        reprompt += '.';
+        speech += reprompt;
+        state = 'RESULTS';
+      } else {
+        attributes.lastResponse.read = 0;
+        speech = context.t('RESULTS_RESULTS')
+          .replace('{0}', attributes.lastResponse.total)
+          .replace('{1}', text);
+
+        let i;
+        for (i = 0; i < attributes.lastResponse.restaurants.length; i++) {
+          speech += (' ' + (i + 1) + ' <break time=\"200ms\"/> ');
+          speech += attributes.lastResponse.restaurants[i].name + '.';
+        }
+        reprompt = context.t('RESULTS_DETAILS');
+        speech += ' ' + reprompt;
+        state = 'LIST';
       }
 
-      reprompt += '.';
-      speech += reprompt;
-      state = 'RESULTS';
-    } else {
-      attributes.lastResponse.read = 0;
-      speech = context.t('RESULTS_RESULTS')
-        .replace('{0}', attributes.lastResponse.total)
-        .replace('{1}', paramsToText(context));
-
-      let i;
-      for (i = 0; i < attributes.lastResponse.restaurants.length; i++) {
-        speech += (' ' + (i + 1) + ' <break time=\"200ms\"/> ');
-        speech += attributes.lastResponse.restaurants[i].name + '.';
-      }
-      reprompt = context.t('RESULTS_DETAILS');
-      speech += ' ' + reprompt;
-      state = 'LIST';
-    }
-
-    callback(speech, reprompt, state);
+      callback(speech, reprompt, state);
+    });
   },
   readRestaurantsFromList: function(context, callback) {
     let speech;
@@ -187,7 +196,7 @@ module.exports = {
   },
 };
 
-function paramsToText(context, noSSML) {
+function paramsToText(context, noSSML, callback) {
   const params = context.attributes.lastSearch;
   let result = '';
 
@@ -219,14 +228,16 @@ function paramsToText(context, noSSML) {
   result += context.t('PARAMS_RESTAURANTS');
 
   if (params.location) {
-    const location = (noSSML) ? params.location : readLocation(context);
-    result += context.t('PARAMS_IN').replace('{0}', location);
+    readLocation(context, noSSML, (location) => {
+      result += context.t('PARAMS_IN').replace('{0}', location);
+      callback(result);
+    });
+  } else {
+    callback(result);
   }
-
-  return result;
 }
 
-function readLocation(context) {
+function readLocation(context, noSSML, callback) {
   // If the location is a ZIP code, spell it out
   const postalFormat = context.t('POSTAL_FORMAT');
   let retval = context.attributes.lastSearch.location;
@@ -255,13 +266,21 @@ function readLocation(context) {
   }
 
   if (isZIP) {
-    retval = '<say-as interpret-as="digits">' + retval + '</say-as>';
+    // See if we can look this up
+    geocahe.getCityFromPostalCode(retval, (err, city) => {
+      if (city) {
+        retval = city;
+      } else if (!noSSML) {
+        retval = '<say-as interpret-as="digits">' + retval + '</say-as>';
+      }
+      callback(retval);
+    });
+  } else {
+    callback(retval);
   }
-
-  return retval;
 }
 
-function buildListTemplate(context) {
+function buildListTemplate(context, callback) {
   let listTemplateBuilder;
   let listItemBuilder;
   let listTemplate;
@@ -270,24 +289,29 @@ function buildListTemplate(context) {
       context.event.context.System.device.supportedInterfaces.Display) {
     context.attributes.display = true;
 
-    listItemBuilder = new Alexa.templateBuilders.ListItemBuilder();
-    listTemplateBuilder = new Alexa.templateBuilders.ListTemplate1Builder();
-    let i = 0;
+    paramsToText(context, true, (location) => {
+      listItemBuilder = new Alexa.templateBuilders.ListItemBuilder();
+      listTemplateBuilder = new Alexa.templateBuilders.ListTemplate1Builder();
+      let i = 0;
 
-    context.attributes.lastResponse.restaurants.forEach((restaurant) => {
-      listItemBuilder.addItem(null, 'item.' + i++,
-        makeRichText('<font size="7">' + restaurant.name + '</font>'));
+      context.attributes.lastResponse.restaurants.forEach((restaurant) => {
+        listItemBuilder.addItem(null, 'item.' + i++,
+          makeRichText('<font size="7">' + restaurant.name + '</font>'));
+      });
+
+      const listItems = listItemBuilder.build();
+      listTemplate = listTemplateBuilder
+        .setToken('listToken')
+        .setTitle(location)
+        .setListItems(listItems)
+        .setBackButtonBehavior('HIDDEN')
+        .build();
+
+      context.response.renderTemplate(listTemplate);
+      callback();
     });
-
-    const listItems = listItemBuilder.build();
-    listTemplate = listTemplateBuilder
-      .setToken('listToken')
-      .setTitle(paramsToText(context, true))
-      .setListItems(listItems)
-      .setBackButtonBehavior('HIDDEN')
-      .build();
-
-    context.response.renderTemplate(listTemplate);
+  } else {
+    callback();
   }
 }
 
