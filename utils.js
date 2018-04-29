@@ -216,6 +216,7 @@ function paramsToText(context, noSSML, callback) {
   }
   if (params.rating) {
     const ratingMap = {'3,5': 'PARAMS_GOOD', '4,5': 'PARAMS_GREAT',
+        '4.5,5': 'PARAMS_BEST',
         '0,2.5': 'PARAMS_BAD', '0,2': 'PARAMS_TERRIBLE'};
 
     result += context.t(ratingMap[params.rating]);

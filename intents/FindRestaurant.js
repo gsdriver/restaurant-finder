@@ -134,6 +134,8 @@ function addYelpParameter(params, value) {
       'pricey': {field: 'price', value: '3,4'},
       'good': {field: 'rating', value: '3,5'},
       'great': {field: 'rating', value: '4,5'},
+      'best': {field: 'rating', value: '4.5,5'},
+      'exceptional': {field: 'rating', value: '4.5,5'},
       'bad': {field: 'rating', value: '0,2.5'},
       'terrible': {field: 'rating', value: '0,2'},
   };
