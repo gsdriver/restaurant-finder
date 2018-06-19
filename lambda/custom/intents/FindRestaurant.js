@@ -5,14 +5,13 @@
 'use strict';
 
 const utils = require('../utils');
-const categoryList = require('../categories');
 const yelp = require('../api/Yelp');
 const location = require('../api/Location');
 
 module.exports = {
   handleIntent: function() {
     // Build up our parameter structure from the intent
-    const params = buildYelpParameters(this.event.request.intent);
+    const params = utils.buildYelpParameters(this.event.request.intent);
     let useDeviceLocation;
 
     // If we are still in results mode, filter the current parameters
@@ -91,90 +90,6 @@ module.exports = {
     }
   },
 };
-
-// Takes a potential category name and returns the name that
-// should be pass to the Yelp API or undefined if no match found
-function findCategoryInList(category) {
-  let i;
-  let alias;
-  let close;
-
-  for (i = 0; i < categoryList.length; i++) {
-    if (category == categoryList[i].alias.toLowerCase()
-        || (category == categoryList[i].title.toLowerCase())) {
-      // This is it - use the alias
-      alias = categoryList[i].alias;
-      break;
-    } else {
-      // Let's see if it's close -- that is, the passed value
-      // contains the category alias or name
-      if ((category.indexOf(categoryList[i].alias.toLowerCase()) > -1)
-        || (category.indexOf(categoryList[i].title.toLowerCase()) > -1)) {
-        close = categoryList[i].alias;
-      }
-    }
-  }
-
-  return alias ? alias : close;
-}
-
-// Takes a value and fits it into the appropriate Yelp parameter
-function addYelpParameter(params, value) {
-  const category = findCategoryInList(value);
-  const mapping = {
-      'open': {field: 'open_now', value: true},
-      'open now': {field: 'open_now', value: true},
-      'cheap': {field: 'price', value: '1'},
-      'moderate': {field: 'price', value: '2'},
-      'spendy': {field: 'price', value: '3'},
-      'splurge': {field: 'price', value: '4'},
-      'inexpensive': {field: 'price', value: '1,2'},
-      'expensive': {field: 'price', value: '3,4'},
-      'costly': {field: 'price', value: '4'},
-      'pricey': {field: 'price', value: '3,4'},
-      'good': {field: 'rating', value: '3,5'},
-      'great': {field: 'rating', value: '4,5'},
-      'best': {field: 'rating', value: '4.5,5'},
-      'exceptional': {field: 'rating', value: '4.5,5'},
-      'bad': {field: 'rating', value: '0,2.5'},
-      'terrible': {field: 'rating', value: '0,2'},
-  };
-
-  if (category) {
-    // OK, this matches a category
-    if (params.categories) {
-      params.categories += (',' + category);
-    } else {
-      params.categories = category;
-    }
-  } else if (mapping[value]) {
-    params[mapping[value].field] = mapping[value].value;
-  }
-}
-
-// Builds a structure to pass to the Yelp API
-function buildYelpParameters(intent) {
-  const params = {};
-
-  // You can have up to three intent slots - first let's see if we have a category
-  if (intent.slots.FirstDescriptor && intent.slots.FirstDescriptor.value) {
-    addYelpParameter(params, intent.slots.FirstDescriptor.value.toLowerCase());
-  }
-  if (intent.slots.SecondDescriptor && intent.slots.SecondDescriptor.value) {
-    addYelpParameter(params, intent.slots.SecondDescriptor.value.toLowerCase());
-  }
-  if (intent.slots.ThirdDescriptor && intent.slots.ThirdDescriptor.value) {
-    addYelpParameter(params, intent.slots.ThirdDescriptor.value.toLowerCase());
-  }
-  if (intent.slots.Location && intent.slots.Location.value) {
-    params.location = intent.slots.Location.value;
-  } else if (intent.slots.LocationZIP && intent.slots.LocationZIP.value
-      && intent.slots.LocationZIP.value.length == 5) {
-    params.location = intent.slots.LocationZIP.value;
-  }
-
-  return params;
-}
 
 function isMe(location) {
   if (!location) {
