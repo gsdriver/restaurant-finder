@@ -1,0 +1,75 @@
+{
+  "manifest": {
+    "publishingInformation": {
+      "locales": {
+        "en-US": {
+          "summary": "Find restaurants in a location based on cuisine type, or filter by price or Yelp rating",
+          "examplePhrases": [
+            "Alexa, ask restaurant finder to find good Italian restaurants in Boise",
+            "Alexa, ask restaurant finder to find great Chinese restaurants in 98052",
+            "read list"
+          ],
+          "keywords": [
+            "restaurant"
+          ],
+          "name": "Restaurant Finder",
+          "smallIconUri": "https://s3.amazonaws.com/CAPS-SSE/echo_developer/14831a6f6fdf47aa808e88b9dcd34ff4/APP_ICON?versionId=hRWIG7V0Ei0Ak0aqYhGpuGwidHFd2Wr1&AWSAccessKeyId=AKIAI3X6PUXD7CU5F5BQ&Expires=1529466853&Signature=HZKJvYNTf8WXsEynXnxv6AcMkMk%3D",
+          "description": "Find restaurants in a location based on the type of cuisine, or filter the restaurants by price or by Yelp rating. Restaurant details including the address and phone number read to you directly through your Alexa-enabled device with additional information displayed in the companion Alexa application.",
+          "largeIconUri": "https://s3.amazonaws.com/CAPS-SSE/echo_developer/56642c8548e74900b241044bd2e3eee5/APP_ICON_LARGE?versionId=iJuP4g3was7RGzjq2c2ksVUU74X.A9l.&AWSAccessKeyId=AKIAI3X6PUXD7CU5F5BQ&Expires=1529466853&Signature=dYenFjvgkVjVU8ftvd0ZnuwsuKA%3D"
+        },
+        "en-CA": {
+          "summary": "Find restaurants in a location based on cuisine type, or filter by price or Yelp rating",
+          "examplePhrases": [
+            "Alexa, ask restaurant finder to find good Italian restaurants in Vancouver",
+            "Alexa, ask restaurant finder to find great Chinese restaurants in Toronto",
+            "read list"
+          ],
+          "keywords": [
+            "restaurant"
+          ],
+          "name": "Restaurant Finder",
+          "smallIconUri": "https://s3.amazonaws.com/CAPS-SSE/echo_developer/14831a6f6fdf47aa808e88b9dcd34ff4/APP_ICON?versionId=hRWIG7V0Ei0Ak0aqYhGpuGwidHFd2Wr1&AWSAccessKeyId=AKIAI3X6PUXD7CU5F5BQ&Expires=1529466853&Signature=HZKJvYNTf8WXsEynXnxv6AcMkMk%3D",
+          "description": "Find restaurants in a location based on the type of cuisine, or filter the restaurants by price or by Yelp rating. Restaurant details including the address and phone number read to you directly through your Alexa-enabled device with additional information displayed in the companion Alexa application.",
+          "largeIconUri": "https://s3.amazonaws.com/CAPS-SSE/echo_developer/56642c8548e74900b241044bd2e3eee5/APP_ICON_LARGE?versionId=iJuP4g3was7RGzjq2c2ksVUU74X.A9l.&AWSAccessKeyId=AKIAI3X6PUXD7CU5F5BQ&Expires=1529466853&Signature=dYenFjvgkVjVU8ftvd0ZnuwsuKA%3D"
+        }
+      },
+      "isAvailableWorldwide": true,
+      "testingInstructions": "This skill walks the user through asking for a list of restaurants, reading the list five at a time, and then providing details about one that the user selects.",
+      "category": "RESTAURANT_BOOKING_INFO_AND_REVIEW",
+      "distributionCountries": []
+    },
+    "apis": {
+      "custom": {
+        "endpoint": {
+          "sourceDir": "lambda\\custom"
+        },
+        "interfaces": [
+          {
+            "type": "RENDER_TEMPLATE"
+          }
+        ]
+      }
+    },
+    "manifestVersion": "1.0",
+    "permissions": [
+      {
+        "name": "alexa:devices:all:address:country_and_postal_code:read"
+      }
+    ],
+    "privacyAndCompliance": {
+      "allowsPurchases": false,
+      "locales": {
+        "en-US": {
+          "privacyPolicyUrl": "http://garrettvargas.com/rf-privacy.html"
+        },
+        "en-CA": {
+          "privacyPolicyUrl": "http://garrettvargas.com/rf-privacy.html"
+        }
+      },
+      "isExportCompliant": true,
+      "containsAds": false,
+      "isChildDirected": false,
+      "usesPersonalInfo": false
+    }
+  }
+}
