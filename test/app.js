@@ -7,6 +7,7 @@ AWS.config.update({region: 'us-east-1'});
 const dynamodb = new AWS.DynamoDB({apiVersion: '2012-08-10'});
 
 const sessionId = "SessionId.c88ec34d-28b0-46f6-a4c7-120d8fba8fb4";
+const LOCALE = 'en-CA';
 
 function BuildEvent(argv)
 {
@@ -63,7 +64,7 @@ function BuildEvent(argv)
       "request": {
         "type": "IntentRequest",
         "requestId": "EdwRequestId.26405959-e350-4dc0-8980-14cdc9a4e921",
-        "locale": "en-US",
+        "locale": LOCALE,
         "timestamp": "2016-11-03T21:31:08Z",
         "intent": {}
       },
@@ -85,7 +86,7 @@ function BuildEvent(argv)
        "request": {
          "type": "LaunchRequest",
          "requestId": "EdwRequestId.26405959-e350-4dc0-8980-14cdc9a4e921",
-         "locale": "en-US",
+         "locale": LOCALE,
          "timestamp": "2016-11-03T21:31:08Z",
          "intent": {}
        },

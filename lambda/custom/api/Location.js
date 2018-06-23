@@ -8,6 +8,12 @@ const https = require('https');
 
 module.exports = {
   getDeviceLocation: function(context, callback) {
+    // Allows us to shortcircuit trying to get location
+    if (process.env.DONTGETLOCATION) {
+      callback(null);
+      return;
+    }
+
     const headers = {'Authorization': 'Bearer ' + context.event.context.System.apiAccessToken};
     const options = {hostname: context.event.context.System.apiEndpoint.replace('https://', ''),
       port: 443,

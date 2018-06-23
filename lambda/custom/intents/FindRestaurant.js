@@ -16,7 +16,7 @@ module.exports = {
 
     // If we are still in results mode, filter the current parameters
     // if there is no overlap in fields (e.g. they are now saying cheap)
-    if ((this.handler.state == 'RESULTS') && this.attributes.lastSearch) {
+    if (this.attributes.lastSearch) {
       let field;
       let newSearch = false;
 
@@ -61,9 +61,9 @@ module.exports = {
           params.location = address.postalCode;
           complete(this);
         } else {
-          console.log('Device Location: ' + JSON.stringify(address));
+          this.attributes.lastSearch = params;
           this.response.askForPermissionsConsentCard(['read::alexa:device:all:address:country_and_postal_code']);
-          utils.emitResponse(this, null, null, this.t('FIND_LOCATION'), this.t('GENERIC_REPROMPT'));
+          utils.emitResponse(this, null, this.t('FIND_LOCATION'));
         }
       });
       return;
