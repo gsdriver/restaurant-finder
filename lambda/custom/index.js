@@ -24,7 +24,7 @@
 
 'use strict';
 
-const Alexa = require('alexa-sdk');
+const Alexa = require('ask-sdk');
 const Launch = require('./intents/Launch');
 const CanFulfill = require('./intents/CanFulfill');
 const FindRestaurant = require('./intents/FindRestaurant');
@@ -34,122 +34,97 @@ const Back = require('./intents/Back');
 const Repeat = require('./intents/Repeat');
 const Help = require('./intents/Help');
 const Exit = require('./intents/Exit');
-const resources = require('./resources');
+const SessionEnd = require('./intents/SessionEnd');
+const Unhandled = require('./intents/Unhandled');
 const utils = require('./utils');
+const ssmlCheck = require('ssml-check-core');
+const {ri, JargonSkillBuilder} = require('@jargon/alexa-skill-sdk');
 
-const APP_ID = 'amzn1.ask.skill.4c848d38-347c-4e03-b908-42c6af6c207d';
+const requestInterceptor = {
+  process(handlerInput) {
+    const attributesManager = handlerInput.attributesManager;
+    const sessionAttributes = attributesManager.getSessionAttributes();
+    const event = handlerInput.requestEnvelope;
+    let attributes;
 
-const detailsHandlers = Alexa.CreateStateHandler('DETAILS', {
-  'NewSession': function() {
-    this.handler.state = '';
-    this.emitWithState('NewSession');
-  },
-  'FindRestaurantIntent': FindRestaurant.handleIntent,
-  'ReadListIntent': ReadList.handleIntent,
-  'BackIntent': Back.handleIntent,
-  'AMAZON.PreviousIntent': Back.handleIntent,
-  'AMAZON.MoreIntent': Repeat.handleIntent,
-  'AMAZON.NextIntent': Details.handleNextIntent,
-  'AMAZON.RepeatIntent': Repeat.handleIntent,
-  'AMAZON.FallbackIntent': Repeat.handleIntent,
-  'AMAZON.HelpIntent': Help.handleIntent,
-  'AMAZON.StopIntent': Exit.handleIntent,
-  'AMAZON.CancelIntent': Exit.handleIntent,
-  'SessionEndedRequest': function() {
-    console.log('Session ended!');
-    this.attributes.sessionCount = (this.attributes.sessionCount + 1) || 1;
-    this.emit(':saveState', true);
-  },
-  'Unhandled': function() {
-    this.response.speak(this.t('UNKNOWN_INTENT')).listen(this.t('UNKNOWN_INTENT_REPROMPT'));
-    this.emit(':responseReady');
-  },
-});
-
-const listHandlers = Alexa.CreateStateHandler('LIST', {
-  'NewSession': function() {
-    this.handler.state = '';
-    this.emitWithState('NewSession');
-  },
-  'FindRestaurantIntent': FindRestaurant.handleIntent,
-  'ReadListIntent': ReadList.handleIntent,
-  'DetailsIntent': Details.handleIntent,
-  'BackIntent': Back.handleIntent,
-  'ElementSelected': Details.handleIntent,
-  'AMAZON.PreviousIntent': Back.handleIntent,
-  'AMAZON.MoreIntent': ReadList.handleIntent,
-  'AMAZON.NextIntent': ReadList.handleIntent,
-  'AMAZON.FallbackIntent': Repeat.handleIntent,
-  'AMAZON.RepeatIntent': Repeat.handleIntent,
-  'AMAZON.HelpIntent': Help.handleIntent,
-  'AMAZON.StopIntent': Exit.handleIntent,
-  'AMAZON.CancelIntent': Exit.handleIntent,
-  'SessionEndedRequest': function() {
-    console.log('Session ended!');
-    this.attributes.sessionCount = (this.attributes.sessionCount + 1) || 1;
-    this.emit(':saveState', true);
-  },
-  'Unhandled': function() {
-    this.response.speak(this.t('UNKNOWN_INTENT')).listen(this.t('UNKNOWN_INTENT_REPROMPT'));
-    this.emit(':responseReady');
-  },
-});
-
-const resultHandlers = Alexa.CreateStateHandler('RESULTS', {
-  'NewSession': function() {
-    this.handler.state = '';
-    this.emitWithState('NewSession');
-  },
-  'FindRestaurantIntent': FindRestaurant.handleIntent,
-  'ReadListIntent': ReadList.handleIntent,
-  'AMAZON.FallbackIntent': Repeat.handleIntent,
-  'AMAZON.RepeatIntent': Repeat.handleIntent,
-  'AMAZON.HelpIntent': Help.handleIntent,
-  'AMAZON.StopIntent': Exit.handleIntent,
-  'AMAZON.CancelIntent': Exit.handleIntent,
-  'SessionEndedRequest': function() {
-    console.log('Session ended!');
-    this.attributes.sessionCount = (this.attributes.sessionCount + 1) || 1;
-    this.emit(':saveState', true);
-  },
-  'Unhandled': function() {
-    this.response.speak(this.t('UNKNOWN_INTENT')).listen(this.t('UNKNOWN_INTENT_REPROMPT'));
-    this.emit(':responseReady');
-  },
-});
-
-const handlers = {
-  'NewSession': function() {
-    this.attributes.lastRun = Date.now();
-    this.attributes.userLocale = this.event.request.locale;
-
-    // Send on this request
-    if (this.event.request.type === 'IntentRequest') {
-      // Clear the last search if this is a FindRestaurantIntent
-      if (this.event.request.intent.name == 'FindRestaurantIntent') {
-        utils.clearState(this);
-      }
-      this.emit(this.event.request.intent.name);
+    if (Object.keys(sessionAttributes).length === 0) {
+      // No session attributes - so get the persistent ones
+      return attributesManager.getPersistentAttributes()
+        .then((attributes) => {
+          attributes.temp = {};
+          attributes.lastRun = Date.now();
+          attributes.playerLocale = event.request.locale;
+          attributes.sessions = (attributes.sessions + 1) || 1;
+          attributesManager.setSessionAttributes(attributes);
+        });
     } else {
-      this.emit('LaunchRequest');
+      return Promise.resolve();
     }
   },
-  'LaunchRequest': Launch.handleIntent,
-  'FindRestaurantIntent': FindRestaurant.handleIntent,
-  'ReadListIntent': ReadList.handleIntent,
-  'DetailsIntent': Details.handleIntent,
-  'AMAZON.FallbackIntent': Help.handleIntent,
-  'AMAZON.HelpIntent': Help.handleIntent,
-  'AMAZON.StopIntent': Exit.handleIntent,
-  'AMAZON.CancelIntent': Exit.handleIntent,
-  'SessionEndedRequest': function() {
-    console.log('Session ended!');
-    this.attributes.sessionCount = (this.attributes.sessionCount + 1) || 1;
-    this.emit(':saveState', true);
+};
+
+const saveResponseInterceptor = {
+  process(handlerInput) {
+    const response = handlerInput.responseBuilder.getResponse();
+    const attributes = handlerInput.attributesManager.getSessionAttributes();
+    let promise;
+
+    if (response) {
+      return Promise.resolve().then(() => {
+      //return utils.drawTable(handlerInput).then(() => {
+        if (response.shouldEndSession) {
+          // We are meant to end the session
+          return SessionEnd.handle(handlerInput);
+        } else {
+          // Save the response and reprompt for repeat
+          if (response.outputSpeech && response.outputSpeech.ssml) {
+            return ssmlCheck.verifyAndFix(response.outputSpeech.ssml, {platform: 'alexa'}, (result) => {
+              if (result.errors) {
+                console.log(JSON.stringify(result.errors));
+              }
+              if (result.fixedSSML) {
+                response.outputSpeech.ssml = result.fixedSSML;
+              }
+
+              // Note the response
+              if (!process.env.NOLOG) {
+                console.log(JSON.stringify(response));
+              }
+
+              // Save the last response and reprompt with stripped <speak> tags
+              let lastResponse = response.outputSpeech.ssml;
+              lastResponse = lastResponse.replace('<speak>', '');
+              lastResponse = lastResponse.replace('</speak>', '');
+              attributes.temp.lastResponse = lastResponse;
+
+              if (response.reprompt && response.reprompt.outputSpeech
+                && response.reprompt.outputSpeech.ssml) {
+                let lastReprompt = response.reprompt.outputSpeech.ssml;
+                lastReprompt = lastReprompt.replace('<speak>', '');
+                lastReprompt = lastReprompt.replace('</speak>', '');
+                attributes.temp.lastReprompt = lastReprompt;
+              }
+            });
+          } else {
+            return Promise.resolve();
+          }
+        }
+      });
+    } else {
+      return Promise.resolve();
+    }
   },
-  'Unhandled': function() {
-    this.response.speak(this.t('UNKNOWN_INTENT')).listen(this.t('UNKNOWN_INTENT_REPROMPT'));
-    this.emit(':responseReady');
+};
+
+const ErrorHandler = {
+  canHandle(handlerInput, error) {
+    console.log(error.stack);
+    return error.name.startsWith('AskSdk');
+  },
+  handle(handlerInput, error) {
+    return handlerInput.jrb
+      .speak(ri('SKILL_ERROR'))
+      .getResponse();
   },
 };
 
@@ -161,25 +136,86 @@ if (process.env.DASHBOTKEY) {
 }
 
 function runSkill(event, context, callback) {
-  const AWS = require('aws-sdk');
-  AWS.config.update({region: 'us-east-1'});
-
-  // If this is a CanFulfill, handle this separately
-  if (event.request && (event.request.type == 'CanFulfillIntentRequest')) {
-    CanFulfill.check(event, (response) => {
-      context.succeed(response);
-    });
-    return;
-  }
-
-  const alexa = Alexa.handler(event, context);
+  const skillBuilder = new JargonSkillBuilder().wrap(Alexa.SkillBuilders.custom());
 
   if (!process.env.NOLOG) {
     console.log(JSON.stringify(event));
   }
-  alexa.appId = APP_ID;
-  alexa.resources = resources.languageStrings;
-  alexa.registerHandlers(resultHandlers, detailsHandlers, listHandlers, handlers);
-  alexa.dynamoDBTableName = 'RestaurantFinder';
-  alexa.execute();
+
+  // If this is a CanFulfill, handle this separately
+  if (event.request && (event.request.type == 'CanFulfillIntentRequest')) {
+    callback(null, CanFulfill.check(event));
+    return;
+  }
+
+  const {DynamoDbPersistenceAdapter} = require('ask-sdk-dynamodb-persistence-adapter');
+  const dbAdapter = new DynamoDbPersistenceAdapter({
+    tableName: 'RestaurantFinder',
+    partitionKeyName: 'userId',
+    attributesName: 'mapAttr',
+  });
+  const skillFunction = skillBuilder.addRequestHandlers(
+      Launch,
+      FindRestaurant,
+      Help,
+      Exit,
+      SessionEnd,
+      Unhandled
+    )
+    .addErrorHandlers(ErrorHandler)
+    .addRequestInterceptors(requestInterceptor)
+    .addResponseInterceptors(saveResponseInterceptor)
+    .withPersistenceAdapter(dbAdapter)
+    .withApiClient(new Alexa.DefaultApiClient())
+    .withSkillId('amzn1.ask.skill.4c848d38-347c-4e03-b908-42c6af6c207d')
+    .lambda();
+  skillFunction(event, context, (err, response) => {
+    callback(err, response);
+  });
 }
+
+/*
+const detailsHandlers = Alexa.CreateStateHandler('DETAILS', {
+  'ReadListIntent': ReadList.handleIntent,
+  'BackIntent': Back.handleIntent,
+  'AMAZON.PreviousIntent': Back.handleIntent,
+  'AMAZON.MoreIntent': Repeat.handleIntent,
+  'AMAZON.NextIntent': Details.handleNextIntent,
+  'AMAZON.RepeatIntent': Repeat.handleIntent,
+  'AMAZON.FallbackIntent': Repeat.handleIntent,
+});
+
+const listHandlers = Alexa.CreateStateHandler('LIST', {
+  'ReadListIntent': ReadList.handleIntent,
+  'DetailsIntent': Details.handleIntent,
+  'BackIntent': Back.handleIntent,
+  'ElementSelected': Details.handleIntent,
+  'AMAZON.PreviousIntent': Back.handleIntent,
+  'AMAZON.MoreIntent': ReadList.handleIntent,
+  'AMAZON.NextIntent': ReadList.handleIntent,
+  'AMAZON.FallbackIntent': Repeat.handleIntent,
+  'AMAZON.RepeatIntent': Repeat.handleIntent,
+});
+
+const resultHandlers = Alexa.CreateStateHandler('RESULTS', {
+  'ReadListIntent': ReadList.handleIntent,
+  'AMAZON.FallbackIntent': Repeat.handleIntent,
+  'AMAZON.RepeatIntent': Repeat.handleIntent,
+});
+
+const handlers = {
+    // Send on this request
+    if (this.event.request.type === 'IntentRequest') {
+      // Clear the last search if this is a FindRestaurantIntent
+      if (this.event.request.intent.name == 'FindRestaurantIntent') {
+        utils.clearState(this);
+      }
+      this.emit(this.event.request.intent.name);
+    } else {
+      this.emit('LaunchRequest');
+    }
+  },
+  'ReadListIntent': ReadList.handleIntent,
+  'DetailsIntent': Details.handleIntent,
+};
+*/

@@ -2,13 +2,11 @@
 // Utility functionals
 //
 
-const Alexa = require('alexa-sdk');
-// utility methods for creating Image and TextField objects
-const makeRichText = Alexa.utils.TextUtils.makeRichText;
 const categoryList = require('./categories');
 const yelp = require('./api/Yelp');
 const geocahe = require('./api/Geocache');
 const LIST_LENGTH = 5;
+const ri = require('@jargon/alexa-skill-sdk').ri;
 
 module.exports = {
   PAGE_SIZE: LIST_LENGTH,
@@ -233,25 +231,25 @@ module.exports = {
 function paramsToText(context, noSSML, callback) {
   const params = context.attributes.lastSearch;
   let result = '';
+  const renderItems = [];
 
+  return handlerInput.render(ri('PARAMS_OPEN'));
   if (params.open_now) {
-    result += context.t('PARAMS_OPEN');
+    renderItems.push(ri('PARAMS_OPEN'));
   }
   if (params.rating) {
     const ratingMap = {'3,5': 'PARAMS_GOOD', '4,5': 'PARAMS_GREAT',
         '4.5,5': 'PARAMS_BEST',
         '0,2.5': 'PARAMS_BAD', '0,2': 'PARAMS_TERRIBLE'};
 
-    result += context.t(ratingMap[params.rating]);
-    result += ' ';
+    renderItems.push(ri(ratingMap[params.rating]));
   }
   if (params.price) {
     const priceMap = {'1': 'PARAMS_CHEAP', '2': 'PARAMS_MODERATE',
         '3': 'PARAMS_SPENDY', '4': 'PARAMS_SPLURGE',
         '1,2': 'PARAMS_INEXPENSIVE', '3,4': 'PARAMS_EXPENSIVE'};
 
-    result += context.t(priceMap[params.price]);
-    result += ' ';
+    renderItems.push(ri(priceMap[params.price]));
   }
   if (params.categories) {
     const catList = params.categories.split(',');
@@ -260,16 +258,24 @@ function paramsToText(context, noSSML, callback) {
       result += (cat + ' ');
     });
   }
-  result += context.t('PARAMS_RESTAURANTS');
+  renderItems.push(ri('PARAMS_RESTAURANTS'));
 
-  if (params.location) {
-    readLocation(context, noSSML, (location) => {
-      result += context.t('PARAMS_IN').replace('{0}', location);
-      callback(result);
+  return handlerInput.jrm.renderBatch(renderItems)
+  .then((items) => {
+    let result = '';
+    items.forEach((item) => {
+      result = result + item + ' ';
     });
-  } else {
-    callback(result);
-  }
+
+    if (params.location) {
+      return readLocation(context, noSSML, (location) => {
+        result += context.t('PARAMS_IN').replace('{0}', location);
+        return result;
+      });
+    } else {
+      return Promise.resolve(result);
+    }
+  });
 }
 
 function readLocation(context, noSSML, callback) {
@@ -302,16 +308,16 @@ function readLocation(context, noSSML, callback) {
 
   if (isZIP) {
     // See if we can look this up
-    geocahe.getCityFromPostalCode(retval, (err, city) => {
+    return geocahe.getCityFromPostalCode(retval, (city) => {
       if (city) {
         retval = city;
       } else if (!noSSML) {
         retval = '<say-as interpret-as="digits">' + retval + '</say-as>';
       }
-      callback(retval);
+      return retval;
     });
   } else {
-    callback(retval);
+    return Promise.resolve(retval);
   }
 }
 
@@ -374,7 +380,7 @@ function addYelpParameter(params, value) {
     params[mapping[value].field] = mapping[value].value;
   }
 }
-
+/*
 function buildListTemplate(context, callback) {
   let listTemplateBuilder;
   let listItemBuilder;
@@ -409,3 +415,4 @@ function buildListTemplate(context, callback) {
     callback();
   }
 }
+*/

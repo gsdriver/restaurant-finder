@@ -7,38 +7,41 @@
 const https = require('https');
 
 module.exports = {
-  getDeviceLocation: function(context, callback) {
+  getDeviceLocation: function(handlerInput) {
+    const event = handlerInput.requestEnvelope;
+
     // Allows us to shortcircuit trying to get location
     if (process.env.DONTGETLOCATION) {
-      callback(null);
-      return;
+      return Promise.resolve();
     }
 
-    const headers = {'Authorization': 'Bearer ' + context.event.context.System.apiAccessToken};
-    const options = {hostname: context.event.context.System.apiEndpoint.replace('https://', ''),
+    const headers = {'Authorization': 'Bearer ' + event.context.System.apiAccessToken};
+    const options = {hostname: event.context.System.apiEndpoint.replace('https://', ''),
       port: 443,
-      path: '/v1/devices/' + context.event.context.System.device.deviceId + '/settings/address/countryAndPostalCode',
+      path: '/v1/devices/' + event.context.System.device.deviceId + '/settings/address/countryAndPostalCode',
       method: 'GET',
       headers: headers};
 
-    const req = https.request(options, (res) => {
-      if (res.statusCode == 200) {
-        // Process the response
-        let fulltext = '';
-        res.on('data', (data) => {
-          fulltext += data;
-        });
-        res.on('end', () => callback(null, JSON.parse(fulltext)));
-      } else {
-        // Sorry, there was an error calling the HTTP endpoint
-        callback('Unable to call endpoint', null);
-      }
-    });
+    return new Promise((resolve, reject) => {
+      const req = https.request(options, (res) => {
+        if (res.statusCode == 200) {
+          // Process the response
+          let fulltext = '';
+          res.on('data', (data) => {
+            fulltext += data;
+          });
+          res.on('end', () => resolve(JSON.parse(fulltext)));
+        } else {
+          // Sorry, there was an error calling the HTTP endpoint
+          reject('Unable to call endpoint');
+        }
+      });
 
-    req.end();
-    req.on('error', (e) => {
-      console.log(e.stack);
-      callback(e, null);
+      req.end();
+      req.on('error', (e) => {
+        console.log(e.stack);
+        reject(e);
+      });
     });
   },
 };

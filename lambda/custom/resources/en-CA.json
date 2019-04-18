@@ -1,0 +1,12 @@
+{
+  "FIND_LOCATION": "Please provide a location, or grant this skill permission in the Alexa app to use your current location.",
+  "HELP_DEFAULT": "'You can find restaurants by cuisine such as Chinese <break time=\"200ms\"/> price range such as cheap <break time=\"200ms\"/> Yelp view such as good <break time=\"200ms\"/> or open to find restaurants that are currently open. <break time=\"200ms\"/> For example, you can say Find a cheap Chinese restaurant in Toronto",
+  "LAUNCH_CITIES": {
+    "v1": "in Vancouver",
+    "v2": "in Toronto",
+    "v3": "in Montreal",
+    "v4": "in Victoria",
+    "v6": "near me"
+  },
+  "POSTAL_FORMAT": "ANA NAN"
+}

@@ -1,13 +1,23 @@
-var mainApp = require('../lambda/custom/index');
+var mainApp = require('./index');
 
 const attributeFile = 'attributes.txt';
 
 const AWS = require('aws-sdk');
+AWS.config.update({
+  accessKeyId: process.env.accessKeyId,
+  secretAccessKey: process.env.secretAccessKey,
+  region: 'us-east-1',
+});
+
 AWS.config.update({region: 'us-east-1'});
 const dynamodb = new AWS.DynamoDB({apiVersion: '2012-08-10'});
 
 const sessionId = "SessionId.c88ec34d-28b0-46f6-a4c7-120d8fba8fb4";
 const LOCALE = 'en-CA';
+const APPID = 'amzn1.ask.skill.4c848d38-347c-4e03-b908-42c6af6c207d';
+const APITOKEN = '';
+
+const fs = require('fs');
 
 function BuildEvent(argv)
 {
@@ -27,7 +37,7 @@ function BuildEvent(argv)
       "session": {
         "sessionId": sessionId,
         "application": {
-          "applicationId": "amzn1.ask.skill.4c848d38-347c-4e03-b908-42c6af6c207d"
+          "applicationId": APPID
         },
         "attributes": {},
         "user": {
@@ -42,7 +52,7 @@ function BuildEvent(argv)
         "Display": {},
         "System": {
           "application": {
-            "applicationId": "amzn1.ask.skill.4c848d38-347c-4e03-b908-42c6af6c207d"
+            "applicationId": APPID
           },
           "user": {
             "userId": "not-amazon"
@@ -72,25 +82,50 @@ function BuildEvent(argv)
     };
 
     var openEvent = {
-       "session": {
-         "sessionId": "SessionId.c88ec34d-28b0-46f6-a4c7-120d8fba8fa7",
-         "application": {
-           "applicationId": "amzn1.ask.skill.4c848d38-347c-4e03-b908-42c6af6c207d"
+      "session": {
+        "sessionId": "SessionId.c88ec34d-28b0-46f6-a4c7-120d8fba8fa7",
+        "application": {
+          "applicationId": APPID
+        },
+        "user": {
+          "userId": "not-amazon",
+        },
+        "new": true
+      },
+      "request": {
+        "type": "LaunchRequest",
+        "requestId": "EdwRequestId.26405959-e350-4dc0-8980-14cdc9a4e921",
+        "locale": LOCALE,
+        "timestamp": "2016-11-03T21:31:08Z",
+        "intent": {}
+      },
+      "version": "1.0",
+       "context": {
+         "AudioPlayer": {
+           "playerActivity": "IDLE"
          },
-         "attributes": {},
-         "user": {
-           "userId": "amzn1.ask.account.AFLJ3RYNI3X6MQMX4KVH52CZKDSI6PMWCQWRBHSPJJPR2MKGDNJHW36XF2ET6I2BFUDRKH3SR2ACZ5VCRLXLGJFBTQGY4RNYZA763JED57USTK6F7IRYT6KR3XYO2ZTKK55OM6ID2WQXQKKXJCYMWXQ74YXREHVTQ3VUD5QHYBJTKHDDH5R4ALQAGIQKPFL52A3HQ377WNCCHYI"
-         },
-         "new": true
+         "Display": {},
+         "System": {
+           "application": {
+             "applicationId": APPID
+           },
+           "user": {
+             "userId": "not-amazon",
+           },
+           "device": {
+             "deviceId": "not-amazon",
+             "supportedInterfaces": {
+               "AudioPlayer": {},
+               "Display": {
+                 "templateVersion": "1.0",
+                 "markupVersion": "1.0"
+               }
+             }
+           },
+           "apiEndpoint": "https://api.amazonalexa.com",
+           "apiAccessToken": APITOKEN,
+         }
        },
-       "request": {
-         "type": "LaunchRequest",
-         "requestId": "EdwRequestId.26405959-e350-4dc0-8980-14cdc9a4e921",
-         "locale": LOCALE,
-         "timestamp": "2016-11-03T21:31:08Z",
-         "intent": {}
-       },
-       "version": "1.0"
     };
 
     // If there is no argument, then we'll just return
@@ -172,50 +207,61 @@ function BuildEvent(argv)
     return lambda;
 }
 
+function ssmlToText(ssml) {
+  let text = ssml;
+
+  // Replace break with ...
+  text = text.replace(/<break[^>]+>/g, ' ... ');
+
+  // Remove all other angle brackets
+  text = text.replace(/<\/?[^>]+(>|$)/g, '');
+  text = text.replace(/\s+/g, ' ').trim();
+  return text;
+}
+
 // Simple response - just print out what I'm given
 function myResponse(appId) {
   this._appId = appId;
 }
 
-myResponse.succeed = function(result) {
-  if (!result.response || !result.response.outputSpeech) {
-    console.log(JSON.stringify(result));
-  } else {
-    if (result.response.outputSpeech) {
-      if (result.response.outputSpeech.ssml) {
-        console.log('AS SSML: ' + result.response.outputSpeech.ssml);
+function myResponse(err, result) {
+  // Write the last action
+  fs.writeFile('lastResponse.txt', JSON.stringify(result), (err) => {
+    if (err) {
+      console.log('ERROR; ' + err.stack);
+    } else if (result) {
+      if (result.sessionAttributes) {
+        // Output the attributes
+        const fs = require('fs');
+        fs.writeFile(attributeFile, JSON.stringify(result.sessionAttributes), (err) => {
+          if (err) {
+            console.log(err);
+          }
+        });
+        if (!process.env.NOLOG) {
+          console.log('"attributes": ' + JSON.stringify(result.sessionAttributes));
+        }
+      }
+      if (!result.response || !result.response.outputSpeech) {
+        console.log('RETURNED ' + JSON.stringify(result));
       } else {
-        console.log(result.response.outputSpeech.text);
+        if (result.response.outputSpeech.ssml) {
+          console.log('AS SSML: ' + result.response.outputSpeech.ssml);
+          console.log('AS TEXT: ' + ssmlToText(result.response.outputSpeech.ssml));
+        } else {
+          console.log(result.response.outputSpeech.text);
+        }
+        if (result.response.card && result.response.card.content) {
+          console.log('Card Content: ' + result.response.card.content);
+        }
+        console.log('The session ' + ((!result.response.shouldEndSession) ? 'stays open.' : 'closes.'));
       }
     }
-    if (result.response.card && result.response.card.content) {
-      console.log('Card Content: ' + result.response.card.content);
-    }
-    if (result.response.speechletResponse && result.response.speechletResponse.directives
-      && result.response.speechletResponse.directives.videoItem) {
-      console.log('Video ' + result.response.speechletResponse.directives.videoItem.source);
-    }
-    console.log('The session ' + ((!result.response.shouldEndSession) ? 'stays open.' : 'closes.'));
-    if (result.sessionAttributes) {
-      // Output the attributes too
-      const fs = require('fs');
-      fs.writeFile(attributeFile, JSON.stringify(result.sessionAttributes), (err) => {
-        if (!process.env.NOLOG) {
-          console.log('attributes:' + JSON.stringify(result.sessionAttributes) + ',');
-        }
-      });
-    }
-  }
-}
-
-myResponse.fail = function(e) {
-  console.log(e);
+  });
 }
 
 // Build the event object and call the app
 if ((process.argv.length == 3) && (process.argv[2] == 'clear')) {
-  const fs = require('fs');
-
   // Clear is a special case - delete this entry from the DB and delete the attributes.txt file
   dynamodb.deleteItem({TableName: 'RestaurantFinder', Key: { userId: {S: 'not-amazon'}}}, function (error, data) {
     console.log("Deleted " + error);
@@ -226,6 +272,6 @@ if ((process.argv.length == 3) && (process.argv[2] == 'clear')) {
 } else {
   var event = BuildEvent(process.argv);
   if (event) {
-      mainApp.handler(event, myResponse);
+      mainApp.handler(event, null, myResponse);
   }
 }

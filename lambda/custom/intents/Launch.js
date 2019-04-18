@@ -4,15 +4,26 @@
 
 'use strict';
 
-const utils = require('../utils');
+const ri = require('@jargon/alexa-skill-sdk').ri;
 
 module.exports = {
-  handleIntent: function() {
-    const speech = this.t('LAUNCH_WELCOME')
-      .replace('{0}', utils.pickRandomOption(this.t('LAUNCH_QUALIFIER')))
-      .replace('{1}', utils.pickRandomOption(this.t('LAUNCH_CUISINE')))
-      .replace('{2}', utils.pickRandomOption(this.t('LAUNCH_CITIES')));
-    utils.clearState(this);
-    utils.emitResponse(this, null, null, speech, this.t('LAUNCH_REPROMPT'));
+  canHandle: function(handlerInput) {
+    return handlerInput.requestEnvelope.session.new ||
+      (handlerInput.requestEnvelope.request.type === 'LaunchRequest');
+  },
+  handle: function(handlerInput) {
+    const attributes = handlerInput.attributesManager.getSessionAttributes();
+
+    attributes.lastSearch = undefined;
+    attributes.lastResponse = undefined;
+
+    return handlerInput.jrb
+      .speak(ri('LAUNCH_WELCOME', {
+        Qualifier: ri('LAUNCH_QUALIFIER'),
+        Cuisine: ri('LAUNCH_CUISINE'),
+        Cities: ri('LAUNCH_CITIES'),
+      }))
+      .reprompt(ri('LAUNCH_REPROMPT'))
+      .getResponse();
   },
 };

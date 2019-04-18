@@ -9,20 +9,30 @@ const yelp = require('../api/Yelp');
 const location = require('../api/Location');
 
 module.exports = {
-  handleIntent: function() {
+  canHandle: function(handlerInput) {
+    const request = handlerInput.requestEnvelope.request;
+
+    return ((request.type === 'IntentRequest') &&
+      (request.intent.name === 'FindRestaurantIntent'));
+  },
+  handle: function(handlerInput) {
+    const event = handlerInput.requestEnvelope;
+    const attributes = handlerInput.attributesManager.getSessionAttributes();
+    let promise;
+
     // Build up our parameter structure from the intent
-    const params = utils.buildYelpParameters(this.event.request.intent);
+    const params = utils.buildYelpParameters(event.request.intent);
     let useDeviceLocation;
 
     // If we are still in results mode, filter the current parameters
     // if there is no overlap in fields (e.g. they are now saying cheap)
-    if (this.attributes.lastSearch) {
+    if (attributes.lastSearch) {
       let field;
       let newSearch = false;
 
       for (field in params) {
         if (field) {
-          if (this.attributes.lastSearch[field]) {
+          if (attributes.lastSearch[field]) {
             // This field was mentioned last time, so it is a new search
             newSearch = true;
           }
@@ -49,45 +59,46 @@ module.exports = {
       console.log('Location of me being converted to device location');
       useDeviceLocation = true;
     } else if (!params.location) {
-      if (this.attributes.lastSearch && this.attributes.lastSearch.location) {
-        params.location = this.attributes.lastSearch.location;
+      if (attributes.lastSearch && attributes.lastSearch.location) {
+        params.location = attributes.lastSearch.location;
       } else {
         useDeviceLocation = true;
       }
     }
     if (useDeviceLocation) {
-      location.getDeviceLocation(this, (err, address) => {
+      promise = location.getDeviceLocation(handlerInput)
+      .then((address) => {
         if (address && address.postalCode) {
           params.location = address.postalCode;
-          complete(this);
+          return params;
         } else {
-          this.attributes.lastSearch = params;
-          this.response.askForPermissionsConsentCard(['read::alexa:device:all:address:country_and_postal_code']);
-          utils.emitResponse(this, null, this.t('FIND_LOCATION'));
+          attributes.lastSearch = params;
+          return handlerInput.jrb
+            .speak(ri('FIND_LOCATION'), true)
+            .withAskForPermissionsConsentCard(['read::alexa:device:all:address:country_and_postal_code']);
         }
       });
-      return;
+    } else {
+      promise = new Promise.resolve(params);
     }
 
-    if (params.location) {
-      complete(this);
-    }
-
-    function complete(context) {
+    return promise.resolve((params) => {
       // OK, let's call Yelp API to get a list of restaurants
-      yelp.getRestaurantList(params, (error, restaurantList) => {
-        if (restaurantList) {
-          context.attributes.lastSearch = params;
-          context.attributes.lastResponse = restaurantList;
+      if ((typeof params === 'object') && params.location) {
+        return yelp.getRestaurantList(params, (restaurantList) => {
+          attributes.lastSearch = params;
+          attributes.lastResponse = restaurantList;
           utils.readRestaurantResults(context, (speech, reprompt, state) => {
             context.handler.state = state;
             utils.emitResponse(context, null, null, speech, reprompt);
           });
-        } else {
-          utils.emitResponse(context, error);
-        }
-      });
-    }
+        }).catch((error) => {
+          return handlerInput.jrb
+            .speak(ri('SKILL_ERROR'))
+            .getResponse();
+        });
+      }
+    });
   },
 };
 
