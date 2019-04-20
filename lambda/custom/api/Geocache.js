@@ -20,7 +20,8 @@ module.exports = {
       key: process.env.GEOCACHEKEY,
     };
     const urlPath = '/maps/api/geocode/json?' + querystring.stringify(params);
-    return sendRequest(urlPath, (result) => {
+    return sendRequest(urlPath)
+    .then((result) => {
       // OK, let's get the locality name - just look at the first result
       let city;
 
@@ -35,7 +36,7 @@ module.exports = {
         });
       }
 
-       return city;
+      return city;
     }).catch((error) => {
       console.log('getCityFromPostalCode error ' + error);
       return;

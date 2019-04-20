@@ -10,144 +10,157 @@ const ri = require('@jargon/alexa-skill-sdk').ri;
 
 module.exports = {
   PAGE_SIZE: LIST_LENGTH,
-  emitResponse: function(context, error, response, speech, reprompt,
-                        cardTitle, cardText, imageUrl) {
-    if (error) {
-      console.log('Speech error: ' + error);
-      context.response.speak(context.t('SPEECH_ERROR'))
-        .listen(context.t('GENERIC_REPROMPT'));
-    } else if (response) {
-      context.attributes.sessionCount = (context.attributes.sessionCount + 1) || 1;
-      context.response.speak(response);
-    } else if (cardTitle) {
-      context.response.speak(speech)
-        .listen(reprompt);
-      if (imageUrl) {
-        context.response.cardRenderer(cardTitle, cardText, {smallImageUrl: imageUrl});
-      } else {
-        context.response.cardRenderer(cardTitle, cardText);
-      }
-    } else {
-      context.response.speak(speech)
-        .listen(reprompt);
-    }
-
-    // If the state is now list, we draw the template
-    if (context.handler.state == 'LIST') {
-      buildListTemplate(context, () => {
-        done();
-      });
-    } else {
-      done();
-    }
-
-    function done() {
-      context.emit(':responseReady');
-    }
-  },
   clearState: function(context) {
     context.handler.state = '';
     delete context.attributes['STATE'];
     context.attributes.lastSearch = undefined;
     context.attributes.lastResponse = undefined;
   },
-  readRestaurantResults: function(context, callback) {
-    const attributes = context.attributes;
+  readRestaurantResults: function(handlerInput) {
+    const attributes = handlerInput.attributesManager.getSessionAttributes();
     let speech;
     let reprompt;
+    let state;
 
-    paramsToText(context, false, (text) => {
+    return paramsToText(handlerInput, false)
+    .then((text) => {
       // If there are more than five results, prompt the user to filter further
       if (!attributes.lastResponse || !attributes.lastResponse.restaurants
         || !attributes.lastResponse.restaurants.length) {
-        speech = context.t('RESULTS_NORESULTS').replace('{0}', text);
-        reprompt = context.t('GENERIC_REPROMPT');
-        speech += reprompt;
         state = '';
+        return handlerInput.jrm.renderBatch([
+          ri('RESULT_NORESULTS', {RestaurantText: text}),
+          ri('Jargon.DefaultReprompt'),
+        ]);
       } else if (attributes.lastResponse.total > LIST_LENGTH) {
-        speech = context.t('RESULTS_RESULTS')
-          .replace('{0}', attributes.lastResponse.total)
-          .replace('{1}', text);
-
-        // More than two pages of results?  Suggest a filter
-        reprompt = context.t('RESULTS_REPROMPT');
-        if (attributes.lastResponse.total > 2 * LIST_LENGTH) {
-          if (!attributes.lastSearch.price
-            || !attributes.lastSearch.categories
-            || !attributes.lastSearch.rating) {
-            let option;
-            if (!attributes.lastSearch.categories) {
-              option = module.exports.pickRandomOption(context.t('RESULTS_FILTER_CUISINE'));
-            } else if (!attributes.lastSearch.rating) {
-              option = module.exports.pickRandomOption(context.t('RESULTS_FILTER_RATING'));
-            } else {
-              option = module.exports.pickRandomOption(context.t('RESULTS_FILTER_PRICE'));
-            }
-            reprompt += context.t('RESULTS_FILTER').replace('{0}', option);
-          }
-        }
-
-        reprompt += '.';
-        speech += reprompt;
         state = 'RESULTS';
+        let speech;
+
+        return handlerInput.jrm
+          .render(ri('RESULTS_RESULTS', {Total: attributes.lastResponse.total, RestaurantText: text}))
+        .then((text) => {
+          // More than two pages of results?  Suggest a filter
+          speech = text;
+          if (attributes.lastResponse.total > 2 * LIST_LENGTH) {
+            if (!attributes.lastSearch.price
+              || !attributes.lastSearch.categories
+              || !attributes.lastSearch.rating) {
+              let option;
+              if (!attributes.lastSearch.categories) {
+                option = 'RESULTS_FILTER_CUISINE';
+              } else if (!attributes.lastSearch.rating) {
+                option = 'RESULTS_FILTER_RATING';
+              } else {
+                option = 'RESULTS_FILTER_PRICE';
+              }
+              return handlerInput.jrm.render(ri(option));
+              reprompt += context.t('RESULTS_FILTER').replace('{0}', option);
+            } else {
+              return Promise.resolve();
+            }
+          } else {
+            return Promise.resolve();
+          }
+        }).then((condition) => {
+          if (condition) {
+            reprompt = 'RESULTS_FILTER';
+          } else {
+            reprompt = 'RESULTS_REPROMPT';
+          }
+          return handlerInput.jrm.render(ri(reprompt, {Condition: condition}));
+        }).then((text) => {
+          return [speech + text, text];
+        });
       } else {
-        attributes.lastResponse.read = 0;
-        speech = context.t('RESULTS_RESULTS')
-          .replace('{0}', attributes.lastResponse.total)
-          .replace('{1}', text);
-
-        let i;
-        for (i = 0; i < attributes.lastResponse.restaurants.length; i++) {
-          speech += (' ' + (i + 1) + ' <break time=\"200ms\"/> ');
-          speech += attributes.lastResponse.restaurants[i].name + '.';
-        }
-        reprompt = context.t('RESULTS_DETAILS');
-        speech += ' ' + reprompt;
         state = 'LIST';
+        attributes.lastResponse.read = 0;
+        return handlerInput.jrm.renderBatch([
+          ri('RESULTS_RESULTS', {Total: attributes.lastResponse.total, RestaurantText: text}),
+          ri('RESULTS_DETAILS'),
+        ]).then((results) => {
+          let i;
+          for (i = 0; i < attributes.lastResponse.restaurants.length; i++) {
+            results[0] += (' ' + (i + 1) + ' <break time=\"200ms\"/> ');
+            results[0] += attributes.lastResponse.restaurants[i].name + '.';
+          }
+          results[0] += (' ' + results[1]);
+          return results;
+        });
       }
-
-      callback(speech, reprompt, state);
+    }).then((results) => {
+      return {speech: results[0], reprompt: results[1], state: state};
     });
   },
-  readRestaurantsFromList: function(context, callback) {
+  readRestaurantsFromList: function(handlerInput) {
+    const attributes = handlerInput.attributesManager.getSessionAttributes();
     let speech;
     let reprompt;
-    const restaurantList = context.attributes.lastResponse;
+    const restaurantList = attributes.lastResponse;
     const toRead = Math.min(restaurantList.restaurants.length - restaurantList.read, LIST_LENGTH);
-
-    // OK, read the names as allow them to ask for more detail on any choice
-    speech = context.t('READLIST_RESULTS').replace('{0}', toRead);
-    reprompt = context.t('RESULTS_DETAILS');
-    if (restaurantList.restaurants.length - restaurantList.read > LIST_LENGTH) {
-      reprompt += context.t('READLIST_MORE');
-    }
-    reprompt += '. ';
-    speech += reprompt;
+    let restaurants = '';
 
     let i;
     for (i = 0; i < toRead; i++) {
-      speech += (' ' + (i + 1) + ' <break time=\"200ms\"/> ' + restaurantList.restaurants[restaurantList.read + i].name + '.');
+      restaurants += (' ' + (i + 1) + ' <break time=\"200ms\"/> ' + restaurantList.restaurants[restaurantList.read + i].name + '.');
     }
 
-    // Return the speech and reprompt text
-    callback(speech, reprompt);
+    // OK, read the names as allow them to ask for more detail on any choice
+    speech = 'READLIST_RESULTS';
+    reprompt = 'RESULTS_DETAILS';
+    if (restaurantList.restaurants.length - restaurantList.read > LIST_LENGTH) {
+      speech += '_MORE';
+      reprompt += '_MORE';
+    }
+
+    return handlerInput.jrm.renderBatch([
+      ri(speech, {Total: toRead, Restaurants: restaurants}),
+      ri(reprompt),
+    ]).then((results) => {
+      return {speech: results[0], reprompt: results[1]};
+    });
   },
-  readRestaurantDetails: function(context, callback) {
-    const restaurantList = context.attributes.lastResponse;
+  readRestaurantDetails: function(handlerInput) {
+    const attributes = handlerInput.attributesManager.getSessionAttributes();
+    const restaurantList = attributes.lastResponse;
     const restaurant = restaurantList.restaurants[restaurantList.details];
     const priceList = ['DETAILS_PRICE_CHEAP', 'DETAILS_PRICE_MODERATE',
           'DETAILS_PRICE_SPENDY', 'DETAILS_PRICE_SPLURGE'];
-    let speech;
+    let speech = '';
     let cardText = '';
+    let imageUrl;
+    let business;
 
-    yelp.businessLookup(restaurant.id, (error, business) => {
-      const imageUrl = (business) ? business.image_url : undefined;
+    return yelp.businessLookup(restaurant.id)
+    .then((result) => {
+      business = result;
+      imageUrl = (business) ? business.image_url : undefined;
+      const renderItems = [];
 
       // Read information about the restaurant
-      speech = context.t('DETAILS_LOCATION')
-        .replace('{0}', restaurant.name)
-        .replace('{1}', restaurant.location.address1)
-        .replace('{2}', restaurant.location.city);
+      renderItems.push(ri('DETAILS_LOCATION', {
+        Name: restaurant.name,
+        Address: restaurant.location.address1,
+        City: restaurant.location.city,
+      }));
+
+      if (restaurant.phone) {
+        renderItems.push(ri('DETAILS_PHONE', {Phone: restaurant.phone}));
+      }
+      if (business) {
+        if (business.open !== undefined) {
+          renderItems.push(ri('DETAILS_OPERATING', {
+            Status: ri(business.open ? 'DETAILS_OPEN' : 'DETAILS_CLOSED'),
+          }));
+        }
+      }
+
+      renderItems.push(ri('DETAILS_SEECARD'));
+      return handlerInput.jrm.renderBatch(renderItems);
+    }).then((items) => {
+      const renderItems = [];
+      items.forEach((item) => {
+        speech += item;
+      });
 
       // And set up the card
       if (restaurant.location.display_address) {
@@ -158,51 +171,69 @@ module.exports = {
         cardText += restaurant.location.address1 + '\n';
         cardText += restaurant.location.city + '\n';
       }
-      cardText += context.t('DETAILS_CARD_YELP')
-        .replace('{0}', restaurant.rating)
-        .replace('{1}', restaurant.review_count);
+      renderItems.push(ri('DETAILS_CARD_YELP', {
+        Rating: restaurant.rating,
+        Count: restaurant.review_count,
+      }));
 
       if (restaurant.price) {
-        cardText += context.t('DETAILS_CARD_PRICE').replace('{0}', context.t(priceList[restaurant.price - 1]));
+        renderItems.push(ri('DETAILS_CARD_PRICE', {
+          Price: priceList[restaurant.price - 1],
+        }));
       }
       if (restaurant.phone) {
-        speech += context.t('DETAILS_PHONE').replace('{0}', restaurant.phone);
-        cardText += context.t('DETAILS_CARD_PHONE').replace('{0}', restaurant.phone);
+        renderItems.push(ri('DETAILS_CARD_PHONE', {
+          Phone: restaurant.phone,
+        }));
       }
       if (business) {
         if (business.open !== undefined) {
-          speech += context.t('DETAILS_OPERATING')
-            .replace('{0}', context.t(business.open ? 'DETAILS_OPEN': 'DETAILS_CLOSED'));
-          cardText += context.t('DETAILS_CARD_OPERATING')
-            .replace('{0}', context.t(business.open ? 'DETAILS_CARD_OPEN': 'DETAILS_CARD_CLOSED'));
+          renderItems.push(ri('DETAILS_CARD_OPERATING', {
+            Status: ri(business.open ? 'DETAILS_CARD_OPEN' : 'DETAILS_CARD_CLOSED'),
+          }));
         }
         if (business.transactions) {
           if (business.transactions.indexOf('delivery') > -1) {
             if (business.transactions.indexOf('restaurant_reservation') > -1) {
-              cardText += context.t('DETAILS_CARD_DELIVER_RESERVATION');
+              renderItems.push(ri('DETAILS_CARD_DELIVER_RESERVATION'));
             } else {
-              cardText += context.t('DETAILS_CARD_DELIVER');
+              renderItems.push(ri('DETAILS_CARD_DELIVER'));
             }
           } else if (business.transactions.indexOf('restaurant_reservation') > -1) {
-            cardText += context.t('DETAILS_CARD_RESERVATION');
+            renderItems.push(ri('DETAILS_CARD_RESERVATION'));
           }
         }
       }
 
-      speech += context.t('DETAILS_SEECARD');
-      callback(speech, cardText, imageUrl);
+      return handlerInput.jrm.renderBatch(renderItems);
+    }).then((items) => {
+      items.forEach((item) => {
+        cardText += item;
+      });
+
+      return {speech: speech, cardText: cardText, imageUrl: imageUrl};
     });
   },
-  pickRandomOption: function(str) {
-    const options = str.split('|');
-    const index = Math.floor(Math.random() * options.length);
+  showDetails: function(handlerInput, index) {
+    const attributes = handlerInput.attributesManager.getSessionAttributes();
+    let speech;
+    let cardText;
 
-    // Just in case random returned 1.0
-    if (index == options.length) {
-      index--;
-    }
-
-    return options[index];
+    attributes.lastResponse.details = index;
+    return module.exports.readRestaurantDetails(handlerInput)
+    .then((result) => {
+      speech = result.speech + ' <break time=\"200ms\"/> ';
+      cardText = result.cardText;
+      return handlerInput.jrm.render(ri('Jargon.defaultReprompt'));
+    }).then((reprompt) => {
+      speech += reprompt;
+      attributes.state = 'DETAILS';
+      return handlerInput.responseBuilder
+        .speak(speech)
+        .reprompt(reprompt)
+        .getResponse();
+      // BUGBUG - Use cardText???
+    });
   },
   buildYelpParameters: function(intent) {
     const params = {};
@@ -228,12 +259,13 @@ module.exports = {
   },
 };
 
-function paramsToText(context, noSSML, callback) {
-  const params = context.attributes.lastSearch;
+function paramsToText(handlerInput, noSSML) {
+  const attributes = handlerInput.attributesManager.getSessionAttributes();
+  const params = attributes.lastSearch;
   let result = '';
+  let retVal = '';
   const renderItems = [];
 
-  return handlerInput.render(ri('PARAMS_OPEN'));
   if (params.open_now) {
     renderItems.push(ri('PARAMS_OPEN'));
   }
@@ -262,63 +294,69 @@ function paramsToText(context, noSSML, callback) {
 
   return handlerInput.jrm.renderBatch(renderItems)
   .then((items) => {
-    let result = '';
     items.forEach((item) => {
-      result = result + item + ' ';
+      retVal = retVal + item + ' ';
     });
 
     if (params.location) {
-      return readLocation(context, noSSML, (location) => {
-        result += context.t('PARAMS_IN').replace('{0}', location);
-        return result;
+      return readLocation(handlerInput, noSSML)
+      .then((location) => {
+        return handlerInput.jrm.render(ri('PARAMS_IN', {Location: location}));
       });
     } else {
-      return Promise.resolve(result);
+      return '';
     }
+  }).then((location) => {
+    retVal += location;
+    return retVal;
   });
 }
 
-function readLocation(context, noSSML, callback) {
-  // If the location is a ZIP code, spell it out
-  const postalFormat = context.t('POSTAL_FORMAT');
-  let retval = context.attributes.lastSearch.location;
+function readLocation(handlerInput, noSSML) {
+  const attributes = handlerInput.attributesManager.getSessionAttributes();
+  let retval = attributes.lastSearch.location;
   let isZIP = true;
 
-  if (postalFormat && (retval.length == postalFormat.length)) {
-    const zip = retval.toUpperCase(retval);
-    let i;
-    for (i = 0; i < postalFormat.length; i++) {
-      const postalChar = postalFormat.substring(i, i + 1);
-      const zipChar = zip.substring(i, i + 1);
-      if (postalChar == 'N') {
-        if (isNaN(parseInt(zipChar))) {
+  return handlerInput.jrm.render(ri('POSTAL_FORMAT'))
+  .then((postalFormat) => {
+    // If the location is a ZIP code, spell it out
+    if (retval.length == postalFormat.length) {
+      const zip = retval.toUpperCase(retval);
+      let i;
+      for (i = 0; i < postalFormat.length; i++) {
+        const postalChar = postalFormat.substring(i, i + 1);
+        const zipChar = zip.substring(i, i + 1);
+        if (postalChar == 'N') {
+          if (isNaN(parseInt(zipChar))) {
+            isZIP = false;
+          }
+        } else if (postalChar == 'A') {
+          if (!zipChar.match(/[a-z]/i)) {
+            isZIP = false;
+          }
+        } else if (postalChar != zipChar) {
           isZIP = false;
         }
-      } else if (postalChar == 'A') {
-        if (!zipChar.match(/[a-z]/i)) {
-          isZIP = false;
-        }
-      } else if (postalChar != zipChar) {
-        isZIP = false;
       }
+    } else {
+      isZIP = false;
     }
-  } else {
-    isZIP = false;
-  }
 
-  if (isZIP) {
-    // See if we can look this up
-    return geocahe.getCityFromPostalCode(retval, (city) => {
-      if (city) {
-        retval = city;
-      } else if (!noSSML) {
-        retval = '<say-as interpret-as="digits">' + retval + '</say-as>';
-      }
+    if (isZIP) {
+      // See if we can look this up
+      return geocahe.getCityFromPostalCode(retval)
+      .then((city) => {
+        if (city) {
+          retval = city;
+        } else if (!noSSML) {
+          retval = '<say-as interpret-as="digits">' + retval + '</say-as>';
+        }
+        return retval;
+      });
+    } else {
       return retval;
-    });
-  } else {
-    return Promise.resolve(retval);
-  }
+    }
+  });
 }
 
 // Takes a potential category name and returns the name that

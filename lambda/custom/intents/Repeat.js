@@ -5,30 +5,65 @@
 'use strict';
 
 const utils = require('../utils');
+const ri = require('@jargon/alexa-skill-sdk').ri;
 
 module.exports = {
-  handleIntent: function() {
+  canHandle: function(handlerInput) {
+    const request = handlerInput.requestEnvelope.request;
+    const attributes = handlerInput.attributesManager.getSessionAttributes();
+
+    if ((request.type === 'IntentRequest') &&
+      ((request.intent.name === 'AMAZON.RepeatIntent') || (request.intent.name === 'AMAZON.FallbackIntent'))) {
+      return true;
+    }
+
+    if ((request.type === 'IntentRequest') && (attributes.state === 'DETAILS')
+      && (request.intent.name === 'AMAZON.MoreIntent')) {
+      return true;
+    }
+
+    return false;
+  },
+  handle: function(handlerInput) {
+    const attributes = handlerInput.attributesManager.getSessionAttributes();
+
     // Look at the state
-    switch (this.handler.state) {
+    switch (attributes.state) {
       case 'RESULTS':
-        utils.readRestaurantResults(this, (speech, reprompt) => {
-          utils.emitResponse(this, null, null, speech, reprompt);
+        return utils.readRestaurantResults(handlerInput)
+        .then((result) => {
+          return handlerInput.responseBuilder
+            .speak(result.speech)
+            .reprompt(result.reprompt)
+            .getResponse();
         });
         break;
       case 'LIST':
-        utils.readRestaurantsFromList(this, (speech, reprompt) => {
-          utils.emitResponse(this, null, null, speech, reprompt);
+        return utils.readRestaurantsFromList(handlerInput)
+        .then((result) => {
+          return handlerInput.responseBuilder
+            .speak(result.speech)
+            .reprompt(result.reprompt)
+            .getResponse();
         });
         break;
       case 'DETAILS':
-        utils.readRestaurantDetails(this, (text) => {
-          const reprompt = this.t('GENERIC_REPROMPT');
-          const speech = text + ' <break time=\"200ms\"/> ' + reprompt;
-          utils.emitResponse(this, null, null, speech, reprompt);
+        return utils.readRestaurantDetails(handlerInput)
+        .then((result) => {
+          return handlerInput.jrb.render(ri('Jargon.defaultReprompt'));
+        }).then((reprompt) => {
+          const speech = result.speech + ' <break time=\"200ms\"/> ' + reprompt;
+          return handlerInput.responseBuilder
+            .speak(speech)
+            .reprompt(reprompt)
+            .getResponse();
         });
         break;
       default:
-        utils.emitResponse(this, null, null, this.t('REPEAT_NONE'), this.t('GENERIC_REPROMPT'));
+        return handlerInput.jrb
+          .speak(ri('REPEAT_NONE'))
+          .reprompt(ri('Jargon.defaultReprompt'))
+          .getResponse();
         break;
     }
   },

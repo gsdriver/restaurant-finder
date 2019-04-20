@@ -7,6 +7,7 @@
 const utils = require('../utils');
 const yelp = require('../api/Yelp');
 const location = require('../api/Location');
+const ri = require('@jargon/alexa-skill-sdk').ri;
 
 module.exports = {
   canHandle: function(handlerInput) {
@@ -79,20 +80,26 @@ module.exports = {
         }
       });
     } else {
-      promise = new Promise.resolve(params);
+      promise = Promise.resolve(params);
     }
 
-    return promise.resolve((params) => {
+    return promise.then((params) => {
       // OK, let's call Yelp API to get a list of restaurants
       if ((typeof params === 'object') && params.location) {
-        return yelp.getRestaurantList(params, (restaurantList) => {
+        return yelp.getRestaurantList(params)
+        .then((restaurantList) => {
           attributes.lastSearch = params;
           attributes.lastResponse = restaurantList;
-          utils.readRestaurantResults(context, (speech, reprompt, state) => {
-            context.handler.state = state;
-            utils.emitResponse(context, null, null, speech, reprompt);
+          return utils.readRestaurantResults(handlerInput)
+          .then((result) => {
+            attributes.state = result.state;
+            return handlerInput.responseBuilder
+              .speak(result.speech)
+              .reprompt(result.reprompt)
+              .getResponse();
           });
         }).catch((error) => {
+          console.log(error.stack);
           return handlerInput.jrb
             .speak(ri('SKILL_ERROR'))
             .getResponse();

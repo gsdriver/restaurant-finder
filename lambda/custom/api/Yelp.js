@@ -82,7 +82,8 @@ module.exports = {
     });
   },
   businessLookup: function(id) {
-    return sendYelpRequest('/v3/businesses/' + id, (error, result) => {
+    return sendYelpRequest('/v3/businesses/' + id)
+    .then((result) => {
       const myResult = {};
 
       myResult.image_url = result.image_url;
@@ -91,7 +92,7 @@ module.exports = {
         myResult.open = result.hours[0].is_open_now ? true : false;
       }
       return myResult;
-    }).then((error) => {
+    }).catch((error) => {
       console.log('Yelp:businessLookup error ' + error);
       return undefined;
     });

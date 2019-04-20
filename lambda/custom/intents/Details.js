@@ -5,78 +5,84 @@
 'use strict';
 
 const utils = require('../utils');
+const ri = require('@jargon/alexa-skill-sdk').ri;
 
 module.exports = {
-  handleIntent: function() {
-    if (!this.attributes.lastResponse) {
-      utils.emitResponse(this, null, null, this.t('DETAILS_NOLIST'), this.t('GENERIC_REPROMPT'));
-      return;
+  canHandle: function(handlerInput) {
+    const request = handlerInput.requestEnvelope.request;
+    const attributes = handlerInput.attributesManager.getSessionAttributes();
+
+    if ((request.type === 'IntentRequest') && (attributes.state === 'LIST')
+      && (request.intent.name === 'DetailsIntent')) {
+      return true;
     }
 
-    const index = getSelectedIndex(this);
+    if ((request.type === 'Display.ElementSelected') && (attributes.state === 'LIST')) {
+      return true;
+    }
 
+    return false;
+  },
+  handle: function(handlerInput) {
+    const attributes = handlerInput.attributesManager.getSessionAttributes();
+
+    if (!attributes.lastResponse) {
+      return handlerInput.jrb
+        .speak(ri('DETAILS_NOLIST'))
+        .reprompt(ri('Jargon.defaultReprompt'))
+        .getResponse();
+    }
+
+    const index = getSelectedIndex(handlerInput);
     if (index === undefined) {
-      utils.emitResponse(this, null, null, this.t('DETAILS_NONUMBER'), this.t('GENERIC_REPROMPT'));
-      return;
+      return handlerInput.jrb
+        .speak(ri('DETAILS_NONUMBER'))
+        .reprompt(ri('Jargon.defaultReprompt'))
+        .getResponse();
     }
 
     // You have to be in list mode before you can ask for details
-    if (this.handler.state != 'LIST') {
-      utils.emitResponse(this, null, null, this.t('DETAILS_READLIST'), this.t('DETAILS_READLIST'));
+    if (attributes.state != 'LIST') {
+      return handlerInput.jrb
+        .speak(ri('DETAILS_READLIST'))
+        .reprompt(ri('DETAILS_READLIST'))
+        .getResponse();
     } else {
       // OK, let's get the details
-      if (!this.attributes.lastResponse ||
-        (index >= this.attributes.lastResponse.restaurants.length)) {
-        utils.emitResponse(this, null, null,
-          this.t('DETAILS_INVALID_NUMBER'), this.t('DETAILS_INVALID_NUMBER_REPROMPT'));
+      if (!attributes.lastResponse ||
+        (index >= attributes.lastResponse.restaurants.length)) {
+        return handlerInput.jrb
+          .speak(ri('DETAILS_INVALID_NUMBER'))
+          .reprompt(ri('DETAILS_INVALID_NUMBER_REPROMPT'))
+          .getResponse();
       } else {
-        showDetails(this, index);
+        return utils.showDetails(handlerInput, index);
       }
-    }
-  },
-  handleNextIntent: function() {
-    // Go to the next restaurant in the list
-    const index = this.attributes.lastResponse.details + 1;
-    if (!this.attributes.lastResponse ||
-      (index >= this.attributes.lastResponse.restaurants.length)) {
-      utils.emitResponse(this, null, null, this.t('DETAILS_LISTEND'), this.t('DETAILS_LISTEND_REPROMPT'));
-    } else {
-      showDetails(this, index);
     }
   },
 };
 
-function showDetails(context, index) {
-  context.attributes.lastResponse.details = index;
-  utils.readRestaurantDetails(context, (text, cardText, imageUrl) => {
-    const reprompt = context.t('GENERIC_REPROMPT');
-    const speech = text + ' <break time=\"200ms\"/> ' + reprompt;
-
-    context.handler.state = 'DETAILS';
-    utils.emitResponse(context, null, null, speech, reprompt,
-      context.attributes.lastResponse.restaurants[index].name, cardText, imageUrl);
-  });
-}
-
-function getSelectedIndex(context) {
+function getSelectedIndex(handlerInput) {
+  const request = handlerInput.requestEnvelope.request;
+  const attributes = handlerInput.attributesManager.getSessionAttributes();
   let index;
 
-  if (context.event.request.token) {
-    const games = context.event.request.token.split('.');
+  if (request.token) {
+    const games = request.token.split('.');
     if (games.length === 2) {
       index = games[1];
     }
   } else {
     // Look for an intent slot
-    if (context.event.request.intent.slots && context.event.request.intent.slots.RestaurantID
-      && context.event.request.intent.slots.RestaurantID.value) {
-      index = parseInt(context.event.request.intent.slots.RestaurantID.value);
+    if (request.intent.slots && request.intent.slots.RestaurantID
+      && request.intent.slots.RestaurantID.value) {
+      index = parseInt(request.intent.slots.RestaurantID.value);
 
       if (isNaN(index)) {
         index = undefined;
       } else {
         // Need to base this off last read
-        index = context.attributes.lastResponse.read + index - 1;
+        index = attributes.lastResponse.read + index - 1;
       }
     }
   }

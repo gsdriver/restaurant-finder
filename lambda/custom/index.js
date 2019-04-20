@@ -30,6 +30,7 @@ const CanFulfill = require('./intents/CanFulfill');
 const FindRestaurant = require('./intents/FindRestaurant');
 const ReadList = require('./intents/ReadList');
 const Details = require('./intents/Details');
+const Next = require('./intents/Next');
 const Back = require('./intents/Back');
 const Repeat = require('./intents/Repeat');
 const Help = require('./intents/Help');
@@ -156,7 +157,12 @@ function runSkill(event, context, callback) {
   });
   const skillFunction = skillBuilder.addRequestHandlers(
       Launch,
+      Repeat,
       FindRestaurant,
+      ReadList,
+      Details,
+      Next,
+      Back,
       Help,
       Exit,
       SessionEnd,
@@ -175,34 +181,6 @@ function runSkill(event, context, callback) {
 }
 
 /*
-const detailsHandlers = Alexa.CreateStateHandler('DETAILS', {
-  'ReadListIntent': ReadList.handleIntent,
-  'BackIntent': Back.handleIntent,
-  'AMAZON.PreviousIntent': Back.handleIntent,
-  'AMAZON.MoreIntent': Repeat.handleIntent,
-  'AMAZON.NextIntent': Details.handleNextIntent,
-  'AMAZON.RepeatIntent': Repeat.handleIntent,
-  'AMAZON.FallbackIntent': Repeat.handleIntent,
-});
-
-const listHandlers = Alexa.CreateStateHandler('LIST', {
-  'ReadListIntent': ReadList.handleIntent,
-  'DetailsIntent': Details.handleIntent,
-  'BackIntent': Back.handleIntent,
-  'ElementSelected': Details.handleIntent,
-  'AMAZON.PreviousIntent': Back.handleIntent,
-  'AMAZON.MoreIntent': ReadList.handleIntent,
-  'AMAZON.NextIntent': ReadList.handleIntent,
-  'AMAZON.FallbackIntent': Repeat.handleIntent,
-  'AMAZON.RepeatIntent': Repeat.handleIntent,
-});
-
-const resultHandlers = Alexa.CreateStateHandler('RESULTS', {
-  'ReadListIntent': ReadList.handleIntent,
-  'AMAZON.FallbackIntent': Repeat.handleIntent,
-  'AMAZON.RepeatIntent': Repeat.handleIntent,
-});
-
 const handlers = {
     // Send on this request
     if (this.event.request.type === 'IntentRequest') {
@@ -215,7 +193,5 @@ const handlers = {
       this.emit('LaunchRequest');
     }
   },
-  'ReadListIntent': ReadList.handleIntent,
-  'DetailsIntent': Details.handleIntent,
 };
 */
