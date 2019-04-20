@@ -37,7 +37,7 @@
             "codeUri": "lambda/custom",
             "functionName": "RestaurantFinder_v3",
             "handler": "index.handler",
-            "revisionId": "8d3ed76d-5931-4985-8c7d-e148926c8417",
+            "revisionId": "41ae416f-8e42-4d08-88fb-8dea77677478",
             "runtime": "nodejs8.10"
           }
         ]

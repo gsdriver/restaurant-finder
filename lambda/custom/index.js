@@ -37,7 +37,7 @@ const Help = require('./intents/Help');
 const Exit = require('./intents/Exit');
 const SessionEnd = require('./intents/SessionEnd');
 const Unhandled = require('./intents/Unhandled');
-const utils = require('./utils');
+// const utils = require('./utils');
 const ssmlCheck = require('ssml-check-core');
 const {ri, JargonSkillBuilder} = require('@jargon/alexa-skill-sdk');
 
@@ -46,7 +46,6 @@ const requestInterceptor = {
     const attributesManager = handlerInput.attributesManager;
     const sessionAttributes = attributesManager.getSessionAttributes();
     const event = handlerInput.requestEnvelope;
-    let attributes;
 
     if (Object.keys(sessionAttributes).length === 0) {
       // No session attributes - so get the persistent ones
@@ -68,11 +67,10 @@ const saveResponseInterceptor = {
   process(handlerInput) {
     const response = handlerInput.responseBuilder.getResponse();
     const attributes = handlerInput.attributesManager.getSessionAttributes();
-    let promise;
 
     if (response) {
       return Promise.resolve().then(() => {
-      //return utils.drawTable(handlerInput).then(() => {
+      // return utils.drawTable(handlerInput).then(() => {
         if (response.shouldEndSession) {
           // We are meant to end the session
           return SessionEnd.handle(handlerInput);

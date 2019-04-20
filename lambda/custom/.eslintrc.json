@@ -21,6 +21,7 @@
       "avoidEscape": true
       }
     ],
+    "indent": "off",
     "no-param-reassign": "error",
     "prefer-arrow-callback": "error",
     "camelcase": "warn",

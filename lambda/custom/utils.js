@@ -34,7 +34,6 @@ module.exports = {
         ]);
       } else if (attributes.lastResponse.total > LIST_LENGTH) {
         state = 'RESULTS';
-        let speech;
 
         return handlerInput.jrm
           .render(ri('RESULTS_RESULTS', {Total: attributes.lastResponse.total, RestaurantText: text}))
@@ -262,7 +261,6 @@ module.exports = {
 function paramsToText(handlerInput, noSSML) {
   const attributes = handlerInput.attributesManager.getSessionAttributes();
   const params = attributes.lastSearch;
-  let result = '';
   let retVal = '';
   const renderItems = [];
 

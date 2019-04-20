@@ -10,7 +10,6 @@ const ri = require('@jargon/alexa-skill-sdk').ri;
 module.exports = {
   canHandle: function(handlerInput) {
     const request = handlerInput.requestEnvelope.request;
-    const attributes = handlerInput.attributesManager.getSessionAttributes();
 
     return ((request.type === 'IntentRequest')
       && ((request.intent.name === 'BackIntent') || (request.intent.name === 'AMAZON.PreviousIntent')));
