@@ -10,11 +10,44 @@ const ri = require('@jargon/alexa-skill-sdk').ri;
 
 module.exports = {
   PAGE_SIZE: LIST_LENGTH,
-  clearState: function(context) {
-    context.handler.state = '';
-    delete context.attributes['STATE'];
-    context.attributes.lastSearch = undefined;
-    context.attributes.lastResponse = undefined;
+  drawTable: function(handlerInput) {
+    const event = handlerInput.requestEnvelope;
+    const attributes = handlerInput.attributesManager.getSessionAttributes();
+
+    if ((attributes.state === 'LIST') && event.context &&
+      event.context.System &&
+      event.context.System.device &&
+      event.context.System.device.supportedInterfaces &&
+      event.context.System.device.supportedInterfaces.Display) {
+      attributes.display = true;
+
+      return paramsToText(handlerInput, true)
+      .then((location) => {
+        const listItems = [];
+        attributes.lastResponse.restaurants.forEach((restaurant, i) => {
+          listItems.push({
+            'token': 'item.' + i,
+            'textContent': {
+              'primaryText': {
+                'type': 'RichText',
+                'text': '<font size=\"7\">' + restaurant.name + '</font>',
+              },
+            },
+          });
+        });
+
+        return handlerInput.responseBuilder
+          .addRenderTemplateDirective({
+            type: 'ListTemplate1',
+            token: 'listToken',
+            backButton: 'hidden',
+            title: location,
+            listItems: listItems,
+          });
+      });
+    } else {
+      return Promise.resolve();
+    }
   },
   readRestaurantResults: function(handlerInput) {
     const attributes = handlerInput.attributesManager.getSessionAttributes();
@@ -230,8 +263,8 @@ module.exports = {
       return handlerInput.responseBuilder
         .speak(speech)
         .reprompt(reprompt)
+        .withSimpleCard(attributes.lastResponse.restaurants[index].name, cardText)
         .getResponse();
-      // BUGBUG - Use cardText???
     });
   },
   buildYelpParameters: function(intent) {
@@ -285,7 +318,7 @@ function paramsToText(handlerInput, noSSML) {
     const catList = params.categories.split(',');
 
     catList.forEach((cat) => {
-      result += (cat + ' ');
+      retVal += (cat + ' ');
     });
   }
   renderItems.push(ri('PARAMS_RESTAURANTS'));
@@ -416,39 +449,3 @@ function addYelpParameter(params, value) {
     params[mapping[value].field] = mapping[value].value;
   }
 }
-/*
-function buildListTemplate(context, callback) {
-  let listTemplateBuilder;
-  let listItemBuilder;
-  let listTemplate;
-
-  if (context.event.context &&
-      context.event.context.System.device.supportedInterfaces.Display) {
-    context.attributes.display = true;
-
-    paramsToText(context, true, (location) => {
-      listItemBuilder = new Alexa.templateBuilders.ListItemBuilder();
-      listTemplateBuilder = new Alexa.templateBuilders.ListTemplate1Builder();
-      let i = 0;
-
-      context.attributes.lastResponse.restaurants.forEach((restaurant) => {
-        listItemBuilder.addItem(null, 'item.' + i++,
-          makeRichText('<font size="7">' + restaurant.name + '</font>'));
-      });
-
-      const listItems = listItemBuilder.build();
-      listTemplate = listTemplateBuilder
-        .setToken('listToken')
-        .setTitle(location)
-        .setListItems(listItems)
-        .setBackButtonBehavior('HIDDEN')
-        .build();
-
-      context.response.renderTemplate(listTemplate);
-      callback();
-    });
-  } else {
-    callback();
-  }
-}
-*/

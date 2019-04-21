@@ -37,7 +37,7 @@ const Help = require('./intents/Help');
 const Exit = require('./intents/Exit');
 const SessionEnd = require('./intents/SessionEnd');
 const Unhandled = require('./intents/Unhandled');
-// const utils = require('./utils');
+const utils = require('./utils');
 const ssmlCheck = require('ssml-check-core');
 const {ri, JargonSkillBuilder} = require('@jargon/alexa-skill-sdk');
 
@@ -69,8 +69,7 @@ const saveResponseInterceptor = {
     const attributes = handlerInput.attributesManager.getSessionAttributes();
 
     if (response) {
-      return Promise.resolve().then(() => {
-      // return utils.drawTable(handlerInput).then(() => {
+      return utils.drawTable(handlerInput).then(() => {
         if (response.shouldEndSession) {
           // We are meant to end the session
           return SessionEnd.handle(handlerInput);
