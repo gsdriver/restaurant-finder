@@ -98,5 +98,6 @@
   "PARAMS_INEXPENSIVE": "inexpensive",
   "PARAMS_EXPENSIVE": "expensive",
   "PARAMS_RESTAURANTS": "restaurants",
+  "PARAMS_NEARME": "near you",
   "PARAMS_IN": "in {Location}"
 }

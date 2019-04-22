@@ -62,7 +62,7 @@ module.exports = {
         || !attributes.lastResponse.restaurants.length) {
         state = '';
         return handlerInput.jrm.renderBatch([
-          ri('RESULT_NORESULTS', {RestaurantText: text}),
+          ri('RESULTS_NORESULTS', {RestaurantText: text}),
           ri('Jargon.DefaultReprompt'),
         ]);
       } else if (attributes.lastResponse.total > LIST_LENGTH) {
@@ -334,6 +334,8 @@ function paramsToText(handlerInput, noSSML) {
       .then((location) => {
         return handlerInput.jrm.render(ri('PARAMS_IN', {Location: location}));
       });
+    } else if (params.latitude && params.longitude) {
+      return handlerInput.jrm.render(ri('PARAMS_NEARME'));
     } else {
       return '';
     }
@@ -447,5 +449,14 @@ function addYelpParameter(params, value) {
     }
   } else if (mapping[value]) {
     params[mapping[value].field] = mapping[value].value;
+  } else {
+    // Split out words and see if there's a match in the mapping table
+    // note that this would already have happened in findCategoryInList
+    const words = value.split(' ');
+    words.forEach((word) => {
+      if (mapping[word]) {
+        params[mapping[word].field] = mapping[word].value;
+       }
+    });
   }
 }

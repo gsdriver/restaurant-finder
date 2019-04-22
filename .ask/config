@@ -35,9 +35,9 @@
             "arn": "arn:aws:lambda:us-east-1:129065607926:function:RestaurantFinder_v3",
             "awsRegion": "us-east-1",
             "codeUri": "lambda/custom",
-            "functionName": "RestaurantFinder_v3",
+            "functionName": "arn:aws:lambda:us-east-1:129065607926:function:RestaurantFinder_v3",
             "handler": "index.handler",
-            "revisionId": "37793842-c44e-44f4-bc0a-103a3e456793",
+            "revisionId": "dfa1c2d4-bda2-458f-9d59-cb38929e2d3e",
             "runtime": "nodejs8.10"
           }
         ]

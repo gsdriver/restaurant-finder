@@ -67,25 +67,42 @@ module.exports = {
       }
     }
     if (useDeviceLocation) {
-      promise = location.getDeviceLocation(handlerInput)
-      .then((address) => {
-        if (address && address.postalCode) {
-          params.location = address.postalCode;
-          return params;
-        } else {
-          attributes.lastSearch = params;
-          return handlerInput.jrb
-            .speak(ri('FIND_LOCATION'), true)
-            .withAskForPermissionsConsentCard(['read::alexa:device:all:address:country_and_postal_code']);
-        }
-      });
+      // First let's see if we can get lat/long
+      const event = handlerInput.requestEnvelope;
+
+      if (event.context && event.context.System && event.context.Geolocation &&
+        event.context.System.device &&
+        event.context.System.device.supportedInterfaces &&
+        event.context.System.device.supportedInterfaces.Geolocation) {
+        // Great, let's get it
+        params.location = undefined;
+        params.latitude = event.context.Geolocation.coordinate.latitudeInDegrees;
+        params.longitude = event.context.Geolocation.coordinate.longitudeInDegrees;
+        params.sort_by = 'distance';
+        promise = Promise.resolve(params);
+      } else {
+        // Nope - let's see if we can get postal code instead
+        promise = location.getDeviceLocation(handlerInput)
+        .then((address) => {
+          if (address && address.postalCode) {
+            params.location = address.postalCode;
+            return params;
+          } else {
+            attributes.lastSearch = params;
+            return handlerInput.jrb
+              .speak(ri('FIND_LOCATION'), true)
+              .withAskForPermissionsConsentCard(['read::alexa:device:all:address:country_and_postal_code']);
+          }
+        });
+      }
     } else {
       promise = Promise.resolve(params);
     }
 
     return promise.then((params) => {
       // OK, let's call Yelp API to get a list of restaurants
-      if ((typeof params === 'object') && params.location) {
+      if ((typeof params === 'object') &&
+        (params.location || (params.latitude && params.longitude))) {
         return yelp.getRestaurantList(params)
         .then((restaurantList) => {
           attributes.lastSearch = params;

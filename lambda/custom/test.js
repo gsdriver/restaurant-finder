@@ -49,6 +49,12 @@ function BuildEvent(argv)
         "AudioPlayer": {
           "playerActivity": "IDLE"
         },
+        "Geolocation": {
+          "coordinate": {
+            "latitudeInDegrees": 47.613588,
+            "longitudeInDegrees": -122.197105,
+          },
+        },
         "Display": {},
         "System": {
           "application": {
@@ -61,6 +67,7 @@ function BuildEvent(argv)
             "deviceId": "amzn1.ask.device.AFD2MDKY4WIZW3HGZ277CUWUZEFNDPLO4JY3HDUCWFGN5CWX3LGTS5NANWJPJEKYVUMFU3IXR3LGTZQOU3GQMCSMRJTLEGKVKCAOZ5UPR7VRMI5BQ3HDELM5RA2EQA7IHDXG5SVUAT3FO3ASFNA7RX2NCC2Q",
             "supportedInterfaces": {
               "AudioPlayer": {},
+              "Geolocation": true,
               "Display": {
                 "templateVersion": "1.0",
                 "markupVersion": "1.0"

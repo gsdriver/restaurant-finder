@@ -15,7 +15,7 @@ module.exports = {
     // Actually rating is not a parameter, it's a filter - so strip that out of the URL query
     const yelpParams = {};
     for (field in params) {
-      if (field != 'rating') {
+      if ((field != 'rating') && (params[field] !== undefined)) {
         yelpParams[field] = params[field];
       }
     }
