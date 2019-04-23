@@ -60,6 +60,8 @@ module.exports = {
           myResult.location.display_address = restaurant.location.display_address;
         }
 
+        myResult.latitude = (restaurant.coordinates ? restaurant.coordinates.latitude : undefined);
+        myResult.longitude = (restaurant.coordinates ? restaurant.coordinates.longitude : undefined);
         myResult.name = cleanString(restaurant.name);
         myResult.rating = restaurant.rating;
         myResult.review_count = restaurant.review_count;

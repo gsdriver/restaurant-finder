@@ -58,6 +58,7 @@ function BuildEvent(argv)
             "longitudeInDegrees": -122.197105,
           },
         },
+        "Automotive": {},
         "Display": {},
         "System": {
           "application": {
@@ -114,6 +115,7 @@ function BuildEvent(argv)
          "AudioPlayer": {
            "playerActivity": "IDLE"
          },
+         "Automotive": {},
          "Display": {},
          "System": {
            "application": {
