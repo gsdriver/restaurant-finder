@@ -32,6 +32,7 @@ function BuildEvent(argv)
     var readList = {"name": "ReadListIntent", "slots": {}};
     var backIntent = {"name": "AMAZON.PreviousIntent", "slots": {}};
     var restaurantDetails = {"name": "DetailsIntent", "slots": {"RestaurantID": {"name": "RestaurantID", "value": ""}}};
+    var test = {"name": "TestIntent", "slots": {"Test": {"name": "Test", "value": ""}}};
     var repeatIntent = {"name": "AMAZON.RepeatIntent", "slots": {}};
     var help = {"name": "AMAZON.HelpIntent", "slots": {}};
     var stop = {"name": "AMAZON.StopIntent", "slots": {}};
@@ -58,7 +59,6 @@ function BuildEvent(argv)
             "longitudeInDegrees": -122.197105,
           },
         },
-        "Automotive": {},
         "Display": {},
         "System": {
           "application": {
@@ -115,7 +115,6 @@ function BuildEvent(argv)
          "AudioPlayer": {
            "playerActivity": "IDLE"
          },
-         "Automotive": {},
          "Display": {},
          "System": {
            "application": {
@@ -199,6 +198,11 @@ function BuildEvent(argv)
         lambda.request.intent = restaurantDetails;
         restaurantDetails.slots.RestaurantID.value = (argv.length > 3) ? argv[3] : 1;
     }
+    else if (argv[2] == "test")
+    {
+        lambda.request.intent = test;
+        test.slots.Test.value = (argv.length > 3) ? argv[3] : 1;
+    }
     else if (argv[2] == "repeat")
     {
         lambda.request.intent = repeatIntent;
@@ -214,6 +218,10 @@ function BuildEvent(argv)
     else if (argv[2] == "open")
     {
         // Return the launch request
+        if ((argv.length > 3) && (argv[3] === 'auto')) {
+          console.log('opening in auto mode');
+          openEvent.context.Automotive = {};
+        }
         return openEvent;
     }
     else

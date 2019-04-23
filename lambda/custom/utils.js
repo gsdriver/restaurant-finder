@@ -5,11 +5,15 @@
 const categoryList = require('./categories');
 const yelp = require('./api/Yelp');
 const geocahe = require('./api/Geocache');
-const LIST_LENGTH = 5;
 const ri = require('@jargon/alexa-skill-sdk').ri;
 
 module.exports = {
-  PAGE_SIZE: LIST_LENGTH,
+  pageSize: function(handlerInput) {
+    const attributes = handlerInput.attributesManager.getSessionAttributes();
+    const LIST_LENGTH = 5;
+
+    return (attributes.isAuto ? 1 : LIST_LENGTH);
+  },
   drawTable: function(handlerInput) {
     const event = handlerInput.requestEnvelope;
     const attributes = handlerInput.attributesManager.getSessionAttributes();
@@ -65,7 +69,7 @@ module.exports = {
           ri('RESULTS_NORESULTS', {RestaurantText: text}),
           ri('Jargon.DefaultReprompt'),
         ]);
-      } else if (attributes.lastResponse.total > LIST_LENGTH) {
+      } else if (attributes.lastResponse.total > module.exports.pageSize(handlerInput)) {
         state = 'RESULTS';
 
         return handlerInput.jrm
@@ -73,7 +77,7 @@ module.exports = {
         .then((text) => {
           // More than two pages of results?  Suggest a filter
           speech = text;
-          if (attributes.lastResponse.total > 2 * LIST_LENGTH) {
+          if (attributes.lastResponse.total > 2 * module.exports.pageSize(handlerInput)) {
             if (!attributes.lastSearch.price
               || !attributes.lastSearch.categories
               || !attributes.lastSearch.rating) {
@@ -128,28 +132,61 @@ module.exports = {
     let speech;
     let reprompt;
     const restaurantList = attributes.lastResponse;
-    const toRead = Math.min(restaurantList.restaurants.length - restaurantList.read, LIST_LENGTH);
+    const toRead = Math.min(restaurantList.restaurants.length - restaurantList.read, module.exports.pageSize(handlerInput));
     let restaurants = '';
 
-    let i;
-    for (i = 0; i < toRead; i++) {
-      restaurants += (' ' + (i + 1) + ' <break time=\"200ms\"/> ' + restaurantList.restaurants[restaurantList.read + i].name + '.');
-    }
+    // In auto mode say the name and distance
+    if (attributes.isAuto) {
+      const speechParams = {};
+      speechParams.Name = restaurantList.restaurants[restaurantList.read].name;
+      speech = 'READLIST_AUTO';
 
-    // OK, read the names as allow them to ask for more detail on any choice
-    speech = 'READLIST_RESULTS';
-    reprompt = 'RESULTS_DETAILS';
-    if (restaurantList.restaurants.length - restaurantList.read > LIST_LENGTH) {
-      speech += '_MORE';
-      reprompt += '_MORE';
-    }
+      if (attributes.lastSearch.latitude && attributes.lastSearch.longitude) {
+        speech += '_DISTANCE';
+        speechParams.Distance = module.exports.distanceBetweenPoints(
+          attributes.lastSearch.latitude,
+          attributes.lastSearch.longitude,
+          restaurantList.restaurants[restaurantList.read].latitude,
+          restaurantList.restaurants[restaurantList.read].longitude,
+          handlerInput.requestEnvelope.request.locale === 'en-US',
+        );
+      }
 
-    return handlerInput.jrm.renderBatch([
-      ri(speech, {Total: toRead, Restaurants: restaurants}),
-      ri(reprompt),
-    ]).then((results) => {
-      return {speech: results[0], reprompt: results[1]};
-    });
+      if (restaurantList.restaurants.length - restaurantList.read > module.exports.pageSize(handlerInput)) {
+        reprompt = 'READLIST_AUTO_MORE';
+      } else {
+        reprompt = 'Jargon.defaultReprompt';
+      }
+
+      return handlerInput.jrm.renderBatch([
+        ri(speech, speechParams),
+        ri(reprompt),
+      ]).then((results) => {
+        return {speech: results[0], reprompt: results[1]};
+      });
+    } else {
+      let i;
+      for (i = 0; i < toRead; i++) {
+        restaurants += (' ' + (i + 1) + ' <break time=\"200ms\"/> ' + restaurantList.restaurants[restaurantList.read + i].name + '.');
+      }
+
+      // If we are in auto mode, say the name
+
+      // OK, read the names as allow them to ask for more detail on any choice
+      speech = 'READLIST_RESULTS';
+      reprompt = 'RESULTS_DETAILS';
+      if (restaurantList.restaurants.length - restaurantList.read > module.exports.pageSize(handlerInput)) {
+        speech += '_MORE';
+        reprompt += '_MORE';
+      }
+
+      return handlerInput.jrm.renderBatch([
+        ri(speech, {Total: toRead, Restaurants: restaurants}),
+        ri(reprompt),
+      ]).then((results) => {
+        return {speech: results[0], reprompt: results[1]};
+      });
+    }
   },
   readRestaurantDetails: function(handlerInput) {
     const attributes = handlerInput.attributesManager.getSessionAttributes();
@@ -305,6 +342,17 @@ module.exports = {
 
     return {searchParams: params, yelpParams: yelpParams};
   },
+  distanceBetweenPoints: function(lat1, long1, lat2, long2, miles) {
+    const earthRadius = (miles ? 3959 : 6378);
+    const dLat = deg2rad(lat2 - lat1);
+    const dLong = deg2rad(long2 - long1);
+    const a = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+      Math.cos(deg2rad(lat1)) * Math.cos(deg2rad(lat2)) *
+      Math.sin(dLong / 2) * Math.sin(dLong / 2);
+    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+
+    return (earthRadius * c);
+  }
 };
 
 function getSlotValue(slot) {
@@ -487,4 +535,8 @@ function addYelpParameter(params, yelpParams, value) {
        }
     });
   }
+}
+
+function deg2rad(deg) {
+  return deg * (Math.PI / 180)
 }

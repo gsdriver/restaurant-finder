@@ -7,6 +7,7 @@
 const utils = require('../utils');
 const yelp = require('../api/Yelp');
 const location = require('../api/Location');
+const ReadList = require('./ReadList');
 const ri = require('@jargon/alexa-skill-sdk').ri;
 
 module.exports = {
@@ -123,27 +124,40 @@ module.exports = {
         (params.yelpParams.location || (params.yelpParams.latitude && params.yelpParams.longitude))) {
         return yelp.getRestaurantList(params.yelpParams)
         .then((restaurantList) => {
-          // If this was an automotive lat/long search, filter
-          // to results within two miles
-          if (attributes.isAuto && params.yelpParams.latitude && params.yelpParams.longitude) {
-            restaurantList.restaurants = restaurantList.restaurants.filter((item) => {
-              return (distanceBetweenPoints(params.yelpParams.latitude, params.yelpParams.longitude, item.latitude, item.longitude) <= 2.0)
-            });
-            restaurantList.total = restaurantList.restaurants.length;
-          }
-
           // Save details of the search and results
           attributes.lastSearch = params.searchParams;
           attributes.lastYelpSearch = params.yelpParams;
           attributes.lastResponse = restaurantList;
-          return utils.readRestaurantResults(handlerInput)
-          .then((result) => {
-            attributes.state = result.state;
-            return handlerInput.responseBuilder
-              .speak(result.speech)
-              .reprompt(result.reprompt)
-              .getResponse();
-          });
+
+          // If this was an automotive lat/long search, filter
+          // to results within two miles and start reading the list
+          if (attributes.isAuto && params.yelpParams.latitude && params.yelpParams.longitude) {
+            attributes.lastResponse.restaurants = restaurantList.restaurants.filter((item) => {
+              return (utils.distanceBetweenPoints(params.yelpParams.latitude, params.yelpParams.longitude,
+                item.latitude, item.longitude, true) <= 2.0);
+            });
+            attributes.lastResponse.total = attributes.lastResponse.restaurants.length;
+
+            if (!attributes.lastResponse || !attributes.lastResponse.restaurants
+              || !attributes.lastResponse.restaurants.length) {
+              attributes.state = '';
+              return handlerInput.jrm.renderBatch([
+                ri('RESULTS_NORESULTS', {RestaurantText: text}),
+                ri('Jargon.DefaultReprompt'),
+              ]);
+            } else {
+              return ReadList.handle(handlerInput);
+            }
+          } else {
+            return utils.readRestaurantResults(handlerInput)
+            .then((result) => {
+              attributes.state = result.state;
+              return handlerInput.responseBuilder
+                .speak(result.speech)
+                .reprompt(result.reprompt)
+                .getResponse();
+            });
+          }
         }).catch((error) => {
           console.log(error.stack);
           return handlerInput.jrb
@@ -182,21 +196,4 @@ function isMe(location) {
   }
 
   return false;
-}
-
-// Calculate the distance between two lat/long points in miles
-function distanceBetweenPoints(lat1, long1, lat2, long2) {
-  const earthRadius = 3959;
-  const dLat = deg2rad(lat2 - lat1);
-  const dLong = deg2rad(long2 - long1);
-  const a = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
-    Math.cos(deg2rad(lat1)) * Math.cos(deg2rad(lat2)) *
-    Math.sin(dLong / 2) * Math.sin(dLong / 2);
-  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-
-  return (earthRadius * c);
-}
-
-function deg2rad(deg) {
-  return deg * (Math.PI / 180)
 }

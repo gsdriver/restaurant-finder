@@ -23,7 +23,7 @@ module.exports = {
       case 'LIST':
         // Are there more restaurants?
         speech = 'HELP_LIST';
-        if ((attributes.lastResponse.read + utils.PAGE_SIZE) <
+        if ((attributes.lastResponse.read + utils.pageSize(handlerInput)) <
           attributes.lastResponse.restaurants.length) {
           speech += '_MORE';
         }

@@ -36,6 +36,7 @@ const Repeat = require('./intents/Repeat');
 const Help = require('./intents/Help');
 const Exit = require('./intents/Exit');
 const SessionEnd = require('./intents/SessionEnd');
+const Test = require('./intents/Test');
 const Unhandled = require('./intents/Unhandled');
 const utils = require('./utils');
 const ssmlCheck = require('ssml-check-core');
@@ -54,7 +55,7 @@ const requestInterceptor = {
           attributes.temp = {};
           attributes.isAuto = handlerInput.requestEnvelope.context.Automotive;
           attributes.lastRun = Date.now();
-          attributes.playerLocale = event.request.locale;
+          attributes.userLocale = event.request.locale;
           attributes.sessions = (attributes.sessions + 1) || 1;
           attributesManager.setSessionAttributes(attributes);
         });
@@ -162,6 +163,7 @@ function runSkill(event, context, callback) {
       Next,
       Back,
       Help,
+      Test,
       Exit,
       SessionEnd,
       Unhandled

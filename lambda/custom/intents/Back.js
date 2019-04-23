@@ -20,7 +20,7 @@ module.exports = {
     // If the last action was read list, go to the previous chunk
     switch (attributes.state) {
       case 'LIST':
-        attributes.lastResponse.read -= utils.PAGE_SIZE;
+        attributes.lastResponse.read -= utils.pageSize(handlerInput);
         if (attributes.lastResponse.read < 0) {
           // If they were at the start of the list, just repeat it
           attributes.lastResponse.read = 0;

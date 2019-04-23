@@ -21,10 +21,10 @@
         },
         "interactionModel": {
           "en-CA": {
-            "eTag": "deb4ef76de9199b45517daff2a10b513"
+            "eTag": "5a6f3f5b45b0c57a8087035cd1c521d4"
           },
           "en-US": {
-            "eTag": "36ae457bbba86475de45284f27298367"
+            "eTag": "4652b656b964d44198dd28f0e7bab835"
           }
         },
         "lambda": [
@@ -37,7 +37,7 @@
             "codeUri": "lambda/custom",
             "functionName": "arn:aws:lambda:us-east-1:129065607926:function:RestaurantFinder_v3",
             "handler": "index.handler",
-            "revisionId": "e342c5ea-5c9b-49a4-ad09-f42d6c8f8647",
+            "revisionId": "2f6e4f8a-78ba-4813-bcfd-9881594a30c0",
             "runtime": "nodejs8.10"
           }
         ]

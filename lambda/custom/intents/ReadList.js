@@ -43,7 +43,7 @@ module.exports = {
     if (attributes.state == 'DETAILS') {
       toRead = attributes.lastResponse.read || 0;
     } else {
-      toRead = (attributes.lastResponse.read + utils.PAGE_SIZE) || 0;
+      toRead = (attributes.lastResponse.read + utils.pageSize(handlerInput)) || 0;
     }
 
     // OK, read the next set

@@ -9,5 +9,6 @@
     "v5": "in Chicago",
     "v6": "near me"
   },
+  "READLIST_AUTO_DISTANCE": "{Name} is {Distance} miles away",
   "POSTAL_FORMAT": "NNNNN"
 }

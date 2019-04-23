@@ -8,5 +8,6 @@
     "v4": "in Victoria",
     "v6": "near me"
   },
+  "READLIST_AUTO_DISTANCE": "{Name} is {Distance} kilometers away",
   "POSTAL_FORMAT": "ANA NAN"
 }
