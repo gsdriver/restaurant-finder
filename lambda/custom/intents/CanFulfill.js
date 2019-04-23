@@ -70,7 +70,7 @@ module.exports = {
           case 'FindRestaurantIntent':
             if (event.request.intent.slots) {
               const params = utils.buildYelpParameters(event.request.intent);
-              yelp.getRestaurantList(params, (error, restaurantList) => {
+              yelp.getRestaurantList(params.yelpParams, (error, restaurantList) => {
                 if (restaurantList) {
                   valid = true;
                 }

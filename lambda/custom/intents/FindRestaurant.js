@@ -24,6 +24,8 @@ module.exports = {
 
     // Build up our parameter structure from the intent
     const params = utils.buildYelpParameters(event.request.intent);
+    const yelpParams = params.yelpParams;
+    const searchParams = params.searchParams;
     let useDeviceLocation;
 
     if (event.request.intent.name === 'FindRestaurantNearbyIntent') {
@@ -31,13 +33,13 @@ module.exports = {
     } else {
       // If we are still in results mode, filter the current parameters
       // if there is no overlap in fields (e.g. they are now saying cheap)
-      if (attributes.lastSearch) {
+      if (attributes.lastYelpSearch) {
         let field;
         let newSearch = false;
 
-        for (field in params) {
+        for (field in yelpParams) {
           if (field) {
-            if (attributes.lastSearch[field]) {
+            if (attributes.lastYelpSearch[field]) {
               // This field was mentioned last time, so it is a new search
               newSearch = true;
             }
@@ -46,9 +48,14 @@ module.exports = {
 
         // If it's not a new search, copy over the parameters from the last search
         if (!newSearch) {
-          for (field in this.attributes.lastSearch) {
+          for (field in attributes.lastYelpSearch) {
             if (field) {
-              params[field] = this.attributes.lastSearch[field];
+              yelpParams[field] = attributes.lastYelpSearch[field];
+            }
+          }
+          for (field in attributes.lastSearch) {
+            if (field) {
+              searchParams[field] = attributes.lastSearch[field];
             }
           }
         }
@@ -60,12 +67,15 @@ module.exports = {
       //   3) The device location (we'll need to ask permission in their app)
       // If the location is me then we'll assume that they are looking near
       // their location (not Maine), and will go directly to the device location
-      if (isMe(params.location)) {
+      if (isMe(yelpParams.location)) {
         console.log('Location of me being converted to device location');
         useDeviceLocation = true;
-      } else if (!params.location) {
-        if (attributes.lastSearch && attributes.lastSearch.location) {
-          params.location = attributes.lastSearch.location;
+      } else if (!yelpParams.location) {
+        if (attributes.lastYelpSearch && attributes.lastYelpSearch.location) {
+          yelpParams.location = attributes.lastYelpSearch.location;
+          if (attributes.lastSearch && attributes.lastSearch.location) {
+            searchParams.location = attributes.lastSearch.location;
+          }
         } else {
           useDeviceLocation = true;
         }
@@ -79,20 +89,24 @@ module.exports = {
         event.context.System.device.supportedInterfaces &&
         event.context.System.device.supportedInterfaces.Geolocation) {
         // Great, let's get it
-        params.location = undefined;
-        params.latitude = event.context.Geolocation.coordinate.latitudeInDegrees;
-        params.longitude = event.context.Geolocation.coordinate.longitudeInDegrees;
-        params.sort_by = 'distance';
+        yelpParams.location = undefined;
+        yelpParams.latitude = event.context.Geolocation.coordinate.latitudeInDegrees;
+        yelpParams.longitude = event.context.Geolocation.coordinate.longitudeInDegrees;
+        yelpParams.sort_by = 'distance';
+        searchParams.location = undefined;
+        searchParams.latitude = yelpParams.latitude;
+        searchParams.longitude = yelpParams.longitude;
         promise = Promise.resolve(params);
       } else {
         // Nope - let's see if we can get postal code instead
         promise = location.getDeviceLocation(handlerInput)
         .then((address) => {
           if (address && address.postalCode) {
-            params.location = address.postalCode;
+            yelpParams.location = address.postalCode;
             return params;
           } else {
-            attributes.lastSearch = params;
+            attributes.lastSearch = params.searchParams;
+            attributes.lastYelpSearch = params.yelpParams;
             return handlerInput.jrb
               .speak(ri('FIND_LOCATION'), true)
               .withAskForPermissionsConsentCard(['read::alexa:device:all:address:country_and_postal_code']);
@@ -106,10 +120,11 @@ module.exports = {
     return promise.then((params) => {
       // OK, let's call Yelp API to get a list of restaurants
       if ((typeof params === 'object') &&
-        (params.location || (params.latitude && params.longitude))) {
-        return yelp.getRestaurantList(params)
+        (params.yelpParams.location || (params.yelpParams.latitude && params.yelpParams.longitude))) {
+        return yelp.getRestaurantList(params.yelpParams)
         .then((restaurantList) => {
-          attributes.lastSearch = params;
+          attributes.lastSearch = params.searchParams;
+          attributes.lastYelpSearch = params.yelpParams;
           attributes.lastResponse = restaurantList;
           return utils.readRestaurantResults(handlerInput)
           .then((result) => {

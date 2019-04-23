@@ -271,36 +271,39 @@ module.exports = {
   },
   buildYelpParameters: function(intent) {
     const params = {};
+    const yelpParams = {};
     let value;
 
     // You can have up to three intent slots - first let's see if we have a category
     if (intent.slots.FirstDescriptor) {
       value = getSlotValue(intent.slots.FirstDescriptor);
       if (value) {
-        addYelpParameter(params, value.toLowerCase());
+        addYelpParameter(params, yelpParams, value.toLowerCase());
       }
     }
     if (intent.slots.SecondDescriptor) {
       value = getSlotValue(intent.slots.SecondDescriptor);
       if (value) {
-        addYelpParameter(params, value.toLowerCase());
+        addYelpParameter(params, yelpParams, value.toLowerCase());
       }
     }
     if (intent.slots.ThirdDescriptor) {
       value = getSlotValue(intent.slots.ThirdDescriptor);
       if (value) {
-        addYelpParameter(params, value.toLowerCase());
+        addYelpParameter(params, yelpParams, value.toLowerCase());
       }
     }
 
     if (intent.slots.Location && intent.slots.Location.value) {
       params.location = intent.slots.Location.value;
+      yelpParams.location = intent.slots.Location.value;
     } else if (intent.slots.LocationZIP && intent.slots.LocationZIP.value
         && intent.slots.LocationZIP.value.length == 5) {
       params.location = intent.slots.LocationZIP.value;
+      yelpParams.location = intent.slots.LocationZIP.value;
     }
 
-    return params;
+    return {searchParams: params, yelpParams: yelpParams};
   },
 };
 
@@ -326,24 +329,15 @@ function paramsToText(handlerInput, noSSML) {
   const attributes = handlerInput.attributesManager.getSessionAttributes();
   const params = attributes.lastSearch;
   let retVal = '';
-  const renderItems = [];
 
   if (params.open_now) {
-    renderItems.push(ri('PARAMS_OPEN'));
+    retVal += params.open_now + ' ';
   }
   if (params.rating) {
-    const ratingMap = {'3,5': 'PARAMS_GOOD', '4,5': 'PARAMS_GREAT',
-        '4.5,5': 'PARAMS_BEST',
-        '0,2.5': 'PARAMS_BAD', '0,2': 'PARAMS_TERRIBLE'};
-
-    renderItems.push(ri(ratingMap[params.rating]));
+    retVal += params.rating + ' ';
   }
   if (params.price) {
-    const priceMap = {'1': 'PARAMS_CHEAP', '2': 'PARAMS_MODERATE',
-        '3': 'PARAMS_SPENDY', '4': 'PARAMS_SPLURGE',
-        '1,2': 'PARAMS_INEXPENSIVE', '3,4': 'PARAMS_EXPENSIVE'};
-
-    renderItems.push(ri(priceMap[params.price]));
+    retVal += params.price + ' ';
   }
   if (params.categories) {
     const catList = params.categories.split(',');
@@ -352,14 +346,10 @@ function paramsToText(handlerInput, noSSML) {
       retVal += (cat + ' ');
     });
   }
-  renderItems.push(ri('PARAMS_RESTAURANTS'));
 
-  return handlerInput.jrm.renderBatch(renderItems)
-  .then((items) => {
-    items.forEach((item) => {
-      retVal = retVal + item + ' ';
-    });
-
+  return handlerInput.jrm.render(ri('PARAMS_RESTAURANTS'))
+  .then((item) => {
+    retVal += item + ' ';
     if (params.location) {
       return readLocation(handlerInput, noSSML)
       .then((location) => {
@@ -450,7 +440,7 @@ function findCategoryInList(category) {
 }
 
 // Takes a value and fits it into the appropriate Yelp parameter
-function addYelpParameter(params, value) {
+function addYelpParameter(params, yelpParams, value) {
   const category = findCategoryInList(value);
   const mapping = {
       'open': {field: 'open_now', value: true},
@@ -473,20 +463,27 @@ function addYelpParameter(params, value) {
 
   if (category) {
     // OK, this matches a category
-    if (params.categories) {
-      params.categories += (',' + category);
+    if (yelpParams.categories) {
+      yelpParams.categories += (',' + category);
     } else {
-      params.categories = category;
+      yelpParams.categories = category;
+    }
+    if (params.categories) {
+      params.categories += (',' + value);
+    } else {
+      params.categories = value;
     }
   } else if (mapping[value]) {
-    params[mapping[value].field] = mapping[value].value;
+    yelpParams[mapping[value].field] = mapping[value].value;
+    params[mapping[value].field] = value;
   } else {
     // Split out words and see if there's a match in the mapping table
     // note that this would already have happened in findCategoryInList
     const words = value.split(' ');
     words.forEach((word) => {
       if (mapping[word]) {
-        params[mapping[word].field] = mapping[word].value;
+        yelpParams[mapping[word].field] = mapping[word].value;
+        params[mapping[word].field] = value;
        }
     });
   }
