@@ -52,6 +52,7 @@ const requestInterceptor = {
       return attributesManager.getPersistentAttributes()
         .then((attributes) => {
           attributes.temp = {};
+          attributes.isAuto = handlerInput.requestEnvelope.context.Automotive;
           attributes.lastRun = Date.now();
           attributes.playerLocale = event.request.locale;
           attributes.sessions = (attributes.sessions + 1) || 1;
