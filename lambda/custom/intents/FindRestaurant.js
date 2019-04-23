@@ -14,7 +14,8 @@ module.exports = {
     const request = handlerInput.requestEnvelope.request;
 
     return ((request.type === 'IntentRequest') &&
-      (request.intent.name === 'FindRestaurantIntent'));
+      ((request.intent.name === 'FindRestaurantIntent') ||
+       (request.intent.name === 'FindRestaurantNearbyIntent')));
   },
   handle: function(handlerInput) {
     const event = handlerInput.requestEnvelope;
@@ -25,51 +26,54 @@ module.exports = {
     const params = utils.buildYelpParameters(event.request.intent);
     let useDeviceLocation;
 
-    // If we are still in results mode, filter the current parameters
-    // if there is no overlap in fields (e.g. they are now saying cheap)
-    if (attributes.lastSearch) {
-      let field;
-      let newSearch = false;
-
-      for (field in params) {
-        if (field) {
-          if (attributes.lastSearch[field]) {
-            // This field was mentioned last time, so it is a new search
-            newSearch = true;
-          }
-        }
-      }
-
-      // If it's not a new search, copy over the parameters from the last search
-      if (!newSearch) {
-        for (field in this.attributes.lastSearch) {
-          if (field) {
-            params[field] = this.attributes.lastSearch[field];
-          }
-        }
-      }
-    }
-
-    // Find a location in the following order:
-    //   1) They specified one in the request
-    //   2) The location they used with the last search
-    //   3) The device location (we'll need to ask permission in their app)
-    // If the location is me then we'll assume that they are looking near
-    // their location (not Maine), and will go directly to the device location
-    if (isMe(params.location)) {
-      console.log('Location of me being converted to device location');
+    if (event.request.intent.name === 'FindRestaurantNearbyIntent') {
       useDeviceLocation = true;
-    } else if (!params.location) {
-      if (attributes.lastSearch && attributes.lastSearch.location) {
-        params.location = attributes.lastSearch.location;
-      } else {
+    } else {
+      // If we are still in results mode, filter the current parameters
+      // if there is no overlap in fields (e.g. they are now saying cheap)
+      if (attributes.lastSearch) {
+        let field;
+        let newSearch = false;
+
+        for (field in params) {
+          if (field) {
+            if (attributes.lastSearch[field]) {
+              // This field was mentioned last time, so it is a new search
+              newSearch = true;
+            }
+          }
+        }
+
+        // If it's not a new search, copy over the parameters from the last search
+        if (!newSearch) {
+          for (field in this.attributes.lastSearch) {
+            if (field) {
+              params[field] = this.attributes.lastSearch[field];
+            }
+          }
+        }
+      }
+
+      // Find a location in the following order:
+      //   1) They specified one in the request
+      //   2) The location they used with the last search
+      //   3) The device location (we'll need to ask permission in their app)
+      // If the location is me then we'll assume that they are looking near
+      // their location (not Maine), and will go directly to the device location
+      if (isMe(params.location)) {
+        console.log('Location of me being converted to device location');
         useDeviceLocation = true;
+      } else if (!params.location) {
+        if (attributes.lastSearch && attributes.lastSearch.location) {
+          params.location = attributes.lastSearch.location;
+        } else {
+          useDeviceLocation = true;
+        }
       }
     }
+
     if (useDeviceLocation) {
       // First let's see if we can get lat/long
-      const event = handlerInput.requestEnvelope;
-
       if (event.context && event.context.System && event.context.Geolocation &&
         event.context.System.device &&
         event.context.System.device.supportedInterfaces &&

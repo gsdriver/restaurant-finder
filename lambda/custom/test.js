@@ -26,6 +26,9 @@ function BuildEvent(argv)
                     "SecondDescriptor": {"name": "SecondDescriptor", "value": ""},
                     "ThirdDescriptor": {"name": "ThirdDescriptor", "value": ""},
                     "Location": {"name": "Location", "value": ""}}};
+    var findRestaurantNearby = {"name": "FindRestaurantNearbyIntent", "slots": {"FirstDescriptor": {"name": "FirstDescriptor", "value": ""},
+                    "SecondDescriptor": {"name": "SecondDescriptor", "value": ""},
+                    "ThirdDescriptor": {"name": "ThirdDescriptor", "value": ""}}};
     var readList = {"name": "ReadListIntent", "slots": {}};
     var backIntent = {"name": "AMAZON.PreviousIntent", "slots": {}};
     var restaurantDetails = {"name": "DetailsIntent", "slots": {"RestaurantID": {"name": "RestaurantID", "value": ""}}};
@@ -163,6 +166,22 @@ function BuildEvent(argv)
         if (argv.length > 6)
         {
             findRestaurant.slots.ThirdDescriptor.value = argv[6];
+        }
+    }
+    else if (argv[2] == "findnear")
+    {
+        lambda.request.intent = findRestaurantNearby;
+        if (argv.length > 3)
+        {
+            findRestaurantNearby.slots.FirstDescriptor.value = argv[3];
+        }
+        if (argv.length > 4)
+        {
+            findRestaurantNearby.slots.SecondDescriptor.value = argv[4];
+        }
+        if (argv.length > 5)
+        {
+            findRestaurantNearby.slots.ThirdDescriptor.value = argv[5];
         }
     }
     else if (argv[2] == "readlist")

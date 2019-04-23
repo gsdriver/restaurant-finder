@@ -210,7 +210,7 @@ module.exports = {
 
       if (restaurant.price) {
         renderItems.push(ri('DETAILS_CARD_PRICE', {
-          Price: priceList[restaurant.price - 1],
+          Price: ri(priceList[restaurant.price - 1]),
         }));
       }
       if (restaurant.phone) {
@@ -250,12 +250,14 @@ module.exports = {
     const attributes = handlerInput.attributesManager.getSessionAttributes();
     let speech;
     let cardText;
+    let imageUrl;
 
     attributes.lastResponse.details = index;
     return module.exports.readRestaurantDetails(handlerInput)
     .then((result) => {
       speech = result.speech + ' <break time=\"200ms\"/> ';
       cardText = result.cardText;
+      imageUrl = result.imageUrl;
       return handlerInput.jrm.render(ri('Jargon.defaultReprompt'));
     }).then((reprompt) => {
       speech += reprompt;
@@ -263,23 +265,34 @@ module.exports = {
       return handlerInput.responseBuilder
         .speak(speech)
         .reprompt(reprompt)
-        .withSimpleCard(attributes.lastResponse.restaurants[index].name, cardText)
+        .withStandardCard(attributes.lastResponse.restaurants[index].name, cardText, imageUrl)
         .getResponse();
     });
   },
   buildYelpParameters: function(intent) {
     const params = {};
+    let value;
 
     // You can have up to three intent slots - first let's see if we have a category
-    if (intent.slots.FirstDescriptor && intent.slots.FirstDescriptor.value) {
-      addYelpParameter(params, intent.slots.FirstDescriptor.value.toLowerCase());
+    if (intent.slots.FirstDescriptor) {
+      value = getSlotValue(intent.slots.FirstDescriptor);
+      if (value) {
+        addYelpParameter(params, value.toLowerCase());
+      }
     }
-    if (intent.slots.SecondDescriptor && intent.slots.SecondDescriptor.value) {
-      addYelpParameter(params, intent.slots.SecondDescriptor.value.toLowerCase());
+    if (intent.slots.SecondDescriptor) {
+      value = getSlotValue(intent.slots.SecondDescriptor);
+      if (value) {
+        addYelpParameter(params, value.toLowerCase());
+      }
     }
-    if (intent.slots.ThirdDescriptor && intent.slots.ThirdDescriptor.value) {
-      addYelpParameter(params, intent.slots.ThirdDescriptor.value.toLowerCase());
+    if (intent.slots.ThirdDescriptor) {
+      value = getSlotValue(intent.slots.ThirdDescriptor);
+      if (value) {
+        addYelpParameter(params, value.toLowerCase());
+      }
     }
+
     if (intent.slots.Location && intent.slots.Location.value) {
       params.location = intent.slots.Location.value;
     } else if (intent.slots.LocationZIP && intent.slots.LocationZIP.value
@@ -290,6 +303,24 @@ module.exports = {
     return params;
   },
 };
+
+function getSlotValue(slot) {
+  let result;
+
+  if (slot.resolutions && slot.resolutions.resolutionsPerAuthority) {
+    slot.resolutions.resolutionsPerAuthority.forEach((auth) => {
+      if (auth.values) {
+        auth.values.forEach((value) => {
+          result = value.name;
+        });
+      }
+    });
+  } else {
+    result = slot.value;
+  }
+
+  return result;
+}
 
 function paramsToText(handlerInput, noSSML) {
   const attributes = handlerInput.attributesManager.getSessionAttributes();
