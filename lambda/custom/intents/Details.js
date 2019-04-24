@@ -13,7 +13,8 @@ module.exports = {
     const attributes = handlerInput.attributesManager.getSessionAttributes();
 
     if ((request.type === 'IntentRequest') && (attributes.state === 'LIST')
-      && (request.intent.name === 'DetailsIntent')) {
+      && ((request.intent.name === 'DetailsIntent') ||
+         (attributes.isAuto && (request.intent.name === 'AMAZON.MoreIntent')))) {
       return true;
     }
 

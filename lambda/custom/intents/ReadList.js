@@ -18,7 +18,8 @@ module.exports = {
     }
 
     if ((request.type === 'IntentRequest') && (attributes.state === 'LIST')
-      && ((request.intent.name === 'AMAZON.MoreIntent') || (request.intent.name === 'AMAZON.NextIntent'))) {
+      && ((request.intent.name === 'AMAZON.NextIntent') ||
+         (!attributes.isAuto && (request.intent.name === 'AMAZON.MoreIntent')))) {
       return true;
     }
 

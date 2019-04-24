@@ -132,30 +132,54 @@ module.exports = {
     let speech;
     let reprompt;
     const restaurantList = attributes.lastResponse;
-    const toRead = Math.min(restaurantList.restaurants.length - restaurantList.read, module.exports.pageSize(handlerInput));
-    let restaurants = '';
+    const toRead = Math.min(restaurantList.restaurants.length - restaurantList.read,
+      module.exports.pageSize(handlerInput));
 
-    // In auto mode say the name and distance
-    if (attributes.isAuto) {
-      const speechParams = {};
-      speechParams.Name = restaurantList.restaurants[restaurantList.read].name;
-      speech = 'READLIST_AUTO';
+    // Build the list of restaurants
+    const renderItems = [];
+    restaurantList.restaurants.slice(restaurantList.read, restaurantList.read + toRead)
+    .forEach((restaurant, i) => {
+      const params = {};
+      let template = 'RESTAURANT';
 
-      if (attributes.lastSearch.latitude && attributes.lastSearch.longitude) {
-        speech += '_DISTANCE';
-        speechParams.Distance = module.exports.distanceBetweenPoints(
-          attributes.lastSearch.latitude,
-          attributes.lastSearch.longitude,
-          restaurantList.restaurants[restaurantList.read].latitude,
-          restaurantList.restaurants[restaurantList.read].longitude,
-          handlerInput.requestEnvelope.request.locale === 'en-US',
-        );
+      params.Number = i + 1;
+      params.Name = restaurant.name;
+      if (attributes.isAuto) {
+        template += '_AUTO';
+        if (attributes.lastSearch.latitude && attributes.lastSearch.longitude) {
+          template += '_DISTANCE';
+          params.Distance = module.exports.distanceBetweenPoints(
+            attributes.lastSearch.latitude,
+            attributes.lastSearch.longitude,
+            restaurantList.restaurants[restaurantList.read].latitude,
+            restaurantList.restaurants[restaurantList.read].longitude,
+            handlerInput.requestEnvelope.request.locale === 'en-US');
+        }
       }
 
-      if (restaurantList.restaurants.length - restaurantList.read > module.exports.pageSize(handlerInput)) {
-        reprompt = 'READLIST_AUTO_MORE';
-      } else {
-        reprompt = 'Jargon.defaultReprompt';
+      renderItems.push(ri(template, params));
+    });
+
+    return handlerInput.jrm.renderBatch(renderItems)
+    .then((items) => {
+      const speechParams = {};
+
+      speechParams.Restaurants = items.reduce((x, y) => (x + ' ' + y));
+      speechParams.Total = toRead;
+
+      // OK, read the names as allow them to ask for more detail on any choice
+      speech = 'READLIST_RESULTS';
+      if (attributes.isAuto) {
+        speech += '_AUTO';
+      } else if (restaurantList.restaurants.length - restaurantList.read >
+        module.exports.pageSize(handlerInput)) {
+        speech += '_MORE';
+      }
+
+      reprompt = (attributes.isAuto) ? 'Jargon.defaultReprompt' : 'RESULTS_DETAILS';
+      if (restaurantList.restaurants.length - restaurantList.read >
+        module.exports.pageSize(handlerInput)) {
+        reprompt = (attributes.isAuto) ? 'READLIST_AUTO_MORE' : 'RESULTS_DETAILS_MORE';
       }
 
       return handlerInput.jrm.renderBatch([
@@ -164,29 +188,7 @@ module.exports = {
       ]).then((results) => {
         return {speech: results[0], reprompt: results[1]};
       });
-    } else {
-      let i;
-      for (i = 0; i < toRead; i++) {
-        restaurants += (' ' + (i + 1) + ' <break time=\"200ms\"/> ' + restaurantList.restaurants[restaurantList.read + i].name + '.');
-      }
-
-      // If we are in auto mode, say the name
-
-      // OK, read the names as allow them to ask for more detail on any choice
-      speech = 'READLIST_RESULTS';
-      reprompt = 'RESULTS_DETAILS';
-      if (restaurantList.restaurants.length - restaurantList.read > module.exports.pageSize(handlerInput)) {
-        speech += '_MORE';
-        reprompt += '_MORE';
-      }
-
-      return handlerInput.jrm.renderBatch([
-        ri(speech, {Total: toRead, Restaurants: restaurants}),
-        ri(reprompt),
-      ]).then((results) => {
-        return {speech: results[0], reprompt: results[1]};
-      });
-    }
+    });
   },
   readRestaurantDetails: function(handlerInput) {
     const attributes = handlerInput.attributesManager.getSessionAttributes();
@@ -352,7 +354,7 @@ module.exports = {
     const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
 
     return (earthRadius * c);
-  }
+  },
 };
 
 function getSlotValue(slot) {
@@ -538,5 +540,5 @@ function addYelpParameter(params, yelpParams, value) {
 }
 
 function deg2rad(deg) {
-  return deg * (Math.PI / 180)
+  return deg * (Math.PI / 180);
 }
