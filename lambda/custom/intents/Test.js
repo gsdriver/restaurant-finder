@@ -4,7 +4,6 @@
 
 'use strict';
 
-const utils = require('../utils');
 const ri = require('@jargon/alexa-skill-sdk').ri;
 
 module.exports = {

@@ -25,8 +25,6 @@ module.exports = {
 
     // Build up our parameter structure from the intent
     const params = utils.buildYelpParameters(event.request.intent);
-    const yelpParams = params.yelpParams;
-    const searchParams = params.searchParams;
     let useDeviceLocation;
 
     if (event.request.intent.name === 'FindRestaurantNearbyIntent') {
@@ -38,7 +36,7 @@ module.exports = {
         let field;
         let newSearch = false;
 
-        for (field in yelpParams) {
+        for (field in params.yelpParams) {
           if (field) {
             if (attributes.lastYelpSearch[field]) {
               // This field was mentioned last time, so it is a new search
@@ -51,12 +49,12 @@ module.exports = {
         if (!newSearch) {
           for (field in attributes.lastYelpSearch) {
             if (field) {
-              yelpParams[field] = attributes.lastYelpSearch[field];
+              params.yelpParams[field] = attributes.lastYelpSearch[field];
             }
           }
           for (field in attributes.lastSearch) {
             if (field) {
-              searchParams[field] = attributes.lastSearch[field];
+              params.searchParams[field] = attributes.lastSearch[field];
             }
           }
         }
@@ -68,14 +66,14 @@ module.exports = {
       //   3) The device location (we'll need to ask permission in their app)
       // If the location is me then we'll assume that they are looking near
       // their location (not Maine), and will go directly to the device location
-      if (isMe(yelpParams.location)) {
+      if (isMe(params.yelpParams.location)) {
         console.log('Location of me being converted to device location');
         useDeviceLocation = true;
-      } else if (!yelpParams.location) {
+      } else if (!params.yelpParams.location) {
         if (attributes.lastYelpSearch && attributes.lastYelpSearch.location) {
-          yelpParams.location = attributes.lastYelpSearch.location;
+          params.yelpParams.location = attributes.lastYelpSearch.location;
           if (attributes.lastSearch && attributes.lastSearch.location) {
-            searchParams.location = attributes.lastSearch.location;
+            params.searchParams.location = attributes.lastSearch.location;
           }
         } else {
           useDeviceLocation = true;
@@ -90,28 +88,34 @@ module.exports = {
         event.context.System.device.supportedInterfaces &&
         event.context.System.device.supportedInterfaces.Geolocation) {
         // Great, let's get it
-        yelpParams.location = undefined;
-        yelpParams.latitude = event.context.Geolocation.coordinate.latitudeInDegrees;
-        yelpParams.longitude = event.context.Geolocation.coordinate.longitudeInDegrees;
-        yelpParams.sort_by = 'distance';
-        searchParams.location = undefined;
-        searchParams.latitude = yelpParams.latitude;
-        searchParams.longitude = yelpParams.longitude;
+        params.yelpParams.location = undefined;
+        params.yelpParams.latitude = event.context.Geolocation.coordinate.latitudeInDegrees;
+        params.yelpParams.longitude = event.context.Geolocation.coordinate.longitudeInDegrees;
+        params.yelpParams.sort_by = 'distance';
+        params.searchParams.location = undefined;
+        params.searchParams.latitude = params.yelpParams.latitude;
+        params.searchParams.longitude = params.yelpParams.longitude;
         promise = Promise.resolve(params);
       } else {
         // Nope - let's see if we can get postal code instead
         promise = location.getDeviceLocation(handlerInput)
         .then((address) => {
           if (address && address.postalCode) {
-            yelpParams.location = address.postalCode;
+            params.yelpParams.location = address.postalCode;
             return params;
           } else {
             attributes.lastSearch = params.searchParams;
             attributes.lastYelpSearch = params.yelpParams;
             return handlerInput.jrb
               .speak(ri('FIND_LOCATION'), true)
-              .withAskForPermissionsConsentCard(['read::alexa:device:all:address:country_and_postal_code']);
+              .withAskForPermissionsConsentCard(['read::alexa:device:all:address:country_and_postal_code'])
+              .getResponse();
           }
+        }).catch((err) => {
+          return handlerInput.jrb
+            .speak(ri('SKILL_ERROR'))
+            .withShouldEndSession(true)
+            .getResponse();
         });
       }
     } else {
@@ -120,8 +124,9 @@ module.exports = {
 
     return promise.then((params) => {
       // OK, let's call Yelp API to get a list of restaurants
-      if ((typeof params === 'object') &&
-        (params.yelpParams.location || (params.yelpParams.latitude && params.yelpParams.longitude))) {
+      if ((typeof params === 'object') && params.yelpParams &&
+        (params.yelpParams.location ||
+        (params.yelpParams.latitude && params.yelpParams.longitude))) {
         return yelp.getRestaurantList(params.yelpParams)
         .then((restaurantList) => {
           // Save details of the search and results
@@ -133,7 +138,8 @@ module.exports = {
           // to results within two miles and start reading the list
           if (attributes.isAuto && params.yelpParams.latitude && params.yelpParams.longitude) {
             attributes.lastResponse.restaurants = restaurantList.restaurants.filter((item) => {
-              return (utils.distanceBetweenPoints(params.yelpParams.latitude, params.yelpParams.longitude,
+              return (utils.distanceBetweenPoints(params.yelpParams.latitude,
+                params.yelpParams.longitude,
                 item.latitude, item.longitude, true) <= 2.0);
             });
             attributes.lastResponse.total = attributes.lastResponse.restaurants.length;
@@ -162,8 +168,12 @@ module.exports = {
           console.log(error.stack);
           return handlerInput.jrb
             .speak(ri('SKILL_ERROR'))
+            .withShouldEndSession(true)
             .getResponse();
         });
+      } else {
+        // It was already a response - pass it on
+        return params;
       }
     });
   },

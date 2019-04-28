@@ -48,9 +48,11 @@ module.exports = {
         });
         break;
       case 'DETAILS':
+        let result;
         return utils.readRestaurantDetails(handlerInput)
-        .then((result) => {
-          return handlerInput.jrb.render(ri('Jargon.defaultReprompt'));
+        .then((details) => {
+          result = details;
+          return handlerInput.jrm.render(ri('Jargon.defaultReprompt'));
         }).then((reprompt) => {
           const speech = result.speech + ' <break time=\"200ms\"/> ' + reprompt;
           return handlerInput.responseBuilder

@@ -2,6 +2,7 @@ var mainApp = require('./index');
 
 const attributeFile = 'attributes.txt';
 
+const fs = require('fs');
 const AWS = require('aws-sdk');
 AWS.config.update({
   accessKeyId: process.env.accessKeyId,
@@ -16,8 +17,6 @@ const sessionId = "SessionId.c88ec34d-28b0-46f6-a4c7-120d8fba8fb4";
 const LOCALE = 'en-CA';
 const APPID = 'amzn1.ask.skill.4c848d38-347c-4e03-b908-42c6af6c207d';
 const APITOKEN = '';
-
-const fs = require('fs');
 
 function BuildEvent(argv)
 {
@@ -36,6 +35,8 @@ function BuildEvent(argv)
     var repeatIntent = {"name": "AMAZON.RepeatIntent", "slots": {}};
     var help = {"name": "AMAZON.HelpIntent", "slots": {}};
     var stop = {"name": "AMAZON.StopIntent", "slots": {}};
+    var yes = {"name": "AMAZON.YesIntent", "slots": {}};
+    var no = {"name": "AMAZON.NoIntent", "slots": {}};
 
     var lambda = {
       "session": {
@@ -139,11 +140,73 @@ function BuildEvent(argv)
        },
     };
 
+  const canFulfill = {
+     "session":{
+       "new": true,
+       "sessionId":"SessionId.12",
+       "application":{
+         "applicationId": APPID
+       },
+       "attributes":{
+         "key": "string value"
+       },
+       "user":{
+         "userId": "not-amazon",
+       }
+     },
+     "request":{
+       "type":"CanFulfillIntentRequest",
+       "requestId":"EdwRequestId.12",
+       "intent":{
+         "name":"FindRestaurantIntent",
+         "slots":{
+           "Ordinal":{
+             "name":"Ordinal",
+             "value":"2"
+           },
+         }
+       },
+       "locale":LOCALE,
+       "timestamp":"2017-10-03T22:02:29Z"
+     },
+     "context":{
+       "AudioPlayer":{
+         "playerActivity":"IDLE"
+       },
+       "System":{
+         "application":{
+           "applicationId": APPID
+         },
+         "user":{
+           "userId": "not-amazon",
+         },
+         "device":{
+           "supportedInterfaces":{
+
+           }
+         }
+       }
+     },
+     "version":"1.0"
+    };
+
     // If there is no argument, then we'll just return
     if (argv.length <= 2)
     {
         console.log("I need some parameters");
         return null;
+    }
+    else if (argv[2] == "seed") {
+        if (fs.existsSync("seed.txt")) {
+            data = fs.readFileSync("seed.txt", 'utf8');
+            if (data) {
+                return JSON.parse(data);
+            }
+        }
+    }
+    else if (argv[2] == "canfulfill")
+    {
+        return canFulfill;
     }
     else if (argv[2] == "find")
     {
@@ -215,6 +278,14 @@ function BuildEvent(argv)
     {
         lambda.request.intent = stop;
     }
+    else if (argv[2] == "yes")
+    {
+        lambda.request.intent = yes;
+    }
+    else if (argv[2] == "no")
+    {
+        lambda.request.intent = no;
+    }
     else if (argv[2] == "open")
     {
         // Return the launch request
@@ -231,7 +302,6 @@ function BuildEvent(argv)
     }
 
     // If there is an attributes.txt file, read the attributes from there
-    const fs = require('fs');
     if (fs.existsSync(attributeFile)) {
       data = fs.readFileSync(attributeFile, 'utf8');
       if (data) {
@@ -268,7 +338,6 @@ function myResponse(err, result) {
     } else if (result) {
       if (result.sessionAttributes) {
         // Output the attributes
-        const fs = require('fs');
         fs.writeFile(attributeFile, JSON.stringify(result.sessionAttributes), (err) => {
           if (err) {
             console.log(err);

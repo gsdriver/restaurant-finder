@@ -33,7 +33,11 @@ module.exports = {
           res.on('end', () => resolve(JSON.parse(fulltext)));
         } else {
           // Sorry, there was an error calling the HTTP endpoint
-          reject('Unable to call endpoint');
+          if (process.env.FAKELOCATION) {
+            resolve({postalCode: '98074'});
+          } else {
+            reject('Unable to call endpoint');
+          }
         }
       });
 

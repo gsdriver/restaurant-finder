@@ -14,7 +14,8 @@ module.exports = {
 
     if ((request.type === 'IntentRequest') && (attributes.state === 'LIST')
       && ((request.intent.name === 'DetailsIntent') ||
-         (attributes.isAuto && (request.intent.name === 'AMAZON.MoreIntent')))) {
+         (attributes.isAuto &&
+         ((request.intent.name === 'AMAZON.MoreIntent') || (request.intent.name === 'AMAZON.YesIntent'))))) {
       return true;
     }
 
@@ -73,6 +74,8 @@ function getSelectedIndex(handlerInput) {
     if (games.length === 2) {
       index = games[1];
     }
+  } else if (request.intent.name === 'AMAZON.YesIntent') {
+    index = attributes.lastResponse.read;
   } else {
     // Look for an intent slot
     if (request.intent.slots && request.intent.slots.RestaurantID

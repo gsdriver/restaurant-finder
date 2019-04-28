@@ -36,7 +36,6 @@ const Repeat = require('./intents/Repeat');
 const Help = require('./intents/Help');
 const Exit = require('./intents/Exit');
 const SessionEnd = require('./intents/SessionEnd');
-const Test = require('./intents/Test');
 const Unhandled = require('./intents/Unhandled');
 const utils = require('./utils');
 const ssmlCheck = require('ssml-check-core');
@@ -47,6 +46,18 @@ const requestInterceptor = {
     const attributesManager = handlerInput.attributesManager;
     const sessionAttributes = attributesManager.getSessionAttributes();
     const event = handlerInput.requestEnvelope;
+
+    if (process.env.FAKEAUTO) {
+      event.context.Geolocation = {
+        coordinate: {
+          latitudeInDegrees: '38.8977',
+          longitudeInDegrees: '-77.0365',
+        },
+      };
+
+      event.context.Automotive = {};
+      event.context.System.device.supportedInterfaces.Geolocation = {};
+    }
 
     if (Object.keys(sessionAttributes).length === 0) {
       // No session attributes - so get the persistent ones
@@ -144,7 +155,9 @@ function runSkill(event, context, callback) {
 
   // If this is a CanFulfill, handle this separately
   if (event.request && (event.request.type == 'CanFulfillIntentRequest')) {
-    callback(null, CanFulfill.check(event));
+    CanFulfill.check(event, (response) => {
+      callback(response);
+    });
     return;
   }
 
@@ -163,7 +176,6 @@ function runSkill(event, context, callback) {
       Next,
       Back,
       Help,
-      Test,
       Exit,
       SessionEnd,
       Unhandled

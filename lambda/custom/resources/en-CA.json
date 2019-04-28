@@ -8,6 +8,6 @@
     "v4": "in Victoria",
     "v6": "near me"
   },
-  "RESTAURANT_AUTO_DISTANCE": "{Name} is {Distance} kilometers away",
+  "RESTAURANT_AUTO_DISTANCE": "{Name} is {Distance} kilometers away <break time=\"200ms\"/> Would you like to hear about it?",
   "POSTAL_FORMAT": "ANA NAN"
 }

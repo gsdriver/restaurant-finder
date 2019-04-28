@@ -454,18 +454,6 @@
           ]
         },
         {
-          "name": "TestIntent",
-          "slots": [
-            {
-              "name": "Test",
-              "type": "AMAZON.NUMBER"
-            }
-          ],
-          "samples": [
-            "launch test number {Test}"
-          ]
-        },
-        {
           "name": "AMAZON.RepeatIntent",
           "samples": []
         },
@@ -519,6 +507,14 @@
         },
         {
           "name": "AMAZON.ScrollUpIntent",
+          "samples": []
+        },
+        {
+          "name": "AMAZON.YesIntent",
+          "samples": []
+        },
+        {
+          "name": "AMAZON.NoIntent",
           "samples": []
         }
       ],

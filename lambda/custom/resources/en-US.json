@@ -9,6 +9,6 @@
     "v5": "in Chicago",
     "v6": "near me"
   },
-  "RESTAURANT_AUTO_DISTANCE": "{Name} is {Distance} miles away",
+  "RESTAURANT_AUTO_DISTANCE": "{Name} is {Distance} miles away <break time=\"200ms\"/> Would you like to hear about it?",
   "POSTAL_FORMAT": "NNNNN"
 }

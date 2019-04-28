@@ -131,6 +131,7 @@ module.exports = {
     const attributes = handlerInput.attributesManager.getSessionAttributes();
     let speech;
     let reprompt;
+    const repromptParams = {};
     const restaurantList = attributes.lastResponse;
     const toRead = Math.min(restaurantList.restaurants.length - restaurantList.read,
       module.exports.pageSize(handlerInput));
@@ -148,12 +149,13 @@ module.exports = {
         template += '_AUTO';
         if (attributes.lastSearch.latitude && attributes.lastSearch.longitude) {
           template += '_DISTANCE';
-          params.Distance = module.exports.distanceBetweenPoints(
+          const distance = module.exports.distanceBetweenPoints(
             attributes.lastSearch.latitude,
             attributes.lastSearch.longitude,
             restaurantList.restaurants[restaurantList.read].latitude,
             restaurantList.restaurants[restaurantList.read].longitude,
             handlerInput.requestEnvelope.request.locale === 'en-US');
+          params.Distance = Math.round(distance * 10) / 10.0;
         }
       }
 
@@ -176,15 +178,20 @@ module.exports = {
         speech += '_MORE';
       }
 
-      reprompt = (attributes.isAuto) ? 'Jargon.defaultReprompt' : 'RESULTS_DETAILS';
-      if (restaurantList.restaurants.length - restaurantList.read >
-        module.exports.pageSize(handlerInput)) {
-        reprompt = (attributes.isAuto) ? 'READLIST_AUTO_MORE' : 'RESULTS_DETAILS_MORE';
+      if (attributes.isAuto) {
+        reprompt = 'READLIST_AUTO_MORE';
+        repromptParams.Restaurants = restaurantList.restaurants[restaurantList.read].name;
+      } else {
+        reprompt = 'RESULTS_DETAILS';
+        if (restaurantList.restaurants.length - restaurantList.read >
+          module.exports.pageSize(handlerInput)) {
+          reprompt = 'RESULTS_DETAILS_MORE';
+        }
       }
 
       return handlerInput.jrm.renderBatch([
         ri(speech, speechParams),
-        ri(reprompt),
+        ri(reprompt, repromptParams),
       ]).then((results) => {
         return {speech: results[0], reprompt: results[1]};
       });
@@ -364,11 +371,15 @@ function getSlotValue(slot) {
     slot.resolutions.resolutionsPerAuthority.forEach((auth) => {
       if (auth.values) {
         auth.values.forEach((value) => {
-          result = value.name;
+          if (value.value) {
+            result = value.value.name;
+          }
         });
       }
     });
-  } else {
+  }
+
+  if (!result) {
     result = slot.value;
   }
 
@@ -399,7 +410,7 @@ function paramsToText(handlerInput, noSSML) {
 
   return handlerInput.jrm.render(ri('PARAMS_RESTAURANTS'))
   .then((item) => {
-    retVal += item + ' ';
+    retVal += item;
     if (params.location) {
       return readLocation(handlerInput, noSSML)
       .then((location) => {
@@ -411,7 +422,9 @@ function paramsToText(handlerInput, noSSML) {
       return '';
     }
   }).then((location) => {
-    retVal += location;
+    if (location.length) {
+      retVal += (' ' + location);
+    }
     return retVal;
   });
 }

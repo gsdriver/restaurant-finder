@@ -23,6 +23,11 @@ module.exports = {
       return true;
     }
 
+    if ((request.type === 'IntentRequest') && (attributes.state === 'LIST')
+      && attributes.isAuto && (request.intent.name === 'AMAZON.NoIntent')) {
+      return true;
+    }
+
     return false;
   },
   handle: function(handlerInput) {

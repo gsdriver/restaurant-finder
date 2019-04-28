@@ -17,14 +17,14 @@
       "in_skill_products": [],
       "resources": {
         "manifest": {
-          "eTag": "f9a6180041866dab8d154a6daf291804"
+          "eTag": "36361af409a96ba230a9c301437198d3"
         },
         "interactionModel": {
           "en-CA": {
-            "eTag": "5a6f3f5b45b0c57a8087035cd1c521d4"
+            "eTag": "1326642f877c708428b16565aa6d3687"
           },
           "en-US": {
-            "eTag": "4652b656b964d44198dd28f0e7bab835"
+            "eTag": "365c8784babe1f478ae618fa0a64bafa"
           }
         },
         "lambda": [
@@ -37,7 +37,7 @@
             "codeUri": "lambda/custom",
             "functionName": "arn:aws:lambda:us-east-1:129065607926:function:RestaurantFinder_v3",
             "handler": "index.handler",
-            "revisionId": "6e1d816f-a751-49b9-8b17-b489e6fbb7bf",
+            "revisionId": "2c8491d5-174f-4f6a-ac69-ca85a7451ff1",
             "runtime": "nodejs8.10"
           }
         ]
