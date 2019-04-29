@@ -89,7 +89,8 @@ const saveResponseInterceptor = {
         } else {
           // Save the response and reprompt for repeat
           if (response.outputSpeech && response.outputSpeech.ssml) {
-            return ssmlCheck.verifyAndFix(response.outputSpeech.ssml, {platform: 'alexa'}, (result) => {
+            return ssmlCheck.verifyAndFix(response.outputSpeech.ssml, {platform: 'amazon'})
+            .then((result) => {
               if (result.errors) {
                 console.log(JSON.stringify(result.errors));
               }

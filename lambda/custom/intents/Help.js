@@ -22,10 +22,14 @@ module.exports = {
     switch (attributes.state) {
       case 'LIST':
         // Are there more restaurants?
-        speech = 'HELP_LIST';
-        if ((attributes.lastResponse.read + utils.pageSize(handlerInput)) <
-          attributes.lastResponse.restaurants.length) {
-          speech += '_MORE';
+        if (attributes.lastResponse) {
+          speech = 'HELP_LIST';
+          if ((attributes.lastResponse.read + utils.pageSize(handlerInput)) <
+            attributes.lastResponse.restaurants.length) {
+            speech += '_MORE';
+          }
+        } else {
+          speech = 'HELP_DEFAULT';
         }
         break;
       case 'RESULTS':

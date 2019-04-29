@@ -23,6 +23,13 @@ module.exports = {
     const attributes = handlerInput.attributesManager.getSessionAttributes();
     let promise;
 
+    // If this was a new session, then start by clearing the last search
+    if (handlerInput.requestEnvelope.session.new) {
+      attributes.state = undefined;
+      attributes.lastSearch = undefined;
+      attributes.lastResponse = undefined;
+    }
+
     // Build up our parameter structure from the intent
     const params = utils.buildYelpParameters(event.request.intent);
     let useDeviceLocation;
@@ -82,12 +89,8 @@ module.exports = {
     }
 
     if (useDeviceLocation) {
-      // First let's see if we can get lat/long
-      if (event.context && event.context.System && event.context.Geolocation &&
-        event.context.System.device &&
-        event.context.System.device.supportedInterfaces &&
-        event.context.System.device.supportedInterfaces.Geolocation) {
-        // Great, let's get it
+      if (event.context && event.context.Geolocation && event.context.Geolocation.coordinate) {
+        // We have a lat/long that we can use
         params.yelpParams.location = undefined;
         params.yelpParams.latitude = event.context.Geolocation.coordinate.latitudeInDegrees;
         params.yelpParams.longitude = event.context.Geolocation.coordinate.longitudeInDegrees;
@@ -96,25 +99,31 @@ module.exports = {
         params.searchParams.latitude = params.yelpParams.latitude;
         params.searchParams.longitude = params.yelpParams.longitude;
         promise = Promise.resolve(params);
+      } else if (event.context && event.context.System &&
+        event.context.System.device &&
+        event.context.System.device.supportedInterfaces &&
+        event.context.System.device.supportedInterfaces.Geolocation) {
+        // The device supports providing lat/long, so let's ask for it
+        attributes.lastSearch = params.searchParams;
+        attributes.lastYelpSearch = params.yelpParams;
+        return handlerInput.jrb
+          .speak(ri('FIND_GEOLOCATION'), true)
+          .withAskForPermissionsConsentCard(['alexa::devices:all:geolocation:read'])
+          .getResponse();
       } else {
-        // Nope - let's see if we can get postal code instead
+        // The device doesn't support geolocation, so let's use postal code instead
         promise = location.getDeviceLocation(handlerInput)
         .then((address) => {
-          if (address && address.postalCode) {
-            params.yelpParams.location = address.postalCode;
-            return params;
-          } else {
-            attributes.lastSearch = params.searchParams;
-            attributes.lastYelpSearch = params.yelpParams;
-            return handlerInput.jrb
-              .speak(ri('FIND_LOCATION'), true)
-              .withAskForPermissionsConsentCard(['read::alexa:device:all:address:country_and_postal_code'])
-              .getResponse();
-          }
+          params.yelpParams.location = address.postalCode;
+          return params;
         }).catch((err) => {
+          attributes.lastSearch = params.searchParams;
+          attributes.lastYelpSearch = params.yelpParams;
+
+          // OK, they don't have a geolocation
           return handlerInput.jrb
-            .speak(ri('SKILL_ERROR'))
-            .withShouldEndSession(true)
+            .speak(ri('FIND_LOCATION'), true)
+            .withAskForPermissionsConsentCard(['read::alexa:device:all:address:country_and_postal_code'])
             .getResponse();
         });
       }
@@ -135,13 +144,17 @@ module.exports = {
           attributes.lastResponse = restaurantList;
 
           // If this was an automotive lat/long search, filter
-          // to results within two miles and start reading the list
+          // to results within three miles and start reading the list
+          // Make sure there is at least one response, even if more than 3 miles away
           if (attributes.isAuto && params.yelpParams.latitude && params.yelpParams.longitude) {
             attributes.lastResponse.restaurants = restaurantList.restaurants.filter((item) => {
               return (utils.distanceBetweenPoints(params.yelpParams.latitude,
                 params.yelpParams.longitude,
-                item.latitude, item.longitude, true) <= 2.0);
+                item.latitude, item.longitude, true) <= 3.0);
             });
+            if (attributes.lastResponse.restaurants.length === 0) {
+              attributes.lastResponse.restaurants = restaurantList.restaurants.slice(0, 1);
+            }
             attributes.lastResponse.total = attributes.lastResponse.restaurants.length;
 
             if (!attributes.lastResponse || !attributes.lastResponse.restaurants

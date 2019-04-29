@@ -8,12 +8,12 @@ const ri = require('@jargon/alexa-skill-sdk').ri;
 
 module.exports = {
   canHandle: function(handlerInput) {
-    return handlerInput.requestEnvelope.session.new ||
-      (handlerInput.requestEnvelope.request.type === 'LaunchRequest');
+    return (handlerInput.requestEnvelope.request.type === 'LaunchRequest');
   },
   handle: function(handlerInput) {
     const attributes = handlerInput.attributesManager.getSessionAttributes();
 
+    attributes.state = undefined;
     attributes.lastSearch = undefined;
     attributes.lastResponse = undefined;
 

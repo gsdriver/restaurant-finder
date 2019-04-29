@@ -39,6 +39,7 @@
   "REPEAT_NONE": "I have nothing to repeat. What else can I help you with?",
   "GENERIC_REPROMPT": "What else can I help with?",
   "SPEECH_ERROR": "Sorry, something went wrong",
+  "FIND_GEOLOCATION": "Restaurant Finder would like to use your location. To turn on location sharing, please go to your Alexa app, and follow the instructions",
   "RESULTS_NORESULTS": "I'm sorry, I didn't find any {RestaurantText}. What else can I help you with?",
   "RESULTS_RESULTS": "I found {Total} {RestaurantText}. ",
   "RESULTS_REPROMPT": "Say read list to start reading the list",
