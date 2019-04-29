@@ -157,7 +157,7 @@ function runSkill(event, context, callback) {
   // If this is a CanFulfill, handle this separately
   if (event.request && (event.request.type == 'CanFulfillIntentRequest')) {
     CanFulfill.check(event, (response) => {
-      callback(response);
+      callback(null, response);
     });
     return;
   }
