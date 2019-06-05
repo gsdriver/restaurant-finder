@@ -17,7 +17,7 @@
           "smallIconUri": "https://s3.amazonaws.com/CAPS-SSE/echo_developer/1a33/a733e44b6808402090b03b5cf2112c9d/APP_ICON?versionId=J2Vq_fLELyjxh7.xgwKA4R2IaNNShrOw&X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Date=20190604T215836Z&X-Amz-SignedHeaders=host&X-Amz-Expires=86400&X-Amz-Credential=AKIAJFEYRBGIHK2BBYKA%2F20190604%2Fus-east-1%2Fs3%2Faws4_request&X-Amz-Signature=6fa18f18c5601c8bfb4cb751bdec5636f9c7729ae17ee8b9c102c5dc2598c1aa",
           "largeIconUri": "https://s3.amazonaws.com/CAPS-SSE/echo_developer/abfb/8d4a1c7761c64ac58485fad8bb614029/APP_ICON_LARGE?versionId=FgeAl6__ad6PwJV9FQhqgWe91kxCfLJa&X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Date=20190604T215836Z&X-Amz-SignedHeaders=host&X-Amz-Expires=86400&X-Amz-Credential=AKIAJFEYRBGIHK2BBYKA%2F20190604%2Fus-east-1%2Fs3%2Faws4_request&X-Amz-Signature=0cedd92b85e72ec976ca2813f906ae058e737d876d551c0da68fa40b78d69228",
           "name": "Restaurant Finder",
-          "description": "Find restaurants in a location based on the type of cuisine, or filter the restaurants by price or by Yelp rating. Restaurant details including the address and phone number read to you directly through your Alexa-enabled device with additional information displayed in the companion Alexa application.",
+          "description": "Find restaurants in a location based on the type of cuisine, or filter the restaurants by price or by Yelp rating. Restaurant details including the address and phone number read to you directly through your Alexa-enabled device with additional information displayed in the companion Alexa application."
         },
         "en-CA": {
           "summary": "Find restaurants in a location based on cuisine type, or filter by price or Yelp rating",
@@ -34,7 +34,7 @@
           "name": "Restaurant Finder",
           "smallIconUri": "https://s3.amazonaws.com/CAPS-SSE/echo_developer/1a33/a733e44b6808402090b03b5cf2112c9d/APP_ICON?versionId=J2Vq_fLELyjxh7.xgwKA4R2IaNNShrOw&X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Date=20190604T215836Z&X-Amz-SignedHeaders=host&X-Amz-Expires=86400&X-Amz-Credential=AKIAJFEYRBGIHK2BBYKA%2F20190604%2Fus-east-1%2Fs3%2Faws4_request&X-Amz-Signature=6fa18f18c5601c8bfb4cb751bdec5636f9c7729ae17ee8b9c102c5dc2598c1aa",
           "largeIconUri": "https://s3.amazonaws.com/CAPS-SSE/echo_developer/abfb/8d4a1c7761c64ac58485fad8bb614029/APP_ICON_LARGE?versionId=FgeAl6__ad6PwJV9FQhqgWe91kxCfLJa&X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Date=20190604T215836Z&X-Amz-SignedHeaders=host&X-Amz-Expires=86400&X-Amz-Credential=AKIAJFEYRBGIHK2BBYKA%2F20190604%2Fus-east-1%2Fs3%2Faws4_request&X-Amz-Signature=0cedd92b85e72ec976ca2813f906ae058e737d876d551c0da68fa40b78d69228",
-          "description": "Find restaurants in a location based on the type of cuisine, or filter the restaurants by price or by Yelp rating. Restaurant details including the address and phone number read to you directly through your Alexa-enabled device with additional information displayed in the companion Alexa application.",
+          "description": "Find restaurants in a location based on the type of cuisine, or filter the restaurants by price or by Yelp rating. Restaurant details including the address and phone number read to you directly through your Alexa-enabled device with additional information displayed in the companion Alexa application."
         }
       },
       "isAvailableWorldwide": true,

@@ -18,7 +18,8 @@
   "HELP_LIST_MORE": "Say repeat to hear this list again or say the number of the restaurant that you want more details about or say more to hear more restaurants.",
   "HELP_RESULTS": "Say read list to hear the list of restaurants.",
   "HELP_DETAILS": "You can say back to go back to the list of restaurants, or find restaurants to find more restaurants.",
-  "LAUNCH_WELCOME": "Welcome to Restaurant Finder. You can say Find {Qualifier} {Cuisine} restaurant {Cities}. How can I help you?",
+  "LAUNCH_WELCOME_GEO": "Welcome to Restaurant Finder. You can say Find {Qualifier} {Cuisine} restaurant near me. How can I help you?",
+  "LAUNCH_WELCOME": "Welcome to Restaurant Finder, you can find restaurants saying phrases like find {Qualifier} {Cuisine} restaurant {Cities}. Note that some features of this skill aren't available on a device without geo-location services. How can I help you?",
   "LAUNCH_CUISINE": {
     "v1": "Chinese",
     "v2": "Indian",
