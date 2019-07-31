@@ -1,0 +1,14 @@
+{
+  "FIND_LOCATION": "Please provide a location, or grant this skill permission in the Alexa app to use your current ZIP code.",
+  "HELP_DEFAULT": "You can find restaurants by cuisine such as Chinese <break time=\"200ms\"/> price range such as cheap <break time=\"200ms\"/> Yelp view such as good <break time=\"200ms\"/> or open to find restaurants that are currently open. <break time=\"200ms\"/> For example, you can say Find a cheap Chinese restaurant in Seattle",
+  "LAUNCH_CITIES": {
+    "v1": "in Austin",
+    "v2": "in Seattle",
+    "v3": "in New York",
+    "v4": "in San Francisco",
+    "v5": "in Chicago",
+    "v6": "near me"
+  },
+  "RESTAURANT_AUTO_DISTANCE": "{Name} is {Distance} miles away <break time=\"200ms\"/> Would you like to hear about it?",
+  "POSTAL_FORMAT": "NNNNN"
+}

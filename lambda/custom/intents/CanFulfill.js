@@ -14,7 +14,8 @@ module.exports = {
   check: function(event, callback) {
     const attributes = {};
     const noSlotIntents = ['AMAZON.FallbackIntent', 'AMAZON.HelpIntent',
-        'AMAZON.StopIntent', 'AMAZON.CancelIntent'];
+        'AMAZON.StopIntent', 'AMAZON.CancelIntent', 'AMAZON.YesIntent',
+        'AMAZON.NoIntent', 'AMAZON.RepeatIntent'];
 
     // Default to a negative response
     const response = {
@@ -68,9 +69,15 @@ module.exports = {
       if (!valid) {
         switch (event.request.intent.name) {
           case 'FindRestaurantIntent':
+          case 'FindRestaurantNearbyIntent':
             if (event.request.intent.slots) {
               const params = utils.buildYelpParameters(event.request.intent);
-              yelp.getRestaurantList(params, (error, restaurantList) => {
+              // Assume we can get a location if not provided
+              if (!params.yelpParams.location) {
+                params.yelpParams.location = 'Seattle';
+              }
+              yelp.getRestaurantList(params.yelpParams)
+              .then((restaurantList) => {
                 if (restaurantList) {
                   valid = true;
                 }

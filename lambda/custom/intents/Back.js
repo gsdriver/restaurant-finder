@@ -5,30 +5,45 @@
 'use strict';
 
 const utils = require('../utils');
+const ri = require('@jargon/alexa-skill-sdk').ri;
 
 module.exports = {
-  handleIntent: function() {
+  canHandle: function(handlerInput) {
+    const request = handlerInput.requestEnvelope.request;
+
+    return ((request.type === 'IntentRequest')
+      && ((request.intent.name === 'BackIntent') || (request.intent.name === 'AMAZON.PreviousIntent')));
+  },
+  handle: function(handlerInput) {
+    const attributes = handlerInput.attributesManager.getSessionAttributes();
+
     // If the last action was read list, go to the previous chunk
-    switch (this.handler.state) {
+    switch (attributes.state) {
       case 'LIST':
-        this.attributes.lastResponse.read -= utils.PAGE_SIZE;
-        if (this.attributes.lastResponse.read < 0) {
+        attributes.lastResponse.read -= utils.pageSize(handlerInput);
+        if (attributes.lastResponse.read < 0) {
           // If they were at the start of the list, just repeat it
-          this.attributes.lastResponse.read = 0;
+          attributes.lastResponse.read = 0;
         }
         break;
       case 'DETAILS':
         // Just go back to the list state
         break;
       default:
-        utils.emitResponse(this, null, this.t('BACK_NOBACK'));
-        return;
+        return handlerInput.jrb
+          .speak(ri('BACK_NOBACK'))
+          .reprompt(ri('Jargon.defaultReprompt'))
+          .getResponse();
     }
 
     // OK, let's read - store the starting location first since reading the list will change it
-    this.handler.state = 'LIST';
-    utils.readRestaurantsFromList(this, (speech, reprompt) => {
-      utils.emitResponse(this, null, null, speech, reprompt);
+    attributes.state = 'LIST';
+    return utils.readRestaurantsFromList(handlerInput)
+    .then((result) => {
+      return handlerInput.responseBuilder
+        .speak(result.speech)
+        .reprompt(result.reprompt)
+        .getResponse();
     });
   },
 };

@@ -4,33 +4,48 @@
 
 'use strict';
 
-const utils = require('../utils');
+const ri = require('@jargon/alexa-skill-sdk').ri;
 
 module.exports = {
-  handleIntent: function() {
-    let speech;
-    const reprompt = this.t('GENERIC_REPROMPT');
+  canHandle: function(handlerInput) {
+    const request = handlerInput.requestEnvelope.request;
+    const attributes = handlerInput.attributesManager.getSessionAttributes();
 
-    switch (this.handler.state) {
+    return ((request.type === 'IntentRequest') &&
+      ((request.intent.name === 'AMAZON.HelpIntent') ||
+      ((request.intent.name === 'AMAZON.FallbackIntent') && !attributes.state)));
+  },
+  handle: function(handlerInput) {
+    const attributes = handlerInput.attributesManager.getSessionAttributes();
+    let speech;
+
+    switch (attributes.state) {
       case 'LIST':
         // Are there more restaurants?
-        speech = this.t('HELP_LIST');
-        if ((this.attributes.lastResponse.read + utils.PAGE_SIZE) <
-          this.attributes.lastResponse.restaurants.length) {
-          speech += this.t('HELP_LIST_MORE');
+        if (attributes.lastResponse) {
+          speech = 'HELP_LIST';
+          if ((attributes.lastResponse.read + utils.pageSize(handlerInput)) <
+            attributes.lastResponse.restaurants.length) {
+            speech += '_MORE';
+          }
+        } else {
+          speech = 'HELP_DEFAULT';
         }
         break;
       case 'RESULTS':
-        speech = this.t('HELP_RESULTS');
+        speech = 'HELP_RESULTS';
         break;
       case 'DETAILS':
-        speech = this.t('HELP_DETAILS');
+        speech = 'HELP_DETAILS';
         break;
       default:
-        speech = this.t('HELP_DEFAULT');
+        speech = 'HELP_DEFAULT';
         break;
     }
 
-    utils.emitResponse(this, null, null, speech, reprompt);
+    return handlerInput.jrb
+      .speak(ri(speech))
+      .reprompt(ri('Jargon.defaultReprompt'))
+      .getResponse();
   },
 };

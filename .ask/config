@@ -8,13 +8,37 @@
           "apis": {
             "custom": {
               "endpoint": {
-                "uri": "arn:aws:lambda:us-east-1:129065607926:function:RestaurantFinder_v2"
+                "uri": "arn:aws:lambda:us-east-1:129065607926:function:RestaurantFinder_v3"
               }
             }
           }
         }
       },
-      "in_skill_products": []
+      "in_skill_products": [],
+      "resources": {
+        "manifest": {
+          "eTag": "36361af409a96ba230a9c301437198d3"
+        },
+        "interactionModel": {
+          "en-CA": {
+            "eTag": "1326642f877c708428b16565aa6d3687"
+          },
+          "en-US": {
+            "eTag": "365c8784babe1f478ae618fa0a64bafa"
+          }
+        },
+        "lambda": [
+          {
+            "arn": "arn:aws:lambda:us-east-1:129065607926:function:RestaurantFinder_v3",
+            "functionName": "arn:aws:lambda:us-east-1:129065607926:function:RestaurantFinder_v3",
+            "awsRegion": "us-east-1",
+            "alexaUsage": [
+              "custom/default"
+            ],
+            "revisionId": "827e1698-bd06-4d30-a1af-13b136dbb92c"
+          }
+        ]
+      }
     }
   }
 }

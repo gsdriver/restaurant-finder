@@ -1,13 +1,22 @@
-var mainApp = require('../lambda/custom/index');
+var mainApp = require('./index');
 
 const attributeFile = 'attributes.txt';
 
+const fs = require('fs');
 const AWS = require('aws-sdk');
+AWS.config.update({
+  accessKeyId: process.env.accessKeyId,
+  secretAccessKey: process.env.secretAccessKey,
+  region: 'us-east-1',
+});
+
 AWS.config.update({region: 'us-east-1'});
 const dynamodb = new AWS.DynamoDB({apiVersion: '2012-08-10'});
 
 const sessionId = "SessionId.c88ec34d-28b0-46f6-a4c7-120d8fba8fb4";
 const LOCALE = 'en-CA';
+const APPID = 'amzn1.ask.skill.4c848d38-347c-4e03-b908-42c6af6c207d';
+const APITOKEN = '';
 
 function BuildEvent(argv)
 {
@@ -16,18 +25,24 @@ function BuildEvent(argv)
                     "SecondDescriptor": {"name": "SecondDescriptor", "value": ""},
                     "ThirdDescriptor": {"name": "ThirdDescriptor", "value": ""},
                     "Location": {"name": "Location", "value": ""}}};
+    var findRestaurantNearby = {"name": "FindRestaurantNearbyIntent", "slots": {"FirstDescriptor": {"name": "FirstDescriptor", "value": ""},
+                    "SecondDescriptor": {"name": "SecondDescriptor", "value": ""},
+                    "ThirdDescriptor": {"name": "ThirdDescriptor", "value": ""}}};
     var readList = {"name": "ReadListIntent", "slots": {}};
     var backIntent = {"name": "AMAZON.PreviousIntent", "slots": {}};
     var restaurantDetails = {"name": "DetailsIntent", "slots": {"RestaurantID": {"name": "RestaurantID", "value": ""}}};
+    var test = {"name": "TestIntent", "slots": {"Test": {"name": "Test", "value": ""}}};
     var repeatIntent = {"name": "AMAZON.RepeatIntent", "slots": {}};
     var help = {"name": "AMAZON.HelpIntent", "slots": {}};
     var stop = {"name": "AMAZON.StopIntent", "slots": {}};
+    var yes = {"name": "AMAZON.YesIntent", "slots": {}};
+    var no = {"name": "AMAZON.NoIntent", "slots": {}};
 
     var lambda = {
       "session": {
         "sessionId": sessionId,
         "application": {
-          "applicationId": "amzn1.ask.skill.4c848d38-347c-4e03-b908-42c6af6c207d"
+          "applicationId": APPID
         },
         "attributes": {},
         "user": {
@@ -42,7 +57,7 @@ function BuildEvent(argv)
         "Display": {},
         "System": {
           "application": {
-            "applicationId": "amzn1.ask.skill.4c848d38-347c-4e03-b908-42c6af6c207d"
+            "applicationId": APPID
           },
           "user": {
             "userId": "not-amazon"
@@ -72,25 +87,100 @@ function BuildEvent(argv)
     };
 
     var openEvent = {
-       "session": {
-         "sessionId": "SessionId.c88ec34d-28b0-46f6-a4c7-120d8fba8fa7",
-         "application": {
-           "applicationId": "amzn1.ask.skill.4c848d38-347c-4e03-b908-42c6af6c207d"
+      "session": {
+        "sessionId": "SessionId.c88ec34d-28b0-46f6-a4c7-120d8fba8fa7",
+        "application": {
+          "applicationId": APPID
+        },
+        "user": {
+          "userId": "not-amazon",
+        },
+        "new": true
+      },
+      "request": {
+        "type": "LaunchRequest",
+        "requestId": "EdwRequestId.26405959-e350-4dc0-8980-14cdc9a4e921",
+        "locale": LOCALE,
+        "timestamp": "2016-11-03T21:31:08Z",
+        "intent": {}
+      },
+      "version": "1.0",
+       "context": {
+         "AudioPlayer": {
+           "playerActivity": "IDLE"
          },
-         "attributes": {},
-         "user": {
-           "userId": "amzn1.ask.account.AFLJ3RYNI3X6MQMX4KVH52CZKDSI6PMWCQWRBHSPJJPR2MKGDNJHW36XF2ET6I2BFUDRKH3SR2ACZ5VCRLXLGJFBTQGY4RNYZA763JED57USTK6F7IRYT6KR3XYO2ZTKK55OM6ID2WQXQKKXJCYMWXQ74YXREHVTQ3VUD5QHYBJTKHDDH5R4ALQAGIQKPFL52A3HQ377WNCCHYI"
+         "Display": {},
+         "System": {
+           "application": {
+             "applicationId": APPID
+           },
+           "user": {
+             "userId": "not-amazon",
+           },
+           "device": {
+             "deviceId": "not-amazon",
+             "supportedInterfaces": {
+               "AudioPlayer": {},
+               "Display": {
+                 "templateVersion": "1.0",
+                 "markupVersion": "1.0"
+               }
+             }
+           },
+           "apiEndpoint": "https://api.amazonalexa.com",
+           "apiAccessToken": APITOKEN,
+         }
+       },
+    };
+
+  const canFulfill = {
+     "session":{
+       "new": true,
+       "sessionId":"SessionId.12",
+       "application":{
+         "applicationId": APPID
+       },
+       "attributes":{
+         "key": "string value"
+       },
+       "user":{
+         "userId": "not-amazon",
+       }
+     },
+     "request":{
+       "type":"CanFulfillIntentRequest",
+       "requestId":"EdwRequestId.12",
+       "intent":{
+         "name":"FindRestaurantIntent",
+         "slots":{
+           "Ordinal":{
+             "name":"Ordinal",
+             "value":"2"
+           },
+         }
+       },
+       "locale":LOCALE,
+       "timestamp":"2017-10-03T22:02:29Z"
+     },
+     "context":{
+       "AudioPlayer":{
+         "playerActivity":"IDLE"
+       },
+       "System":{
+         "application":{
+           "applicationId": APPID
          },
-         "new": true
-       },
-       "request": {
-         "type": "LaunchRequest",
-         "requestId": "EdwRequestId.26405959-e350-4dc0-8980-14cdc9a4e921",
-         "locale": LOCALE,
-         "timestamp": "2016-11-03T21:31:08Z",
-         "intent": {}
-       },
-       "version": "1.0"
+         "user":{
+           "userId": "not-amazon",
+         },
+         "device":{
+           "supportedInterfaces":{
+
+           }
+         }
+       }
+     },
+     "version":"1.0"
     };
 
     // If there is no argument, then we'll just return
@@ -98,6 +188,18 @@ function BuildEvent(argv)
     {
         console.log("I need some parameters");
         return null;
+    }
+    else if (argv[2] == "seed") {
+        if (fs.existsSync("seed.txt")) {
+            data = fs.readFileSync("seed.txt", 'utf8');
+            if (data) {
+                return JSON.parse(data);
+            }
+        }
+    }
+    else if (argv[2] == "canfulfill")
+    {
+        return canFulfill;
     }
     else if (argv[2] == "find")
     {
@@ -123,6 +225,22 @@ function BuildEvent(argv)
             findRestaurant.slots.ThirdDescriptor.value = argv[6];
         }
     }
+    else if (argv[2] == "findnear")
+    {
+        lambda.request.intent = findRestaurantNearby;
+        if (argv.length > 3)
+        {
+            findRestaurantNearby.slots.FirstDescriptor.value = argv[3];
+        }
+        if (argv.length > 4)
+        {
+            findRestaurantNearby.slots.SecondDescriptor.value = argv[4];
+        }
+        if (argv.length > 5)
+        {
+            findRestaurantNearby.slots.ThirdDescriptor.value = argv[5];
+        }
+    }
     else if (argv[2] == "readlist")
     {
         lambda.request.intent = readList;
@@ -136,6 +254,11 @@ function BuildEvent(argv)
         lambda.request.intent = restaurantDetails;
         restaurantDetails.slots.RestaurantID.value = (argv.length > 3) ? argv[3] : 1;
     }
+    else if (argv[2] == "test")
+    {
+        lambda.request.intent = test;
+        test.slots.Test.value = (argv.length > 3) ? argv[3] : 1;
+    }
     else if (argv[2] == "repeat")
     {
         lambda.request.intent = repeatIntent;
@@ -148,9 +271,21 @@ function BuildEvent(argv)
     {
         lambda.request.intent = stop;
     }
+    else if (argv[2] == "yes")
+    {
+        lambda.request.intent = yes;
+    }
+    else if (argv[2] == "no")
+    {
+        lambda.request.intent = no;
+    }
     else if (argv[2] == "open")
     {
         // Return the launch request
+        if ((argv.length > 3) && (argv[3] === 'auto')) {
+          console.log('opening in auto mode');
+          openEvent.context.Automotive = {};
+        }
         return openEvent;
     }
     else
@@ -160,7 +295,6 @@ function BuildEvent(argv)
     }
 
     // If there is an attributes.txt file, read the attributes from there
-    const fs = require('fs');
     if (fs.existsSync(attributeFile)) {
       data = fs.readFileSync(attributeFile, 'utf8');
       if (data) {
@@ -172,50 +306,60 @@ function BuildEvent(argv)
     return lambda;
 }
 
+function ssmlToText(ssml) {
+  let text = ssml;
+
+  // Replace break with ...
+  text = text.replace(/<break[^>]+>/g, ' ... ');
+
+  // Remove all other angle brackets
+  text = text.replace(/<\/?[^>]+(>|$)/g, '');
+  text = text.replace(/\s+/g, ' ').trim();
+  return text;
+}
+
 // Simple response - just print out what I'm given
 function myResponse(appId) {
   this._appId = appId;
 }
 
-myResponse.succeed = function(result) {
-  if (!result.response || !result.response.outputSpeech) {
-    console.log(JSON.stringify(result));
-  } else {
-    if (result.response.outputSpeech) {
-      if (result.response.outputSpeech.ssml) {
-        console.log('AS SSML: ' + result.response.outputSpeech.ssml);
+function myResponse(err, result) {
+  // Write the last action
+  fs.writeFile('lastResponse.txt', JSON.stringify(result), (err) => {
+    if (err) {
+      console.log('ERROR; ' + err.stack);
+    } else if (result) {
+      if (result.sessionAttributes) {
+        // Output the attributes
+        fs.writeFile(attributeFile, JSON.stringify(result.sessionAttributes), (err) => {
+          if (err) {
+            console.log(err);
+          }
+        });
+        if (!process.env.NOLOG) {
+          console.log('"attributes": ' + JSON.stringify(result.sessionAttributes));
+        }
+      }
+      if (!result.response || !result.response.outputSpeech) {
+        console.log('RETURNED ' + JSON.stringify(result));
       } else {
-        console.log(result.response.outputSpeech.text);
+        if (result.response.outputSpeech.ssml) {
+          console.log('AS SSML: ' + result.response.outputSpeech.ssml);
+          console.log('AS TEXT: ' + ssmlToText(result.response.outputSpeech.ssml));
+        } else {
+          console.log(result.response.outputSpeech.text);
+        }
+        if (result.response.card && result.response.card.content) {
+          console.log('Card Content: ' + result.response.card.content);
+        }
+        console.log('The session ' + ((!result.response.shouldEndSession) ? 'stays open.' : 'closes.'));
       }
     }
-    if (result.response.card && result.response.card.content) {
-      console.log('Card Content: ' + result.response.card.content);
-    }
-    if (result.response.speechletResponse && result.response.speechletResponse.directives
-      && result.response.speechletResponse.directives.videoItem) {
-      console.log('Video ' + result.response.speechletResponse.directives.videoItem.source);
-    }
-    console.log('The session ' + ((!result.response.shouldEndSession) ? 'stays open.' : 'closes.'));
-    if (result.sessionAttributes) {
-      // Output the attributes too
-      const fs = require('fs');
-      fs.writeFile(attributeFile, JSON.stringify(result.sessionAttributes), (err) => {
-        if (!process.env.NOLOG) {
-          console.log('attributes:' + JSON.stringify(result.sessionAttributes) + ',');
-        }
-      });
-    }
-  }
-}
-
-myResponse.fail = function(e) {
-  console.log(e);
+  });
 }
 
 // Build the event object and call the app
 if ((process.argv.length == 3) && (process.argv[2] == 'clear')) {
-  const fs = require('fs');
-
   // Clear is a special case - delete this entry from the DB and delete the attributes.txt file
   dynamodb.deleteItem({TableName: 'RestaurantFinder', Key: { userId: {S: 'not-amazon'}}}, function (error, data) {
     console.log("Deleted " + error);
@@ -226,6 +370,6 @@ if ((process.argv.length == 3) && (process.argv[2] == 'clear')) {
 } else {
   var event = BuildEvent(process.argv);
   if (event) {
-      mainApp.handler(event, myResponse);
+      mainApp.handler(event, null, myResponse);
   }
 }

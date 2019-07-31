@@ -4,15 +4,33 @@
 
 'use strict';
 
-const utils = require('../utils');
+const ri = require('@jargon/alexa-skill-sdk').ri;
 
 module.exports = {
-  handleIntent: function() {
-    const speech = this.t('LAUNCH_WELCOME')
-      .replace('{0}', utils.pickRandomOption(this.t('LAUNCH_QUALIFIER')))
-      .replace('{1}', utils.pickRandomOption(this.t('LAUNCH_CUISINE')))
-      .replace('{2}', utils.pickRandomOption(this.t('LAUNCH_CITIES')));
-    utils.clearState(this);
-    utils.emitResponse(this, null, null, speech, this.t('LAUNCH_REPROMPT'));
+  canHandle: function(handlerInput) {
+    return (handlerInput.requestEnvelope.request.type === 'LaunchRequest');
+  },
+  handle: function(handlerInput) {
+    const attributes = handlerInput.attributesManager.getSessionAttributes();
+    const event = handlerInput.requestEnvelope;
+
+    attributes.state = undefined;
+    attributes.lastSearch = undefined;
+    attributes.lastResponse = undefined;
+
+    const welcomeFormat = (event.context && event.context.System &&
+        event.context.System.device &&
+        event.context.System.device.supportedInterfaces &&
+        event.context.System.device.supportedInterfaces.Geolocation)
+        ? 'LAUNCH_WELCOME_GEO' : 'LAUNCH_WELCOME';
+
+    return handlerInput.jrb
+      .speak(ri(welcomeFormat, {
+        Qualifier: ri('LAUNCH_QUALIFIER'),
+        Cuisine: ri('LAUNCH_CUISINE'),
+        Cities: ri('LAUNCH_CITIES'),
+      }))
+      .reprompt(ri('LAUNCH_REPROMPT'))
+      .getResponse();
   },
 };

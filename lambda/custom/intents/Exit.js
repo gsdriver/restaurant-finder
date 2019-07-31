@@ -4,11 +4,19 @@
 
 'use strict';
 
-const utils = require('../utils');
+const ri = require('@jargon/alexa-skill-sdk').ri;
 
 module.exports = {
-  handleIntent: function() {
-    const options = this.t('EXIT_GOODBYE').split('|');
-    utils.emitResponse(this, null, options[Math.floor(Math.random() * options.length)]);
+  canHandle(handlerInput) {
+    const request = handlerInput.requestEnvelope.request;
+
+    return ((request.type === 'IntentRequest') &&
+      ((request.intent.name === 'AMAZON.CancelIntent') || (request.intent.name === 'AMAZON.StopIntent')));
+  },
+  handle: function(handlerInput) {
+    return handlerInput.jrb
+      .speak(ri('EXIT_GOODBYE'))
+      .withShouldEndSession(true)
+      .getResponse();
   },
 };
