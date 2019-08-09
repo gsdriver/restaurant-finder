@@ -57,6 +57,14 @@ module.exports = {
           myResult.location.city =
             (restaurant.location.city && restaurant.location.city.length)
             ? cleanString(restaurant.location.city) : undefined;
+          myResult.location.country =
+            (restaurant.location.country && restaurant.location.country.length)
+            ? cleanString(restaurant.location.country) : undefined;
+          myResult.location.state =
+            (restaurant.location.state && restaurant.location.state.length)
+            ? cleanString(restaurant.location.state) : undefined;
+          myResult.location.zipCode =
+            (restaurant.location.zip_code) ? restaurant.location.zip_code : undefined;
           myResult.location.display_address = restaurant.location.display_address;
         }
 

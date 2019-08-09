@@ -8,7 +8,7 @@
           "apis": {
             "custom": {
               "endpoint": {
-                "uri": "arn:aws:lambda:us-east-1:129065607926:function:RestaurantFinder_v3"
+                "uri": "arn:aws:lambda:us-east-1:129065607926:function:RestaurantFinder_Test"
               }
             }
           }
@@ -17,25 +17,25 @@
       "in_skill_products": [],
       "resources": {
         "manifest": {
-          "eTag": "36361af409a96ba230a9c301437198d3"
+          "eTag": "180248d9c5f3e4077aaa6b1ed33ae4d4"
         },
         "interactionModel": {
           "en-CA": {
-            "eTag": "1326642f877c708428b16565aa6d3687"
+            "eTag": "fd26f06ba960871438f51d8e644bc952"
           },
           "en-US": {
-            "eTag": "365c8784babe1f478ae618fa0a64bafa"
+            "eTag": "b1cc5709b72a9b5dbe9cd03a533387c0"
           }
         },
         "lambda": [
           {
-            "arn": "arn:aws:lambda:us-east-1:129065607926:function:RestaurantFinder_v3",
-            "functionName": "arn:aws:lambda:us-east-1:129065607926:function:RestaurantFinder_v3",
+            "arn": "arn:aws:lambda:us-east-1:129065607926:function:RestaurantFinder_Test",
+            "functionName": "arn:aws:lambda:us-east-1:129065607926:function:RestaurantFinder_Test",
             "awsRegion": "us-east-1",
             "alexaUsage": [
               "custom/default"
             ],
-            "revisionId": "827e1698-bd06-4d30-a1af-13b136dbb92c"
+            "revisionId": "fa4831fe-a4fb-4648-90ea-0d40136e12d2"
           }
         ]
       }

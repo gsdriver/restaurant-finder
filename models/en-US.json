@@ -561,8 +561,26 @@
             "read {RestaurantID}",
             "hear about {RestaurantID}",
             "hear {RestaurantID}",
-            "{RestaurantID} details",
-            "{RestaurantID}"
+            "{RestaurantID} details"
+          ]
+        },
+        {
+          "name": "ReserveIntent",
+          "slots": [
+            {
+              "name": "PartySize",
+              "type": "AMAZON.NUMBER"
+            },
+            {
+              "name": "ReservationTime",
+              "type": "AMAZON.TIME"
+            }
+          ],
+          "samples": [
+            "make a reservation for {PartySize} people at {ReservationTime}",
+            "make a reservation",
+            "make a reservation at {ReservationTime}",
+            "make a reservation for {PartySize}"
           ]
         },
         {
@@ -1866,6 +1884,55 @@
           ]
         }
       ]
-    }
+    },
+    "dialog": {
+      "intents": [
+        {
+          "name": "ReserveIntent",
+          "confirmationRequired": false,
+          "prompts": {},
+          "slots": [
+            {
+              "name": "PartySize",
+              "type": "AMAZON.NUMBER",
+              "confirmationRequired": false,
+              "elicitationRequired": true,
+              "prompts": {
+                "elicitation": "Elicit.Intent-ReserveIntent.IntentSlot-PartySize"
+              }
+            },
+            {
+              "name": "ReservationTime",
+              "type": "AMAZON.TIME",
+              "confirmationRequired": false,
+              "elicitationRequired": true,
+              "prompts": {
+                "elicitation": "Elicit.Intent-ReserveIntent.IntentSlot-ReservationTime"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    "prompts": [
+      {
+        "id": "Elicit.Intent-ReserveIntent.IntentSlot-PartySize",
+        "variations": [
+          {
+            "type": "PlainText",
+            "value": "How many people are in the reservation?"
+          }
+        ]
+      },
+      {
+        "id": "Elicit.Intent-ReserveIntent.IntentSlot-ReservationTime",
+        "variations": [
+          {
+            "type": "PlainText",
+            "value": "What time would you like to make the reservation?"
+          }
+        ]
+      }
+    ]
   }
 }

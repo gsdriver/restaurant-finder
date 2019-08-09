@@ -38,6 +38,9 @@ module.exports = {
       case 'DETAILS':
         speech = 'HELP_DETAILS';
         break;
+      case 'RESERVE':
+        speech = 'HELP_RESERVE';
+        break;
       default:
         speech = 'HELP_DEFAULT';
         break;
