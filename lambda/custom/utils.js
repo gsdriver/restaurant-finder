@@ -216,7 +216,6 @@ module.exports = {
       const renderItems = [];
 
       // Read information about the restaurant
-      console.log(business);
       renderItems.push(ri('DETAILS_LOCATION', {
         Name: restaurant.name,
         Address: restaurant.location.address1,

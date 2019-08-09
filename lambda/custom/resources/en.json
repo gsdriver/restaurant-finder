@@ -93,6 +93,7 @@
   "DETAILS_CARD_DELIVER": "Offers delivery\n",
   "DETAILS_CARD_RESERVATION": "Offers reservations\n",
   "RESERVE_START": "Great! How many people are in your party?",
+  "RESERVE_SUCCESS": "Enjoy your meal! What else can I help you with?",
   "PARAMS_RESTAURANTS": "restaurants",
   "PARAMS_NEARME": "near you",
   "PARAMS_IN": "in {Location}",

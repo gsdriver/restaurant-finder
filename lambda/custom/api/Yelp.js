@@ -9,7 +9,7 @@ const querystring = require('querystring');
 
 module.exports = {
   getRestaurantList: function(params) {
-    let urlPath = '/v3/businesses/search?term=restaurants&limit=50&';
+    let urlPath = '/v3/businesses/search?term=restaurants&limit=25&';
     let field;
 
     // Actually rating is not a parameter, it's a filter - so strip that out of the URL query

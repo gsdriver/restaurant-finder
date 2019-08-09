@@ -580,7 +580,8 @@
             "make a reservation for {PartySize} people at {ReservationTime}",
             "make a reservation",
             "make a reservation at {ReservationTime}",
-            "make a reservation for {PartySize}"
+            "make a reservation for {PartySize}",
+            "{PartySize}"
           ]
         },
         {

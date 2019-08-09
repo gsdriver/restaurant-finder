@@ -37,6 +37,7 @@ const ReservationDetails = require('./intents/ReservationDetails');
 const Reserve = require('./intents/Reserve');
 const Help = require('./intents/Help');
 const Exit = require('./intents/Exit');
+const SessionResumed = require('./intents/SessionResumed');
 const SessionEnd = require('./intents/SessionEnd');
 const Unhandled = require('./intents/Unhandled');
 const utils = require('./utils');
@@ -178,6 +179,7 @@ function runSkill(event, context, callback) {
       Details,
       Next,
       Back,
+      SessionResumed,
       ReservationDetails,
       Reserve,
       Help,
