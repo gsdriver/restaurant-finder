@@ -29,13 +29,16 @@
         },
         "lambda": [
           {
-            "arn": "arn:aws:lambda:us-east-1:129065607926:function:RestaurantFinder_v4",
-            "functionName": "arn:aws:lambda:us-east-1:129065607926:function:RestaurantFinder_v4",
-            "awsRegion": "us-east-1",
             "alexaUsage": [
               "custom/default"
             ],
-            "revisionId": "af153bef-f02c-4e64-bf4a-f86a13d67050"
+            "arn": "arn:aws:lambda:us-east-1:129065607926:function:RestaurantFinder_v4",
+            "awsRegion": "us-east-1",
+            "codeUri": "lambda/custom",
+            "functionName": "arn:aws:lambda:us-east-1:129065607926:function:RestaurantFinder_v4",
+            "handler": "index.handler",
+            "revisionId": "609da3ae-6075-4c09-8e23-c68ab894cebc",
+            "runtime": "nodejs8.10"
           }
         ]
       }

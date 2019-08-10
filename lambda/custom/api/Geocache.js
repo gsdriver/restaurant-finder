@@ -41,33 +41,6 @@ module.exports = {
       return;
     });
   },
-  getTimeZoneFromLatLong: function(lat, long, date) {
-    // If you don't have a key, return undefined
-    if (!process.env.GEOCACHEKEY) {
-      console.log('Set a key for this API');
-      return Promise.resolve();
-    }
-
-    const params = {
-      location: lat + ',' + long,
-      timestamp: (Math.round((date.getTime())/1000)).toString(),
-      key: process.env.GEOCACHEKEY,
-    };
-    const urlPath = '/maps/api/timezone/json?' + querystring.stringify(params);
-    console.log(urlPath);
-    return sendRequest(urlPath)
-    .then((result) => {
-      console.log(result);
-      if (result.data && result.data.timeZoneId) {
-        return result.data.timeZoneId;
-      }
-
-      return '';
-    }).catch((error) => {
-      console.log('getTimeZoneFromLatLong error ' + error);
-      return;
-    });
-  },
 };
 
 function sendRequest(path) {

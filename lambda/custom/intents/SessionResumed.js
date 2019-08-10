@@ -21,6 +21,11 @@ module.exports = {
         .speak(ri('RESERVE_SUCCESS'))
         .reprompt(ri('Jargon.defaultReprompt'))
         .getResponse();
+    } else if (statusCode == '204') {
+      return handlerInput.jrb
+        .speak(ri('RESERVE_DECLINED'))
+        .reprompt(ri('Jargon.defaultReprompt'))
+        .getResponse();
     } else {
       return handlerInput.jrb
         .speak(ri('Jargon.defaultReprompt'))

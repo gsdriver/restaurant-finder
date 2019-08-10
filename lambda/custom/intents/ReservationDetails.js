@@ -4,6 +4,7 @@
 
 'use strict';
 
+const moment = require('moment-timezone');
 const ri = require('@jargon/alexa-skill-sdk').ri;
 const geocache = require('../api/Geocache');
 
@@ -14,7 +15,7 @@ module.exports = {
     return ((request.type === 'IntentRequest')
       && (request.intent.name === 'ReserveIntent'));
   },
-  handle: function(handlerInput) {
+  handle: async function(handlerInput) {
     const event = handlerInput.requestEnvelope;
     const attributes = handlerInput.attributesManager.getSessionAttributes();
     const slots = event.request.intent.slots;
@@ -46,6 +47,7 @@ module.exports = {
         }
       }
 
+      const timezone = await getUserTimezone(handlerInput);
       const date = new Date();
       date.setHours(time[0]);
       if (time.length > 1) {
@@ -57,15 +59,18 @@ module.exports = {
         date.setDate(date.getDate() + 1);
       }
 
+      // Finally, format with timezone offset
+      const dateStr = moment(date).format('YYYY-MM-DDTHH:mm:00.000') + moment(date).tz(timezone).format('Z');
+
       // OK, let's make the reservation
       let partySize = parseInt(slots.PartySize.value, 10);
       if (isNaN(partySize)) {
         partySize = 2;
       }
       const restaurant = attributes.lastResponse.restaurants[attributes.lastResponse.details];
-      let dateStr = date.toISOString();
-      dateStr = dateStr.substr(0, dateStr.length - 5);
-      dateStr += 'Z';
+//      let dateStr = date.toISOString();
+//      dateStr = dateStr.substr(0, dateStr.length - 5);
+//      dateStr += 'Z';
       const reservationDirective = {
         'type': 'Connections.StartConnection',
         'uri': 'connection://AMAZON.ScheduleFoodEstablishmentReservation/1',
@@ -91,14 +96,31 @@ module.exports = {
         },
       };
 
-      return geocache.getTimeZoneFromLatLong(restaurant.latitude, restaurant.longitude, date).then((tz) => {
-        // Done with search - now let's start the filtering
-        console.log(JSON.stringify(reservationDirective));
-        console.log(tz);
-        return handlerInput.responseBuilder
-          .addDirective(reservationDirective)
-          .getResponse();
-      });
+      // Done with search - now let's start the filtering
+      console.log(JSON.stringify(reservationDirective));
+      return handlerInput.responseBuilder
+        .addDirective(reservationDirective)
+        .getResponse();
     }
   },
 };
+
+function getUserTimezone(handlerInput) {
+  const event = handlerInput.requestEnvelope;
+  const usc = handlerInput.serviceClientFactory.getUpsServiceClient();
+  const attributes = handlerInput.attributesManager.getSessionAttributes();
+
+  if (attributes.temp.timezone) {
+    return Promise.resolve(attributes.temp.timezone);
+  }
+
+  return usc.getSystemTimeZone(event.context.System.device.deviceId)
+  .then((timezone) => {
+    attributes.temp.timezone = timezone;
+    return timezone;
+  })
+  .catch((error) => {
+    attributes.temp.timezone = 'America/Los_Angeles';
+    return attributes.temp.timezone;
+  });
+}
