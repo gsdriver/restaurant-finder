@@ -12,8 +12,13 @@ module.exports = {
     const request = handlerInput.requestEnvelope.request;
     const attributes = handlerInput.attributesManager.getSessionAttributes();
 
+    // Note that if the user just says a number, it may come through
+    // as the PartySize slot of ReserveIntent, so let's handle that too if they
+    // are the in the process of reading a list...
     if ((request.type === 'IntentRequest') && (attributes.state === 'LIST')
       && ((request.intent.name === 'DetailsIntent') ||
+          ((request.intent.name === 'ReserveIntent') && request.intent.slots
+            && request.intent.slots.PartySize && request.intent.slots.PartySize.value) ||
          (attributes.isAuto &&
          ((request.intent.name === 'AMAZON.MoreIntent') || (request.intent.name === 'AMAZON.YesIntent'))))) {
       return true;
@@ -80,8 +85,13 @@ function getSelectedIndex(handlerInput) {
     // Look for an intent slot
     if (request.intent.slots && request.intent.slots.RestaurantID
       && request.intent.slots.RestaurantID.value) {
-      index = parseInt(request.intent.slots.RestaurantID.value);
+      index = parseInt(request.intent.slots.RestaurantID.value, 10);
+    } else if (request.intent.slots && request.intent.slots.PartySize
+      && request.intent.slots.PartySize.value) {
+      index = parseInt(request.intent.slots.PartySize.value, 10);
+    }
 
+    if (index !== undefined) {
       if (isNaN(index)) {
         index = undefined;
       } else {

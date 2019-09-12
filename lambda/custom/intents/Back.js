@@ -27,6 +27,7 @@ module.exports = {
         }
         break;
       case 'DETAILS':
+      case 'RESERVE':
         // Just go back to the list state
         break;
       default:

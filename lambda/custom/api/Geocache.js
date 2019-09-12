@@ -27,7 +27,6 @@ module.exports = {
 
       if (result.results && result.results[0] && result.results[0].address_components) {
         const components = result.results[0].address_components;
-
         components.forEach((component) => {
           if (component.types && (component.types.indexOf('locality') > -1)) {
             // This is the one we want

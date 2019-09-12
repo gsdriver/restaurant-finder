@@ -207,6 +207,7 @@ module.exports = {
     let cardText = '';
     let imageUrl;
     let business;
+    let reservation;
 
     return yelp.businessLookup(restaurant.id)
     .then((result) => {
@@ -232,7 +233,15 @@ module.exports = {
         }
       }
 
-      renderItems.push(ri('DETAILS_SEECARD'));
+      if (business.transactions) {
+        if (business.transactions.indexOf('restaurant_reservation') > -1) {
+          renderItems.push(ri('DETAILS_RESERVATION'));
+          reservation = true;
+        }
+      } else {
+        renderItems.push(ri('DETAILS_SEECARD'));
+      }
+
       return handlerInput.jrm.renderBatch(renderItems);
     }).then((items) => {
       const renderItems = [];
@@ -289,7 +298,7 @@ module.exports = {
         cardText += item;
       });
 
-      return {speech: speech, cardText: cardText, imageUrl: imageUrl};
+      return {speech: speech, cardText: cardText, imageUrl: imageUrl, reservation: reservation};
     });
   },
   showDetails: function(handlerInput, index) {
@@ -304,10 +313,12 @@ module.exports = {
       speech = result.speech + ' <break time=\"200ms\"/> ';
       cardText = result.cardText;
       imageUrl = result.imageUrl;
+      attributes.state = (result.reservation) ? 'RESERVE' : 'DETAILS';
       return handlerInput.jrm.render(ri('Jargon.defaultReprompt'));
     }).then((reprompt) => {
-      speech += reprompt;
-      attributes.state = 'DETAILS';
+      if (attributes.state !== 'RESERVE') {
+        speech += reprompt;
+      }
       return handlerInput.responseBuilder
         .speak(speech)
         .reprompt(reprompt)

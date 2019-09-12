@@ -9,7 +9,7 @@ const querystring = require('querystring');
 
 module.exports = {
   getRestaurantList: function(params) {
-    let urlPath = '/v3/businesses/search?term=restaurants&limit=50&';
+    let urlPath = '/v3/businesses/search?term=restaurants&limit=25&';
     let field;
 
     // Actually rating is not a parameter, it's a filter - so strip that out of the URL query
@@ -57,6 +57,14 @@ module.exports = {
           myResult.location.city =
             (restaurant.location.city && restaurant.location.city.length)
             ? cleanString(restaurant.location.city) : undefined;
+          myResult.location.country =
+            (restaurant.location.country && restaurant.location.country.length)
+            ? cleanString(restaurant.location.country) : undefined;
+          myResult.location.state =
+            (restaurant.location.state && restaurant.location.state.length)
+            ? cleanString(restaurant.location.state) : undefined;
+          myResult.location.zipCode =
+            (restaurant.location.zip_code) ? restaurant.location.zip_code : undefined;
           myResult.location.display_address = restaurant.location.display_address;
         }
 
