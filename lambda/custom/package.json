@@ -11,7 +11,7 @@
     "ask-sdk": "^2.5.1",
     "aws-sdk": "^2.438.0",
     "dashbot": "^9.5.0",
-    "moment-timezone": "^0.5.26",
+    "moment-timezone": "^0.5.35",
     "ssml-check-core": "^0.2.0"
   },
   "scripts": {
